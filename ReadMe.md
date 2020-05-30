@@ -1,3 +1,3 @@
 # Mathcat
 
-[mathcat-yoneda](../mathcat-yoneda)
+[mathcat-yoneda](mathcat-yoneda)
