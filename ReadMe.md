@@ -1,5 +1,7 @@
 # Mathcat
 
+## Multi Platform Functional Programming
+
  - [mathcat-core](https://github.com/evoleq/mathcat-core)
  - [mathcat-lens](https://github.com/evoleq/mathcat-lens)
  - [mathcat-morphism](https://github.com/evoleq/mathcat-morphism)
