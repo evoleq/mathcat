@@ -111,7 +111,7 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 - Keyed `updateAll`, `upsertAll`, no-match behavior, duplicate rejection, ordering.
 - Solyton-style Lens-lifted Writer with response conversion through `contraMap`.
 
-**Compilation and execution:** CI is configured to run `:mathcat-core:jvmTest`, `:mathcat-core:jsNodeTest` and the two existing type-algebra targets. Passing status must be confirmed from GitHub Actions, not assumed.
+**Compilation and execution:** [GitHub Actions run #44265321148](https://github.com/evoleq/mathcat/actions/runs/44265321148) completed **successfully**, running `:mathcat-core:jvmTest`, `:mathcat-core:jsNodeTest` and both existing type-algebra targets. This validates the tested JVM/JS implementations; it does not constitute formal proof of all laws or compatibility with more platforms.
 
 ## Explicit exclusions and follow-up
 
@@ -129,4 +129,4 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 | 2026-11-18 | Dedicated `mathcat-core` module using nominal Reader/Writer | Draft implementation |
 | 2026-11-18 | Selection and Lens laws separated; FilterBy represented honestly | Draft implementation + tests |
 | 2026-11-18 | Pure State and keyed list Writer examples added | Draft implementation + tests |
-| 2026-11-18 | CI expanded for two modules × two platforms | Validation pending |
+| 2026-11-18 | CI expanded for two modules × two platforms | [Run #44265321148: SUCCESS](https://github.com/evoleq/mathcat/actions/runs/44265321148) |
