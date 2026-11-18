@@ -24,3 +24,13 @@ fun <T> Source<T>.read(): T = emit()
 
 /** Evaluate sources in list order, once each. */
 fun <T> List<Source<T>>.emit(): List<T> = map { it.emit() }
+
+/**
+ * Pair two Sources without evaluating either one yet.
+ *
+ * This is the binary product of zero-input readers:
+ * (sourceA x sourceB).emit() = (sourceA.emit(), sourceB.emit()).
+ * Evaluation order is left-to-right.
+ */
+infix fun <A, B> Source<A>.x(other: Source<B>): Source<Pair<A, B>> =
+    Source { emit() to other.emit() }
