@@ -10,6 +10,8 @@ The experimental [`mathcat-core`](mathcat-core) module introduces small, nominal
 
 The central composition patterns are `Lens * Lens`, `Lens * Selection`, `Lens * Reader`, `Lens * Writer`, and `Writer.contraMap`. Keyed collection Writers `updateAllBy` and `upsertAllBy` illustrate the same production-proven idea from Solyton's frontend Actions without copying the old library's ambiguous duplicate-handling semantics.
 
+The **mathematical origins are part of the API design**: [Mathematical foundations](docs/MATHEMATICAL-FOUNDATIONS.md) explains function composition, Writer contravariance, Lens/Selection laws, State's monad multiplication and Kleisli arrows. In particular, the capitalized top-level `Update` constructor produces a `KlState` that changes state while preserving the carried value.
+
 See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
 
 ## MathCat 2.0 (research prototype)
