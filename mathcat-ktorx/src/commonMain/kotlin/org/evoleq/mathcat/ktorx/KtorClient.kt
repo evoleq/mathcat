@@ -4,7 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
-import io.ktor.client.request.contentType
+import io.ktor.http.HttpHeaders
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
@@ -66,6 +66,6 @@ suspend fun <S : Any, T : Any> HttpClient.sendEndpoint(
     pathParameters = pathParameters,
     json = json
 ) {
-    contentType(ContentType.Application.Json)
+    headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     setBody(json.encodeToString(requestSerializer, payload))
 }
