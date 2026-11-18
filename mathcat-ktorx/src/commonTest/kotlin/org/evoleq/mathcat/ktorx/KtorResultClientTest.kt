@@ -32,8 +32,8 @@ class KtorResultClientTest {
             assertEquals(HttpMethod.Get, req.method)
             assertEquals("/users/42", req.url.encodedPath)
             respond(serialized, headers = headersOf(
-                HttpHeaders.ContentType, "application/json",
-                CONTEXT_HEADER, "workspace-7"
+                HttpHeaders.ContentType to listOf("application/json"),
+                CONTEXT_HEADER to listOf("workspace-7")
             ))
         })
         try {
