@@ -4,6 +4,10 @@
 
 MathCat is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
 
+## Source and Storage (new stacked draft)
+
+The familiar Evoleq `Source<T> = Reader<Unit,T>`, `Source { ... }`, `emit()` and `Dispatcher<A> = Writer<Unit,A>` return in the core. An independent [`mathcat-storage`](mathcat-storage) KMP module provides synchronous `Storage<S>` and compositional `Storage * Lens → Storage`, `Storage * Reader → Source`, and `Storage * Writer → Dispatcher`. See [Storage architecture and limitations](docs/STORAGE-ARCHITECTURE.md). The module is experimental and does **not** claim atomic updates, concurrency guarantees or `suspend` execution.
+
 ## MathCat Core (new draft module)
 
 The experimental [`mathcat-core`](mathcat-core) module introduces small, nominal, lambda-friendly `Reader` and `Writer` types; **lawful** `Lens` contracts; composable but **not necessarily lawful** `Selection`; and a pure, non-`suspend` State monad.
