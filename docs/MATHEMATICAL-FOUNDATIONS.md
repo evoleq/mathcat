@@ -95,7 +95,7 @@ The laws are **contracts**; the Kotlin constructor cannot prove them. We only ca
 
 ### Why Selection is useful
 
-For `filterBy(even)`:
+For `FilterBy(even)`:
 
 ```text
 get([1,2,3])            = [2]
@@ -165,10 +165,10 @@ This is a functor in `A`. MathCat's names deliberately expose the **unit** and *
 Corresponding code:
 
 ```kotlin
-State.Return<S,A>(a)
+Return<S,A>(a)
 ```
 
-`Return` acts on the **type constructor's structure**, not on an already existing state value. The Kotlin companion is a practical home for this operation until higher-kinded type abstractions are available.
+`Return` acts on the **type constructor's structure**, not on an already existing state value. Kotlin exposes this operation through a standalone `Return` constructor. Its category-theoretic home is the **unit of the State monad**, not a method of an existing State value. We deliberately avoid requiring a companion qualifier at call sites.
 
 ### Multiplication: `multiply`
 
@@ -212,7 +212,7 @@ Update(u)(a)(s) = (a, u(s))
 
 ```kotlin
 val increment: KlState<Int, String, String> = Update { it + 1 }
-val initial = State.Return<Int, String>("request-id")
+val initial = Return<Int, String>("request-id")
 val result = (initial * increment)(10)
 // result == ("request-id" to 11)
 ```
@@ -262,13 +262,39 @@ Functor composition is automatic given suitable functors; Monad composition is *
 | Precomposition, contravariance | `Writer.contraMap` | API payload → domain writer command |
 | Store coalgebra laws | `Lens.get`, `Lens.set` | Lawful focusing and rebuilding |
 | Read/write without lens laws | `Selection` | Filtering and application-specific selections |
-| Monad unit `η` | `State.Return` | Introduce a value without changing state |
+| Monad unit `η` | `Return` | Introduce a value without changing state |
 | Monad multiplication `μ` | `State.multiply` | Flatten nested state computations |
 | Kleisli extension | `State.bind` | Chain computations with state threading |
 | Kleisli arrow | `KlState` | Input value + stateful computation |
 | Value-preserving Kleisli constructor | `Update` | Change state without discarding the incoming value |
 | Functor / kind operators | `mathcat-type-algebra` experiment | Explicit research, not native Kotlin HKT |
 
-**Vocabulary policy:** Keep the author's standalone capitalized `Update` as a Kleisli constructor (not `State.update`), along with `Return`, `multiply`, `map`, `bind`, `get`, `KlState`, `Reader`, `Writer`. Do not create redundant `pure`/`flatMap`/`modify` public aliases. Mathematical symbols live in explanations and equations; Kotlin code keeps a conflict-aware vocabulary.
+**Vocabulary policy:** Preserve the author's standalone capitalized constructors `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`, alongside lowercase operations `multiply`, `map`, `bind`, `get`, `set`, `contraMap`. Do not add redundant `pure`/`flatMap`/`modify` public aliases. The Kotlin API should stay short and readable while its laws and mathematical origins remain explicit. Mathematical symbols live in explanations and equations; Kotlin code keeps a conflict-aware vocabulary.
 
 **Boundaries:** No `suspend` in the pure core; IO, Storage, atomicity and cancellation are separately designed effect concerns. All laws mean extensional behavior under the stated pure-function assumptions, not object identity or a statement about arbitrary observable side effects.
+
+## 7. Constructor vocabulary and Kotlin's alias mechanism
+
+The mathematical names should survive unchanged at the call site; developer ergonomics is a **design constraint**:
+
+```kotlin
+val lift: KlState<Int, String, String> = Update { it + 1 }
+val computation = Return<Int, String>("request-id") * lift
+
+val identity = IdReader<String>()
+val selected = FilterBy<Int> { it % 2 == 0 }
+val appended = Append<Int>()
+```
+
+These are **ordinary Kotlin constructs**, not a claim that Kotlin supports native HKTs. Standalone factories use a capitalized name when creating an algebraic object; operations that act on values (`map`, `multiply`, `bind`, `get`, `set`) stay lowercase. Receiver-based convenience like `lens.upsertAllBy(key)` is also lowercase by design.
+
+When different future monads supply a `Return`, the constructors should live in **their corresponding packages**. A caller can use Kotlin import aliases:
+
+```kotlin
+import org.evoleq.mathcat.core.Return as StateReturn
+// illustrative only; a result monad is not implemented yet:
+// import org.evoleq.mathcat.result.Return as ResultReturn
+```
+
+The alias changes the local name, **not** the mathematical meaning. It cannot solve an actual package-level signature collision; Kotlin also does not overload a function by return type alone. The project should prefer clear package boundaries and import aliases over renaming `Return` to unrelated words.
+
