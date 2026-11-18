@@ -51,6 +51,12 @@ For the JS tests, Kotlin/Gradle downloads the required Node.js environment when 
 
 **Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **CI builds and tests only; it does not publish**. JitPack versus Maven Central and the final license remain open decisions.
 
+## Composable HTTP API declarations
+
+The [`mathcat-api`](mathcat-api) module introduces typed endpoint handles, independently constructed `Api` fragments, logical `group` metadata, path-prefix `module` composition and deterministic conflict detection. Assembled APIs preserve the original module ID and resolve typed declarations without unsafe casts. This is HTTP-aware but **independent of Ktor and every other application framework**.
+
+Its first nine tests live in `commonTest`; platform CI is configured separately. The **planned** `mathcat-ktorx` module will be responsible for Ktor Routes, `Receive`, `Respond` and per-request `Base(call, environment)`. Nothing in this first slice changes Ktor or Solyton. See [the module's usage and contract documentation](mathcat-api/README.md).
+
 ## Earlier MathCat experiments
 
 The earlier MathCat libraries remain separate and are **not** implied dependencies of the new module. They are useful historical references; their API quality and contracts are being reassessed before any potential migration.
