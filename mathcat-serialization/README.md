@@ -49,3 +49,7 @@ val appSerializers = Serializers {
 - Each independent Gradle module can generate its own registry and contribute it to a composition root; no automatic whole-application scan.
 - The KSP processor uses KSP2 `2.3.12`, whose current compatibility range covers Kotlin `2.3.20`. It is in a separate JVM build module in the **MathCat repository**; this does not reuse `fp-axioms` runtime or force an extra Gradle convenience plugin.
 - Result wire compatibility, `ResultSerializer`, Ktor Client/Server and multi-target KSP consumer integration are **separate follow-up slices**. No Solyton migration is implied. Publication via JitPack requires separate consumer/CI verification before a tag/release.
+
+## Typed Result wire format
+
+ResultSerializer(payloadSerializer) serializes and deserializes the existing Solyton JSON fields type/classType/data/message. A compile-time typed payload serializer replaces the unsafe global lookup by class simpleName. JSON golden tests preserve the old Success and Failure format; ListSerializer supports generic payloads. The numeric HTTP status remains separate transport metadata handled by Ktor. The Ktor-free mathcat-result module provides the familiar Result algebra and independently composed ExceptionTransforms for domain-specific status and error messages. No Ktor or app changes are made here.

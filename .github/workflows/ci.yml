@@ -35,7 +35,9 @@ jobs:
             :mathcat-actions:wasmJsNodeTest :mathcat-actions:linuxX64Test \
             :mathcat-serialization:jvmTest :mathcat-serialization:jsNodeTest \
             :mathcat-serialization:wasmJsNodeTest :mathcat-serialization:linuxX64Test \
-            :mathcat-serialization-ksp-fixture:test
+            :mathcat-serialization-ksp-fixture:test \
+            :mathcat-result:jvmTest :mathcat-result:jsNodeTest \
+            :mathcat-result:wasmJsNodeTest :mathcat-result:linuxX64Test
 
   android:
     name: Android library compilation
@@ -56,7 +58,7 @@ jobs:
         with:
           gradle-version: '9.2.1'
       - name: Compile Android KMP targets
-        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-serialization:compileAndroidMain
+        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-serialization:compileAndroidMain :mathcat-result:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
@@ -82,7 +84,9 @@ jobs:
             :mathcat-actions:compileKotlinIosArm64 :mathcat-actions:compileKotlinIosSimulatorArm64 \
             :mathcat-actions:macosX64Test \
             :mathcat-serialization:compileKotlinIosArm64 :mathcat-serialization:compileKotlinIosSimulatorArm64 \
-            :mathcat-serialization:macosX64Test
+            :mathcat-serialization:macosX64Test \
+            :mathcat-result:compileKotlinIosArm64 :mathcat-result:compileKotlinIosSimulatorArm64 \
+            :mathcat-result:macosX64Test
 
   windows:
     name: Windows Native
@@ -98,4 +102,4 @@ jobs:
           gradle-version: '9.2.1'
       - name: Test mingwX64
         shell: pwsh
-        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-serialization:mingwX64Test
+        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-serialization:mingwX64Test :mathcat-result:mingwX64Test

@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     id("com.android.kotlin.multiplatform.library")
 }
 
@@ -24,6 +25,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
+            api(project(":mathcat-result"))
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
