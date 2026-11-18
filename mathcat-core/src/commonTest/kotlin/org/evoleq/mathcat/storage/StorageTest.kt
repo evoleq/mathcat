@@ -30,7 +30,7 @@ class StorageTest {
     @Test
     fun memoryIsAnImplementationOfStorageWithLiveSource() {
         val memory: Storage<Int> = Memory(1)
-        val reading = memory.source
+        val reading = memory.source()
 
         assertEquals(1, reading.emit())
         memory.write(2)
@@ -45,11 +45,38 @@ class StorageTest {
             source = org.evoleq.mathcat.core.reader.Source { raw },
             write = { raw = it }
         )
-        val source = storage.source
+        val source = storage.source()
 
         assertEquals(5, source.emit())
         storage.write(9)
         assertEquals(9, source.emit())
+    }
+
+    @Test
+    fun oneStorageMayCombineSeveralIndependentMemories() {
+        data class View(val visible: Int, val background: String)
+
+        val visibleMemory = Memory(1)
+        val backgroundMemory = Memory("idle")
+
+        val combined: Storage<View> = Storage(
+            read = { View(visibleMemory.read(), backgroundMemory.read()) },
+            write = { view ->
+                // Route independent changes to independent backends.
+                if (visibleMemory.read() != view.visible) visibleMemory.write(view.visible)
+                if (backgroundMemory.read() != view.background) backgroundMemory.write(view.background)
+            }
+        )
+
+        assertEquals(View(1, "idle"), combined.read())
+        combined.write(View(2, "working"))
+        assertEquals(2, visibleMemory.read())
+        assertEquals("working", backgroundMemory.read())
+        assertEquals(View(2, "working"), combined.source().emit())
+
+        // Both memories remain independently writable.
+        backgroundMemory.write("finished")
+        assertEquals(View(2, "finished"), combined.read())
     }
 
     @Test
@@ -71,7 +98,7 @@ class StorageTest {
 
         (storage * nameLens).write("changed")
         assertEquals("changed", selected.emit())
-        assertEquals("changed", storage.source.emit().name)
+        assertEquals("changed", storage.source().emit().name)
     }
 
     @Test

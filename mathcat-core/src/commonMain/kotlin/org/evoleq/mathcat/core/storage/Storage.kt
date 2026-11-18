@@ -8,57 +8,58 @@ import org.evoleq.mathcat.core.reader.emit
 import org.evoleq.mathcat.core.writer.Writer
 
 /**
- * Synchronous read/write boundary for a value of type [S].
+ * Synchronous read/write boundary for a value S.
  *
- * The read side is a first-class Source<S> = Reader<Unit, S>.
+ * A Storage is NOT required to own one backing cell. Its read/write operations
+ * may assemble and route updates across several independently managed memories.
  *
- * Storage itself does not promise persistence, atomicity, thread safety,
- * snapshot isolation or suspension. Those must be supplied explicitly by
- * backends with stronger guarantees. IO requiring suspension needs a
- * separate suspend-aware abstraction; it should not block here.
+ * No persistence, atomicity, thread safety, Compose observation or suspend
+ * semantics are implied by this minimal commonMain contract.
  */
 interface Storage<S> {
-    val source: Source<S>
+    fun read(): S
     fun write(value: S)
-
-    /** Convenience operation: evaluate the live Source now. */
-    fun read(): S = source.emit()
 }
 
 /**
- * Construct Storage from an existing Source and a write function.
+ * Adapt existing synchronous callbacks to Storage.
  *
- * This adapts external storage implementations without imposing inheritance.
- * The factory is capitalized in the existing MathCat constructor vocabulary.
+ * The callbacks may work with one Memory, several Memories, or another backend.
  */
 @Suppress("FunctionName")
-fun <S> Storage(source: Source<S>, write: (S) -> Unit): Storage<S> {
-    val sink = write
+fun <S> Storage(read: () -> S, write: (S) -> Unit): Storage<S> {
+    val reader = read
+    val writer = write
     return object : Storage<S> {
-        override val source: Source<S> = source
-        override fun write(value: S) = sink(value)
+        override fun read(): S = reader()
+        override fun write(value: S) = writer(value)
     }
 }
 
-/** Convenience factory for existing callback-style backends. */
+/** Adapt a Source and a write callback to the ordinary read/write contract. */
 @Suppress("FunctionName")
-fun <S> Storage(read: () -> S, write: (S) -> Unit): Storage<S> =
-    Storage(source = Source(read), write = write)
+fun <S> Storage(source: Source<S>, write: (S) -> Unit): Storage<S> =
+    Storage(read = { source.emit() }, write = write)
 
-/** Read from Storage through a Reader, retaining laziness and live values. */
+/**
+ * Project the read-only side of a Storage as a live Source = Reader<Unit,S>.
+ *
+ * source() is a conversion, NOT a required property of Storage. read() and
+ * write() remain the primary operations of the interface.
+ */
+fun <S> Storage<S>.source(): Source<S> = Source { read() }
+
+/** Read through a Reader and retain deferred evaluation. */
 operator fun <S, A> Storage<S>.times(reader: Reader<S, A>): Source<A> =
     Source { reader(read()) }
 
 /**
- * Focus a Storage through a lawful Lens.
- *
- * Reading remains live. Writing reads the whole current state once, then
- * reconstructs it through the Lens. This read-modify-write is NOT atomic:
- * concurrent external writes may be lost.
+ * Focus through a lawful Lens. Reading remains live; writing reconstructs
+ * the whole S from its current value. Read-modify-write is NOT atomic.
  */
 operator fun <S, A> Storage<S>.times(lens: Lens<S, A>): Storage<A> =
     Storage(
-        source = Source { lens.get(read()) },
+        read = { lens.get(read()) },
         write = { value ->
             val current = read()
             write(lens.set(value)(current))
@@ -66,21 +67,19 @@ operator fun <S, A> Storage<S>.times(lens: Lens<S, A>): Storage<A> =
     )
 
 /**
- * Focus a Storage through a Selection without claiming Lens laws.
- *
- * Writing a value just read may modify the underlying state, because an
- * arbitrary Selection can fail the Get-Put law.
+ * Focus through a Selection without asserting lens laws.
+ * In particular, writing back a selected read may change the underlying S.
  */
 operator fun <S, A> Storage<S>.times(selection: Selection<S, A>): Storage<A> =
     Storage(
-        source = Source { selection.get(read()) },
+        read = { selection.get(read()) },
         write = { value ->
             val current = read()
             write(selection.set(value)(current))
         }
     )
 
-/** Use a pure Writer as a command handler against current Storage contents. */
+/** Execute a Writer command against the current value of a Storage. */
 fun <S, A> Storage<S>.writeWith(writer: Writer<S, A>, command: A) {
     val current = read()
     write(writer(command)(current))
