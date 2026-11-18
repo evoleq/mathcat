@@ -55,7 +55,7 @@ class StateTest {
 
     @Test
     fun getReadsTheStateWithoutChangingIt() {
-        assertEquals(5 to 5, State.get<Int>()(5))
+        assertEquals(5 to 5, Get<Int>()(5))
     }
 
     @Test
