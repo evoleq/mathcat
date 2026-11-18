@@ -12,6 +12,10 @@ org.evoleq.mathcat.core.writer.Dispatcher<A> = Writer<Unit,A>
 org.evoleq.mathcat.storage.Storage<S>        = (read: () -> S, write: (S) -> Unit)
 ```
 
+**Mathematical perspective:** `Reader<Unit,T>` is `Hom(Unit,T)`. In the category of sets this is naturally isomorphic to `T`, but in Kotlin, evaluation may have observable effects. A `Source` therefore has practical deferred-computation semantics that an eagerly materialized value `T` does not.
+
+**Kotlin type-system precision:** `typealias Source<T> = Reader<Unit,T>` is **not a new nominal type**; the compiler can substitute the underlying Reader type. The abstraction is valuable because of its explicit algebraic meaning, named constructor and `emit` API. If independent overload discrimination for Source is ever required, a distinct `fun interface` could be considered later, but this slice deliberately preserves the original Evoleq alias.
+
 `Source<T>` was already present in the legacy Evoleq library, but missing from early MathCat. The factory `Source { ... }` and `emit()` have now been restored. **A Source re-evaluates when emitted**, so it is not a stored snapshot and not the same as the value `T`.
 
 `Dispatcher` in this context is a command-indexed Writer over Unit, **not** a coroutine dispatcher. Its `dispatch(command)` executes an effect.
@@ -65,4 +69,4 @@ No publishing, license or migration decisions are made in this PR.
 - New tests: `SourceTest`, `DispatcherTest`, `StorageTest` across commonTest.
 - Next: concurrency-/atomic-storage alternatives, async/suspend variants and reactive adapters **only after** real usage analysis; do not introduce `suspend` into pure algebra by default.
 
-**Log (2026-11-18):** Restored Source and Dispatcher as aliases, added live Storage composition in a separate KMP module, and configured CI. Review and build verification pending.
+**Log (2026-11-18):** Restored Source and Dispatcher as aliases, added live Storage composition in a separate KMP module, and configured CI. Initial JVM/Windows test run failed in `storageReaderCreatesLazySourceThatSeesFreshValues`: the assertion expected lowercase `second` after `uppercase()`; the correct expectation is `SECOND`. Corrected in the stacked draft. The project also corrected the Android KMP compile task name from `compileKotlinAndroid` to `compileAndroidMain`. Final all-platform CI status is established by the latest [PR checks](https://github.com/evoleq/mathcat/pull/3/checks), not by this interim log.
