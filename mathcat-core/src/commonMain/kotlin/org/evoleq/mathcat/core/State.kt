@@ -19,9 +19,12 @@ typealias KlState<S, A, B> = (A) -> State<S, B>
 fun interface State<S, out A> {
     fun run(state: S): Pair<A, S>
 
+    /**
+     * Execute without requiring consumers to import a separate invoke extension.
+     * The single abstract method remains run, so State { ... } is still a SAM.
+     */
+    operator fun invoke(state: S): Pair<A, S> = run(state)
 }
-
-operator fun <S, A> State<S, A>.invoke(initial: S): Pair<A, S> = run(initial)
 
 /** Functor mapping: transform only the result; preserve the successor state. */
 fun <S, A, B> State<S, A>.map(f: (A) -> B): State<S, B> =
