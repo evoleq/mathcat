@@ -186,6 +186,10 @@ The new keyed list writers are **additional initial examples**, not drop-in repl
 
 **Caveat:** Full business-level conflict handling (version checks, concurrent updates, transactions, optimistic locking) is NOT addressed by these pure collection writers.
 
+## Action-dispatcher integration (research only)
+
+A [separate architecture note](ACTION-DISPATCH-AND-STORAGE.md) examines `Storage<S>` × `ActionDispatcher<S>` as a combined application capability, the common `Store<S> * Lens<S,A>` operation (focusing both state and command dispatch), and tagged sums of commands when composing multiple independent Stores. **No Action/Dispatcher module is added yet; Ktor, serialization, Compose and effect runners remain outside the mathematical core.**
+
 ## Source, Storage and Memory
 
 The next design slice is [algebraic Storage composition](STORAGE-COMPOSITION.md): independent `x` products, sums that require explicit tagged-branch semantics, and assembling a domain Storage over already-existing independent Memories. These combinators are **not implemented yet**, pending law/operational review.
