@@ -12,6 +12,8 @@ The central composition patterns are `Lens * Lens`, `Lens * Selection`, `Lens * 
 
 The **mathematical origins are part of the API design**: [Mathematical foundations](docs/MATHEMATICAL-FOUNDATIONS.md) explains function composition, Writer contravariance, Lens/Selection laws, State's monad multiplication and Kleisli arrows. In particular, the capitalized top-level `Update` constructor produces a `KlState` that changes state while preserving the carried value.
 
+The public DSL now follows a simple rule: **constructors** `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy` and `UpsertAllBy` are capitalized and can be used directly; **operations** `map`, `multiply`, `bind`, `get`, `set` and `contraMap` stay lowercase. Future monads may reuse the name `Return` in their own packages; Kotlin's `import ... as ...` syntax disambiguates call sites without changing mathematical vocabulary. A [commonTest import-alias smoke test](mathcat-core/src/commonTest/kotlin/org/evoleq/mathcat/consumer/ConstructorImportsTest.kt) verifies the public core's alias ergonomics.
+
 See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
 
 ## MathCat 2.0 (research prototype)
