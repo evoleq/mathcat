@@ -36,5 +36,11 @@ fun <S, A, B> Writer<S, A>.contraMap(f: (B) -> A): Writer<S, B> =
 /** Apply an update command to a concrete state. */
 fun <S, A> Writer<S, A>.write(value: A, to: S): S = this(value)(to)
 
-/** Identity reader for any state. */
-fun <S> identityReader(): Reader<S, S> = Reader { it }
+/**
+ * Identity morphism on S, as a Reader.
+ *
+ * IdReader : S -> S,  IdReader(s) = s.
+ * The capitalized standalone constructor follows Evoleq's DSL vocabulary.
+ */
+@Suppress("FunctionName")
+fun <S> IdReader(): Reader<S, S> = Reader { it }
