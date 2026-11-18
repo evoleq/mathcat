@@ -90,3 +90,21 @@ The old `EndPoint<S,T>(key)` Reader stays untouched. An opt-in `CheckedEndPoint<
 The `commonTest` suite now has separate authentication, users and banking feature packages, each defining an independent `Api` value. A composition-root test imports them and proves `Api { group(...); module(...) }` yields **identical endpoint map entries** to the original inline declaration, including `{userId}` and `{accountId}` placeholders. These are separate Kotlin source packages, **not a claim that separate Gradle-module compilation has already been tested**.
 
 **Legacy metadata detail:** `module("users", fragment)` and `module("users/", fragment)` now create the same mounted URL, but the existing `EndPoint.group` field still stores the **literal supplied module string**. The full-API equivalence test therefore uses identical module-path arguments, and a separate regression checks URL equivalence without asserting the groups equal. This preserves historical behavior rather than silently normalizing group metadata.
+
+
+## Executable DSL usage examples
+
+The [`ApiDslUsageTest.kt`](src/commonTest/kotlin/org/evoleq/mathcat/api/ApiDslUsageTest.kt) file is a **runnable, copyable guide** to the public DSL. Its eight self-documenting tests cover:
+
+1. `Api { post<S,T>(key, url); get<S,T>(key, url, parameters) }` and the `KClass`-keyed Map;
+2. the reified-key overload `post<Key,Request,Response>(url)`;
+3. logical `group("authentication") { ... }` without a path prefix;
+4. nested `module` blocks and `/{userId}` placeholders alongside query parameters;
+5. separately declared feature APIs assembled with `group(name, fragment)`, `module(path, fragment)` and `include(fragment)`;
+6. the original `EndPoint(key)` Reader and optional checked variant;
+7. optional route-shape collision diagnostics; and
+8. optional key-conflict checks with the legacy overwrite behavior intact.
+
+The [`FeatureAssemblyTest.kt`](src/commonTest/kotlin/org/evoleq/mathcat/api/FeatureAssemblyTest.kt) test goes further: it compares a realistic inline API definition with separately declared feature packages. It also explicitly records why `module("users", ...)` and `module("users/", ...)` have equal URLs but different legacy `group` metadata.
+
+Run the JVM examples with `gradle :mathcat-api:jvmTest`. They are also part of the `commonTest` multiplatform CI. These tests document declaration and composition; they do **not** invoke Ktor or prove client serialization/runtime handler integration.
