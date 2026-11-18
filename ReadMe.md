@@ -4,6 +4,14 @@
 
 MathCat is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
 
+## MathCat Core (new draft module)
+
+The experimental [`mathcat-core`](mathcat-core) module introduces small, nominal, lambda-friendly `Reader` and `Writer` types; **lawful** `Lens` contracts; composable but **not necessarily lawful** `Selection`; and a pure, non-`suspend` State monad.
+
+The central composition patterns are `Lens * Lens`, `Lens * Selection`, `Lens * Reader`, `Lens * Writer`, and `Writer.contraMap`. Keyed collection Writers `updateAllBy` and `upsertAllBy` illustrate the same production-proven idea from Solyton's frontend Actions without copying the old library's ambiguous duplicate-handling semantics.
+
+See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
+
 ## MathCat 2.0 (research prototype)
 
 The repository now contains the experimental `mathcat-type-algebra` Kotlin Multiplatform module (JVM + JavaScript/Node.js):
@@ -21,12 +29,13 @@ See [Architecture and research notes](docs/ARCHITECTURE.md) for the mathematical
 With JDK 17+ and Gradle 8.6 available:
 
 ```sh
-gradle :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest
+gradle :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest \
+       :mathcat-core:jvmTest :mathcat-core:jsNodeTest
 ```
 
 For the JS tests, Kotlin/Gradle downloads the required Node.js environment when necessary. Gradle is pinned in CI; a Gradle wrapper can be added after the initial build has been verified.
 
-**CI:** Pull requests and pushes to `master` run JVM + JS/Node.js tests. The workflow **does not publish** artifacts. Publishing (JitPack, Maven Central or other) and final license selection are open decisions.
+**CI:** Pull requests and pushes to `master` run JVM + JS/Node.js tests for both modules. The workflow **does not publish** artifacts. Publishing (JitPack, Maven Central or other) and final license selection are open decisions.
 
 ## Earlier MathCat experiments
 
