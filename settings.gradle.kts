@@ -17,3 +17,4 @@ rootProject.name = "mathcat"
 
 include(":mathcat-type-algebra")
 include(":mathcat-core")
+include(":mathcat-store")
