@@ -5,26 +5,27 @@
 ## A simple algebraic boundary
 
 ```text
-Source<T>  = Reader<Unit,T>              (read only; deferred evaluation)
-Storage<T> = Source<T> + (T -> Unit)      (read + write)
-Memory<T>  implements Storage<T>         (plain mutable in-memory backing)
+Source<T>  = Reader<Unit,T>                 (a deferred read)
+Storage<T> = { read: () -> T, write: T -> Unit } (a read/write capability)
+Memory<T>  implements Storage<T>            (one plain mutable backing cell)
 ```
 
-The notation `+` on the Storage line means **a record of capabilities**, not the coproduct/sum type of the type-algebra project.
+The braces express **a record of capabilities**, not an algebraic coproduct. A Storage need not own its backing value directly: it may assemble a view from several independent Memories.
 
 The actual API is:
 
 ```kotlin
 interface Storage<S> {
-    val source: Source<S>
+    fun read(): S
     fun write(value: S)
-    fun read(): S = source.emit()
 }
 
 class Memory<S>(initial: S) : Storage<S>
+
+fun <S> Storage<S>.source(): Source<S> = Source { read() }
 ```
 
-`Source<T>` is **already present in legacy Evoleq**, and is now restored to MathCat as exactly `typealias Source<T> = Reader<Unit,T>`. It is a typealias rather than a wrapper, so `Source * Reader` is ordinary Reader composition. `Storage<T>.source` exposes a **live, lazily evaluated** read; previously obtained Source values observe later writes, not a frozen snapshot.
+`Source<T>` is **already present in legacy Evoleq**, and is now restored to MathCat as exactly `typealias Source<T> = Reader<Unit,T>`. It is a typealias rather than a wrapper, so `Source * Reader` is ordinary Reader composition. **`read()` and `write()` are the required Storage operations.** The optional `storage.source()` projection constructs a live, deferred Source, not a property or an extra obligation on backend implementers. Previously obtained Sources observe later reads of the same Storage, not frozen snapshots.
 
 The named `Storage(source, write)` and `Storage(read, write)` factory functions make adapters easy without subclassing.
 
@@ -39,13 +40,40 @@ Storage<S> * Selection<S,A>     → Storage<A>   (no Lens-law guarantee)
 For a lawful Lens `l : S → A` and `storage : Storage<S>`:
 
 ```text
-(storage * l).source() = l.get(storage.read())
+(storage * l).read()   = l.get(storage.read())
 (storage * l).write(a) = storage.write(l.set(a)(storage.read()))
 ```
 
-The notation `source()` in the equation means evaluation of the `Source` (i.e. `emit()`), not the name of a method on `Storage`.
+For lazy observation, `(storage * l).source().emit()` evaluates to the same projected value as `(storage * l).read()`. The projection is defined in terms of `read()`, not vice versa.
 
 **Important:** A focused write executes a read–modify–write sequence which is **not atomic**. Concurrent writers require a stronger transactional/atomic storage abstraction later. Plain `Memory` is not thread-safe.
+
+## A single Storage over multiple Memories
+
+The current Solyton frontend is not merely a `Memory<Application>`. It manages several **independent backing stores** and exposes one `Storage<Application>` as a synthesized view.
+
+A small commonMain test now demonstrates the essential mechanism without adopting the frontend code or Compose:
+
+```kotlin
+data class View(val visible: Int, val background: String)
+
+val visible = Memory(1)
+val background = Memory("idle")
+
+val composite: Storage<View> = Storage(
+    read = { View(visible.read(), background.read()) },
+    write = { next ->
+        if (visible.read() != next.visible) visible.write(next.visible)
+        if (background.read() != next.background) background.write(next.background)
+    }
+)
+```
+
+This is an **example assembled from callbacks**, not yet a new `CompositeStorage` API. It shows why `Storage` must remain a small interface with `read` and `write`, not an implementation containing precisely one Source.
+
+Formally, let the backing state be `M = M₁ × ⋯ × Mₙ` and the public view be `V`. We want a view function `assemble : M → V` and an update router `route : V → M → M`. If the pair obeys the appropriate get/set laws, it is lens-like; **we must not assume those laws before checking simultaneous changes and mutation semantics**. For an arbitrary router, the weaker Selection viewpoint remains available.
+
+Compose-observable memory versus plain memory affects **which writes invalidate composition**, not the type of the outer Storage. Combining them behind one read/write interface is allowed. The outer read may nevertheless establish snapshot dependencies on whichever Compose state values it reads during composition; this is not per-field observation magic.
 
 ## Observable and non-observable memory are different implementations
 
@@ -67,7 +95,7 @@ fun <T> rememberObservableStorage(initial: () -> T): Storage<T> {
     val state = remember { mutableStateOf(initial()) }
     return remember(state) {
         Storage(
-            source = Source { state.value },
+            read = { state.value },
             write = { state.value = it }
         )
     }
@@ -90,7 +118,11 @@ For a large application, observing one monolithic `mutableStateOf<Application>` 
 
 **Potential lifecycle issue:** `context` and `processes` are created **inside a @Composable function but outside `remember`**. If that function is executed again, they can be recreated and the active state lost. A remembered plain Memory or remembered ordinary holder could preserve their identity without making data changes observable. The exact real-world impact depends on how the Composable is called/retained.
 
-**Potential update issue:** the application writer uses an exclusive `when` to select which kind of difference to process. When an incoming value differs in *multiple* managed components, only its first matching branch is applied; the others may not be updated. This deserves focused regression tests before any Solyton changes.
+**Potential update issue:** the application writer uses an exclusive `when` to select which kind of difference to process. When an incoming value differs in *multiple* managed components, only its first matching branch is applied; the others may not be updated. Compare the *actual* combined value returned by `read()` with the requested write in a future regression test. The existing `onChange` wrapper compares old versus proposed value **before** routing the write, then starts a callback with the proposed `newApplication`, which can differ from the effective post-write value. This deserves focused tests before any Solyton changes.
+
+**Potential identity/law issue:** `Application.withProcesses` modifies `this.processes.registry` in place while `Processes.registry` is a mutable map. This is intentionally non-reactive, but it means the usual immutable-copy intuition and any claimed Lens laws need additional scrutiny. The writer also distinguishes `modals` and `processes` using reference inequality (`!==`) but `context` with value inequality (`!=`).
+
+**Potential lifecycle/effects issue:** the frontend's `onDispatch` starts `CoroutineScope(Job()).launch` each time it is called. If the `@Composable Storage()` factory is re-entered during recomposition, multiple collectors could be started without a composition-tied cancellation owner. The code was inspected, but duplicate collectors in a running application have not been reproduced. Future Compose integration should test lifecycle and cancellation explicitly.
 
 Neither issue is changed by this MathCat PR; they are observations and a follow-up suggestion, **not a claim that production behavior has already been reproduced**.
 
@@ -106,8 +138,10 @@ Neither issue is changed by this MathCat PR; they are observations and a follow-
 ## Implementation status
 
 - `Source<T> = Reader<Unit,T>`: implemented in `mathcat-core/src/commonMain/.../reader/Source.kt`.
-- `Storage<T>` interface with Source projection and standalone factories: implemented in `mathcat-core/src/commonMain/.../storage/Storage.kt`.
+- `Storage<T>` interface with primary `read()/write()`, derived `source()`, and standalone factories: implemented in `mathcat-core/src/commonMain/.../storage/Storage.kt`.
 - `Memory<T>`: implemented as a plain, non-observable backend in `mathcat-core/src/commonMain/.../storage/Memory.kt`.
-- Common tests cover live Source reads, memory writes and Lens/Selection/Reader lifting; CI must establish which platform tasks have passed.
+- Common tests cover live Source reads, memory writes, independent Memories behind one Storage, and Lens/Selection/Reader lifting; CI must establish which platform tasks have passed.
 - Compose adapter: **not implemented**. Putting Compose runtime into commonMain would compromise the minimal math core.
 - Recomposition and persistence are **not** contractual properties of plain `Storage<T>`.
+
+**Decision, 2026-11-18:** Retain the author's `read/write` API. The Solyton FE Storage was **inspected only** and is **not ported**, reimplemented, or refactored in this PR. Generalized composite routing, reactive adapters, event hooks and state lifecycle need a separate review and explicit tests before any implementation.

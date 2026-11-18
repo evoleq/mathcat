@@ -193,11 +193,11 @@ See [Storage, Memory and Compose architecture](STORAGE-AND-MEMORY.md) for the ac
 ```text
 Source<T> = Reader<Unit,T>
 
-Storage<T> = { source: Source<T>, write: T -> Unit }
+Storage<T> = { read: () -> T, write: T -> Unit }
 Memory<T> : Storage<T>  // plain in-memory implementation
 ```
 
-The `Storage` notation expresses a product of read/write **capabilities**, not an algebraic coproduct type. In the API, `Storage` is an interface whose reading part is a first-class `Source<T>`; `Memory` is a plain, non-reactive implementation. With `storage * lens` and `storage * selection`, a focused Storage reads live values and reconstructs the underlying record on writes. With `storage * reader`, it yields a live Source.
+The `Storage` notation expresses a product of read/write **capabilities**, not an algebraic coproduct type. In the API, `Storage` is an interface with **read()/write() as its essential operations**. A derived `storage.source()` yields a first-class `Source<T> = Reader<Unit,T>`; `Memory` is one plain, non-reactive implementation. Several Memories can sit behind a single composite Storage, as demonstrated by a common test. With `storage * lens` and `storage * selection`, a focused Storage reads live values and reconstructs the underlying record on writes. With `storage * reader`, it yields a live Source.
 
 Compose snapshot observation depends on the *backend*, not the `Storage` interface. A `@Composable` function can return plain Memory without triggering recompositions for content writes; a future dedicated Compose adapter can instead back Storage with `MutableState<T>`. Both fit the same algebra. **No Compose runtime is linked into MathCat's commonMain.**
 
@@ -244,4 +244,6 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 | 2026-11-18 | Namespaced core API, with JVM/JS tests passing | [Run #44270455594](https://github.com/evoleq/mathcat/actions/runs/44270455594) |
 | 2026-11-18 | Expanded target configuration and CI matrix | Android, iOS, macOS, Linux, Windows, Wasm; see [status](MULTIPLATFORM.md) (validation pending) |
 
-| 2026-11-18 | Storage/Source algebra and plain Memory implemented | Added `Storage<T>` interface, `source: Source<T>`, `Memory<T>` backend, adapter factories and tests; [design review](STORAGE-AND-MEMORY.md), CI verification pending |
+| 2026-11-18 | Storage/Source algebra and plain Memory implemented | Added `Storage<T>` read/write interface, derived `source()`, `Memory<T>` backend, adapter factories and tests; [design review](STORAGE-AND-MEMORY.md), CI verification pending |
+
+| 2026-11-18 | Storage naming and composition corrected | `read()/write()` remain primary; `source()` is derived, a common test assembles several Memories; [frontend examined, not ported](STORAGE-AND-MEMORY.md) |

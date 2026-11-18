@@ -18,9 +18,9 @@ In particular, **`Get(lens)` and `Set(lens)`** turn an optic into the correspond
 
 ### Storage and Memory
 
-`Source<T> = Reader<Unit,T>` is restored from legacy Evoleq. The `storage` package now provides a synchronous `Storage<T>` interface with a first-class `source: Source<T>`, plus a plain `Memory(initial)` backend. `Storage * Reader` yields a live Source, while `Storage * Lens` and `Storage * Selection` yield focused Storage handles.
+`Source<T> = Reader<Unit,T>` is restored from legacy Evoleq. The `storage` package now provides a synchronous `Storage<T>` interface with **read()/write()**, a derived `storage.source(): Source<T>`, plus a plain `Memory(initial)` backend. One Storage may combine several separate Memories via its read/write callbacks, including backends with different Compose observation policies. `Storage * Reader` yields a live Source, while `Storage * Lens` and `Storage * Selection` yield focused Storage handles.
 
-**Memory is not Compose-observable.** A future Compose adapter can back the **same** Storage interface with `MutableState<T>`, allowing the caller to decide which data should participate in snapshot-driven recomposition. The core intentionally has **no Compose dependency**. See [Storage, Memory and Compose boundaries](docs/STORAGE-AND-MEMORY.md), including observations from Solyton's existing mixed observable/non-observable frontend Storage.
+**Memory is not Compose-observable.** A future Compose adapter can back the **same** Storage interface with `MutableState<T>`, allowing the caller to decide which data should participate in snapshot-driven recomposition. The core intentionally has **no Compose dependency**. See [Storage, Memory and Compose boundaries](docs/STORAGE-AND-MEMORY.md), including a **read-only** review of Solyton's existing mixed observable/non-observable frontend Storage. The concrete frontend implementation is **not ported** in this draft.
 
 See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
 
