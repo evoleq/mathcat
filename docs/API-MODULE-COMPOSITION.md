@@ -1,56 +1,61 @@
-# Framework-independent API modules and groups
+# Framework-independent composition of the existing Evoleq API DSL
 
-**Architecture research · 18 November 2026 · not an implemented MathCat API.**
+**Research context · corrected 18 November 2026.** The implementation slice is [Draft PR #8](https://github.com/evoleq/mathcat/pull/8). **Do not replace the original DSL.** The author explicitly requested *only* modularity; the first alternate Endpoint/ApiBuilder design was rejected and replaced by a faithful port.
 
-The existing Evoleq `Api` DSL offers `group` and `module` declarations. **Neither operation requires Ktor.** Their job is to assemble reusable *descriptions* of an HTTP API, not to install server routes, manage requests or execute effects.
+## Source of truth: the original DSL
 
-> Framework-independent is not the same as protocol-independent. An endpoint with HTTP methods and URL paths is an HTTP description; it can still be consumed by Ktor, another server framework, a client generator, tests or documentation without depending on any of them.
-
-## Minimal dependency direction
-
-```text
-feature-A API definitions ─┐
-feature-B API definitions ─┼─> API description + composition (no Ktor)
-feature-C API definitions ─┘              ↑
-                                          │ consumes descriptors
-                           Ktor routing adapter (separate)
-                                          │
-                               Ktor request lifecycle
-```
-
-The API description/composition layer should have at most Kotlin standard-library dependencies, and **no Ktor, coroutine, database, Compose or application dependency**. It should not depend on `mathcat-store` or `mathcat-actions` merely to combine endpoint metadata. The reusable API declarations may live in a small independent package or a future `mathcat-api` Gradle module; that choice should minimize dependencies. **All Ktor-specific abstractions belong in a dedicated `mathcat-ktorx` module**, which depends on this API description layer, not vice versa. A new generic Boundary framework is **not** a prerequisite.
-
-## Illustrative DSL (not implemented)
+The existing [Evoleq `api.kt`](https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/commonMain/kotlin/org/evoleq/ktorx/api/api.kt) already provides `Api { ... }`, `EndPoint.Get/Post/Put/Patch/Delete/Head`, `Map<KClass<*>, EndPoint<*,*>>`, explicit/reified key overloads, `group(name) { ... }`, `module(path) { ... }`, and **`module(path, fragment: Api)`**. Its concrete [application use](https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-api-data/src/commonMain/kotlin/org/solyton/solawi/bid/application/api/solawi-api.kt) and frontend Map readers are compatibility evidence, not disposable syntax.
 
 ```kotlin
-// The module owns declarations, not a Ktor Route.
-val auctions = apiModule("auctions") {
-    group("admin") {
-        post<CreateAuction, Auction>(CreateAuctionEndpoint, "create")
-    }
+// Features can declare their API fragments independently:
+val authenticationApi = Api {
+    post<Login, LoggedIn>(key = Login::class, url = "login")
 }
-val users = apiModule("users") {
-    get<GetUsers, Users>(GetUsersEndpoint, "all")
+val usersApi = Api {
+    post<CreateUser, User>(key = CreateUser::class, url = "create")
+}
+val versionApi = Api {
+    head<Unit, BuildInfo>(key = BuildInfo::class, url = "api/version")
 }
 
-// Any consumer may compose the descriptions without a web server.
-val api = api {
-    module("auction", auctions)
-    module("users", users)
+// The application collects the contributions:
+val applicationApi = Api {
+    group("authentication", authenticationApi) // newly added overload
+    module("users", usersApi)                   // already existed
+    include(versionApi)                        // newly added
 }
 ```
 
-Prefer adaptation of the **existing** `Api.group` / `Api.module` semantics over a wholesale rewrite. Keep the surface small and preserve familiar Kotlin DSL ergonomics. The above is one possible vocabulary, **not** a proposal to introduce all of these constructors immediately.
+The only new public operations are `group(name, fragment: Api)` and `include(fragment: Api)`. Preserve existing `module(path, Api)` and the original `group(name) { ... }` and `module(path) { ... }`. No new builder paradigm, identity handle, HTTP enum, URL-normalization policy, immutable representation or collision policy is authorized by this task.
 
-A resolved endpoint carries `(endpointId, moduleOrigin, method, canonicalPath, requestType, responseType)`. The declaration's **provenance** survives grouping and nested mounting, but no `ApplicationCall` or handler exists in this layer.
+## Dependency direction
 
-## Composition contracts to test
+```text
+independently declared Api fragments
+               │
+      Api.group / module / include
+               │
+   mathcat-api (Ktor-independent)
+               ▲
+               │ consumed by
+   mathcat-ktorx (future Ktor route binder)
+               │
+             Ktor
+```
 
-- Combining independent API modules preserves every distinct endpoint; nested mounts preserve source module/endpoint identity.
-- Grouping and path composition have documented semantics and consistent normalization, including slashes.
-- A duplicate endpoint identity or collision on (method, canonicalPath) is reported deterministically rather than silently overwriting a `HashMap` entry.
-- Type-safe endpoint lookup never relies on pretending that an unchecked `KClass` cast proves a request/response pairing. The existing registry's unchecked lookup motivates tests and gradual improvement.
-- Equivalent valid groupings resolve to equivalent endpoint descriptions. If the API uses mutable builders, they produce a validated immutable result before consumers use it.
-- A module can be declared and tested **without any Ktor dependency or running server**.
+`mathcat-api` has no Ktor dependency. MathCat Core `Reader` is used to adapt the original `EndPoint(key)` reader to the new core type. A portable `Parameters` data contract retains GET's input bound while old client codecs and serialization remain outside the new module; this is documented as a *portability seam*, not complete source/binary compatibility.
 
-A transport-specific interpreter is optional. The Ktor integration belongs **exclusively in `mathcat-ktorx`** and is described in [its adapter design](KTOR-API-COMPOSITION.md). Keep the author’s original `Boundary` dependency-injection insights conceptually separate; API grouping does not need to become a full-scale architecture framework.
+## What tests actually establish
+
+- Original `Api` DSL, Map lookup and all methods still work.
+- The assembled API has the **same** `EndPoint` entries as the equivalent inline declaration.
+- `group(name, fragment)` has the same effect as inline `group`.
+- `module(path, fragment)` retains the original path and group behavior; imported source fragment is unchanged.
+- `include(fragment)` retains the supplied URLs and group metadata.
+- Historical duplicate-key overwrite semantics are not silently changed.
+
+The corrected first slice passed all four jobs of [CI run 44377915481](https://github.com/evoleq/mathcat/actions/runs/44377915481) on the Draft PR, **not yet merged**. Tests do not establish legacy client codec compatibility or a working Ktor route interpreter.
+
+## Later work, only when separately undertaken
+
+The Ktor-specific route binder belongs to **`mathcat-ktorx`**. It should map a route to a declared `KClass` endpoint, use the existing `method`/`url`/`group` fields and supply `Base(call, environment)` per request. If distinguishing the precise source module requires extra provenance, investigate how to add it **without redesigning `Api`**. See [Ktor adapter research](KTOR-API-COMPOSITION.md). No Solyton change.
