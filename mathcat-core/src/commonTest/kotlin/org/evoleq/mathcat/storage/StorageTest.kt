@@ -23,8 +23,33 @@ class StorageTest {
     )
 
     private fun fixture(): Pair<Storage<Model>, () -> Model> {
-        var current = Model("before", listOf(1, 2, 3))
-        return Storage(read = { current }, write = { current = it }) to { current }
+        val memory = Memory(Model("before", listOf(1, 2, 3)))
+        return memory to { memory.read() }
+    }
+
+    @Test
+    fun memoryIsAnImplementationOfStorageWithLiveSource() {
+        val memory: Storage<Int> = Memory(1)
+        val reading = memory.source
+
+        assertEquals(1, reading.emit())
+        memory.write(2)
+        assertEquals(2, reading.emit())
+        assertEquals(2, memory.read())
+    }
+
+    @Test
+    fun sourceAndCallbackCanBackAStorageWithoutMemory() {
+        var raw = 5
+        val storage = Storage(
+            source = org.evoleq.mathcat.core.reader.Source { raw },
+            write = { raw = it }
+        )
+        val source = storage.source
+
+        assertEquals(5, source.emit())
+        storage.write(9)
+        assertEquals(9, source.emit())
     }
 
     @Test
@@ -46,7 +71,7 @@ class StorageTest {
 
         (storage * nameLens).write("changed")
         assertEquals("changed", selected.emit())
-        assertEquals("changed", storage.source().emit().name)
+        assertEquals("changed", storage.source.emit().name)
     }
 
     @Test
