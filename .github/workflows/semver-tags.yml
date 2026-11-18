@@ -1,0 +1,91 @@
+name: SemVer tags
+
+# Tag only successfully tested pushes to master, never pull-request checks.
+# The existing CI workflow remains the single build/test gate.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: semver-tags-master
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.head_branch == 'master' &&
+          github.event.workflow_run.event == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the tested master commit and full tag history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Calculate and push the next annotated SemVer tag
+        env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git fetch origin master --tags --force
+          if [[ "$(git rev-parse origin/master)" != "$TESTED_SHA" ]]; then
+            echo "A newer master commit exists; the newest successful CI run should tag it."
+            exit 0
+          fi
+          git checkout --detach "$TESTED_SHA"
+
+          # Only stable-form tags vX.Y.Z reachable from this tested commit.
+          current="$(
+            git tag --merged HEAD --list 'v*' |
+            grep -E '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' |
+            sort -V | tail -n 1 || true
+          )"
+
+          if [[ -z "$current" ]]; then
+            # Initial pre-1.0 milestone: public API remains experimental.
+            next="v0.1.0"
+          else
+            if [[ -z "$(git rev-list "$current"..HEAD)" ]]; then
+              echo "HEAD is already covered by $current; nothing to tag."
+              exit 0
+            fi
+
+            number="${current#v}"
+            IFS='.' read -r major minor patch <<< "$number"
+            messages="$(git log --format='%s%n%b' "$current"..HEAD)"
+
+            if grep -Eq '^[a-zA-Z]+(\([^)]*\))?!:|^BREAKING[ -]CHANGE:' <<< "$messages"; then
+              # Until v1.0.0, incompatible API changes advance the minor
+              # series, instead of implying production-stable major versions.
+              if (( major == 0 )); then
+                minor=$((minor + 1)); patch=0
+              else
+                major=$((major + 1)); minor=0; patch=0
+              fi
+            elif grep -Eq '^feat(\([^)]*\))?:' <<< "$messages"; then
+              minor=$((minor + 1)); patch=0
+            else
+              # fixes, refactors, docs, tests, chores => patch
+              patch=$((patch + 1))
+            fi
+            next="v${major}.${minor}.${patch}"
+          fi
+
+          if git rev-parse -q --verify "refs/tags/$next" >/dev/null; then
+            echo "Tag $next already exists; refusing to overwrite it."
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$next" "$TESTED_SHA" -m "MathCat $next (CI verified)"
+          git push origin "refs/tags/$next"
+          echo "Created $next for $TESTED_SHA"

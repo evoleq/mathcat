@@ -47,13 +47,16 @@ class StorageCommandsTest {
         state = Whole(Part("interleaved", 7), revision = 11)
         dispatcher.dispatch("updated")
         assertEquals(Whole(Part("updated", 7), 11), state)
-        assertEquals(1, reads)
+        // (Storage * lens) * writer reads the root state once for the focused
+        // Writer and again when the focused Storage reconstructs the whole.
+        // This is deliberately non-atomic; it is not a single-read transaction.
+        assertEquals(2, reads)
         assertEquals(1, writes)
 
         state = Whole(Part("another", 9), revision = 12)
         dispatcher.dispatch("latest")
         assertEquals(Whole(Part("latest", 9), 12), state)
-        assertEquals(2, reads)
+        assertEquals(4, reads)
         assertEquals(2, writes)
     }
 
