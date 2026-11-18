@@ -4,6 +4,7 @@ import org.evoleq.mathcat.core.optics.Lens
 import org.evoleq.mathcat.core.optics.times
 import org.evoleq.mathcat.core.reader.Reader
 import org.evoleq.mathcat.core.storage.Memory
+import org.evoleq.mathcat.core.storage.source
 import org.evoleq.mathcat.core.writer.Writer
 import org.evoleq.mathcat.store.Store
 import kotlin.coroutines.Continuation
@@ -216,6 +217,41 @@ class ActionCompositionTest {
         assertEquals(2, firstEvents.size)
         assertEquals(1, secondEvents.size)
         assertEquals(initial, memory.read()) // Dispatcher only accepts messages.
+    }
+
+    @Test
+    fun currentSourceDispatcherIsUsedByAlreadyFocusedModuleStore() {
+        val backing = Memory(initial)
+        val eventsOne = mutableListOf<ActionEnvelope<Application, *, *>>()
+        val eventsTwo = mutableListOf<ActionEnvelope<Application, *, *>>()
+        val one: ActionDispatcher<Application> = ActionDispatcher { eventsOne += it }
+        val two: ActionDispatcher<Application> = ActionDispatcher { eventsTwo += it }
+
+        // An ordinary non-observable Memory holds the active dispatcher.
+        val selection = Memory<ActionDispatcher<Application>>(one)
+        val application = Store(
+            storage = backing,
+            dispatcher = DynamicDispatcher(selection.source())
+        )
+        val module = application * moduleLens
+
+        runImmediate { module.dispatch(rename) }
+        assertEquals(1, eventsOne.size)
+        assertEquals(0, eventsTwo.size)
+
+        // The very same focused module retains the same Store reference.
+        selection.write(two)
+        runImmediate {
+            module.dispatchEnvelope(
+                ActionEnvelope(action = rename, id = "switched", run = false)
+            )
+        }
+        assertEquals(1, eventsOne.size)
+        assertEquals(1, eventsTwo.size)
+        assertEquals("switched", eventsTwo.single().id)
+        assertEquals(false, eventsTwo.single().run)
+        assertSame(backing, application.storage)
+        assertEquals(initial, backing.read())
     }
 
     @Test
