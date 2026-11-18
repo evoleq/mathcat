@@ -14,6 +14,8 @@ The **mathematical origins are part of the API design**: [Mathematical foundatio
 
 The public DSL now follows a simple rule: **constructors** `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy` and `UpsertAllBy` are capitalized and can be used directly; **operations** `map`, `multiply`, `bind`, `get`, `set` and `contraMap` stay lowercase. Future monads may reuse the name `Return` in their own packages; Kotlin's `import ... as ...` syntax disambiguates call sites without changing mathematical vocabulary. A [commonTest import-alias smoke test](mathcat-core/src/commonTest/kotlin/org/evoleq/mathcat/consumer/ConstructorImportsTest.kt) verifies the public core's alias ergonomics.
 
+In particular, **`Get(lens)` and `Set(lens)`** turn an optic into the corresponding `Reader` and `Writer`; `Get<S>()` constructs a pure state-read computation. Map readers use `org.evoleq.mathcat.core.maps.Get(key)` / `GetForSure(key)`; explicit imports or import aliases keep these meanings clear. A `State` is directly callable (`state(s)`) without importing a separate invocation extension.
+
 See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
 
 ## MathCat 2.0 (research prototype)
