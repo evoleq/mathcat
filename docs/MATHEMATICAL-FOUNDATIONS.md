@@ -91,6 +91,15 @@ Put–Get   get(set(a)(s))          = a
 Put–Put   set(b)(set(a)(s))       = set(b)(s)
 ```
 
+The Evoleq **construction versus operation** distinction is visible in Optics:
+
+```kotlin
+val read: Reader<Whole, Part> = Get(lens)
+val write: Writer<Whole, Part> = Set(lens)
+```
+
+`Get(lens)` and `Set(lens)` are the covariant/contravariant projections of the Lens' read/write pair. The lowercase `lens.get` and `lens.set` remain the component operations. The same constructors exist for arbitrary `Selection`, but extracting operations does not make such a Selection lawful.
+
 The laws are **contracts**; the Kotlin constructor cannot prove them. We only call a compositional result a `Lens` when both components are assumed lawful.
 
 ### Why Selection is useful
@@ -182,6 +191,17 @@ Return<S,A>(a)
 
 The **updated state `s1`** is passed to the inner computation. This is the key semantic content of multiplication.
 
+### Reading the entire state via `Get`
+
+The value-level state read is a **construction**, not a getter property on an existing State:
+
+```text
+Get<S>() : T_S(S)
+Get<S>()(s) = (s,s)
+```
+
+This zero-argument `Get` overload is distinct from `Get(lens)`. The former constructs a `State<S,S>` computation; the latter constructs a `Reader<S,A>` for the focus of a Lens.
+
 ### Kleisli extension: `bind`
 
 For `f : A → T_S(B)`:
@@ -261,12 +281,14 @@ Functor composition is automatic given suitable functors; Monad composition is *
 | Function / morphism | `Reader` | Observations and compositional projections |
 | Precomposition, contravariance | `Writer.contraMap` | API payload → domain writer command |
 | Store coalgebra laws | `Lens.get`, `Lens.set` | Lawful focusing and rebuilding |
+| Optics projections | `Get(lens)`, `Set(lens)` | Construct Reader/Writer from focus |
 | Read/write without lens laws | `Selection` | Filtering and application-specific selections |
 | Monad unit `η` | `Return` | Introduce a value without changing state |
 | Monad multiplication `μ` | `State.multiply` | Flatten nested state computations |
 | Kleisli extension | `State.bind` | Chain computations with state threading |
 | Kleisli arrow | `KlState` | Input value + stateful computation |
 | Value-preserving Kleisli constructor | `Update` | Change state without discarding the incoming value |
+| State read constructor | `Get<S>()` | Return current state without changing it |
 | Functor / kind operators | `mathcat-type-algebra` experiment | Explicit research, not native Kotlin HKT |
 
 **Vocabulary policy:** Preserve the author's standalone capitalized constructors `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`, alongside lowercase operations `multiply`, `map`, `bind`, `get`, `set`, `contraMap`. Do not add redundant `pure`/`flatMap`/`modify` public aliases. The Kotlin API should stay short and readable while its laws and mathematical origins remain explicit. Mathematical symbols live in explanations and equations; Kotlin code keeps a conflict-aware vocabulary.
@@ -275,7 +297,7 @@ Functor composition is automatic given suitable functors; Monad composition is *
 
 ## 7. Constructor vocabulary and Kotlin's alias mechanism
 
-The mathematical names should survive unchanged at the call site; developer ergonomics is a **design constraint**:
+The mathematical names should survive unchanged at the call site; developer ergonomics is a **design constraint**. Constructors `Get` and `Set` also preserve the old Evoleq Lens helper API:
 
 ```kotlin
 val lift: KlState<Int, String, String> = Update { it + 1 }
@@ -297,4 +319,16 @@ import org.evoleq.mathcat.core.Return as StateReturn
 ```
 
 The alias changes the local name, **not** the mathematical meaning. It cannot solve an actual package-level signature collision; Kotlin also does not overload a function by return type alone. The project should prefer clear package boundaries and import aliases over renaming `Return` to unrelated words.
+
+
+### Map readers and name scopes
+
+The old Evoleq also offers `Get(key): Reader<Map<K,V>,V?>` and the partial `GetForSure(key): Reader<Map<K,V>,V>`. The MathCat port preserves them in `org.evoleq.mathcat.core.maps`:
+
+```kotlin
+import org.evoleq.mathcat.core.Get
+import org.evoleq.mathcat.core.maps.Get as MapGet
+```
+
+This is an intentional use of **separate namespaces**, not a demand to rename mathematical constructors. See the test `GetSetImportsTest` for concrete interoperability.
 
