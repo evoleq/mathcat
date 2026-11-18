@@ -92,10 +92,12 @@ typealias KlState<S, A, B> = (A) -> State<S, B>
 val joined = nested.multiply()
 
 // Value is retained, while the state changes:
-val change: KlState<Int, String, String> = State.update { it + 3 }
+val change: KlState<Int, String, String> = Update { it + 3 }
 val result = (State.Return<Int, String>("payload") * change)(5)
 // result == ("payload" to 8)
 ```
+
+The top-level, capitalized `Update` is intentionally a **Kleisli constructor**, not a method on the `State` companion object. The naming follows existing Evoleq conventions and allows simple import/composition without carrying `State.` throughout the DSL.
 
 The important distinction is between **changing the state** and **discarding the value**. Returning `Unit` is appropriate for an intentionally value-less computation, but not as the default helper for an operation that is meant to be chained. Here the primitive is a `KlState<S,A,A>`: it forwards its input `A` unchanged while updating `S`.
 
@@ -128,7 +130,7 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 - Lens × Reader / Writer; Selection × Lens / Selection / Reader / Writer.
 - Explicit non-lawful `filterBy` regression.
 - State `Return`, `map`, `multiply`, `bind`, `get`, `KlState` and Monad identities/associativity for representative state functions.
-- Kleisli state update: `State.update(change): KlState<S,A,A>` changes state while passing the value through; no implicit `Unit` result or `modify` API.
+- Kleisli state update: `Update(change): KlState<S,A,A>` changes state while passing the value through; no implicit `Unit` result or `modify` API.
 - Keyed `updateAll`, `upsertAll`, no-match behavior, duplicate rejection, ordering.
 - Solyton-style Lens-lifted Writer with response conversion through `contraMap`.
 
@@ -151,4 +153,4 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 | 2026-11-18 | Selection and Lens laws separated; FilterBy represented honestly | Draft implementation + tests |
 | 2026-11-18 | Pure State and keyed list Writer examples added | Draft implementation + tests |
 | 2026-11-18 | CI expanded for two modules × two platforms | [Run #44265321148: SUCCESS](https://github.com/evoleq/mathcat/actions/runs/44265321148) |
-| 2026-11-18 | Author's naming and value-preserving Kleisli state update applied | `Return`, `multiply`, `bind`, `KlState`, `get`, `State.update`; JVM/JS retest pending |
+| 2026-11-18 | Author's naming and value-preserving Kleisli state update applied | `Return`, `multiply`, `bind`, `KlState`, `get` and top-level `Update`; JVM/JS retest pending |
