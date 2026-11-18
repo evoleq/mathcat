@@ -9,7 +9,7 @@ class ReaderWriterTest {
         val f = Reader<Int, Int> { it + 2 }
         val g = Reader<Int, Int> { it * 3 }
         val h = Reader<Int, String> { "n=$it" }
-        val id = identityReader<Int>()
+        val id = IdReader<Int>()
 
         assertEquals(f(4), (id * f)(4))
         assertEquals(f(4), (f * id)(4))
