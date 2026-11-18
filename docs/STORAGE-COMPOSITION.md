@@ -171,6 +171,10 @@ Lifecycle and cancellation of event subscriptions (`onInit`, `onChange`, `onDisp
 6. **Failure and concurrency:** at least one backend write fails; verify partial-write expectations, no false atomicity promise; test races where applicable.
 7. **Sum:** explicit active-branch semantics, transitions and Prism-based partial focus before publishing a `+` operator.
 
+## Dispatchers associated with composed storages
+
+Two existing Storage handles admit a product-valued read/write composition, but two existing ActionDispatchers do **not** automatically yield a dispatcher for arbitrary actions on the product state. A natural candidate is a **tagged sum of commands**, routed explicitly to the corresponding backend. See [Action dispatch and Storage composition](ACTION-DISPATCH-AND-STORAGE.md) for the paired-capability Store design, Lens action lifting, envelope preservation and separate runner lifetime.
+
 ## Decision log / migration boundary
 
 - **Confirmed:** keep `Storage<T>.read()` and `write(T)`. `source()` is a derived read projection. Keep existing handles alive and independently usable.
