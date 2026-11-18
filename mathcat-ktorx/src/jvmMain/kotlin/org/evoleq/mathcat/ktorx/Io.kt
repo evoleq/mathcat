@@ -35,14 +35,14 @@ class KtorAction<E, out T>(
     suspend infix fun runOn(base: RequestBase<E>): T = action(base).first
 }
 
-fun <E, S : Any, T : Any> KtorAction<E, Result<S>>.times(
+operator fun <E, S : Any, T : Any> KtorAction<E, Result<S>>.times(
     transform: ResultTransform<S, T>
 ): KtorAction<E, Result<T>> = KtorAction { base ->
     val (value, next) = execute(base)
     transform.apply(value) to next
 }
 
-fun <E, S : Any, T : Any> KtorAction<E, Result<Contextual<S>>>.times(
+operator fun <E, S : Any, T : Any> KtorAction<E, Result<Contextual<S>>>.times(
     transform: ContextualTransform<S, T>
 ): KtorAction<E, Result<Contextual<T>>> = KtorAction { base ->
     val (value, next) = execute(base)
@@ -198,7 +198,7 @@ fun <T : Any> Respond(
     policy: ResponsePolicy = ResponsePolicy()
 ): Responder<T> = Responder(serializer, json, policy, context)
 
-fun <E, T : Any> KtorAction<E, Result<T>>.times(
+operator fun <E, T : Any> KtorAction<E, Result<T>>.times(
     responder: Responder<T>
 ): KtorAction<E, Unit> = KtorAction { base ->
     val (value, next) = execute(base)
@@ -210,7 +210,7 @@ class KtorStep<E, S, T>(
     val execute: suspend (S, RequestBase<E>) -> Pair<T, RequestBase<E>>
 )
 
-fun <E, S, T> KtorAction<E, S>.times(
+operator fun <E, S, T> KtorAction<E, S>.times(
     step: KtorStep<E, S, T>
 ): KtorAction<E, T> = KtorAction { base ->
     val (value, next) = execute(base)
