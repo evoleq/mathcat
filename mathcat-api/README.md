@@ -83,3 +83,8 @@ val beforeImport = application.conflictsWith(otherFeatureApi)
 `validateRoutes()` detects duplicate method/path shapes (including `users/{id}` vs `users/{userId}`) and malformed/repeated `{name}` segments. `conflictsWith(fragment)` checks endpoint-key clashes and overlapping route patterns **before** a fragment is merged. Already overwritten keys cannot be reconstructed from the final HashMap.
 
 The old `EndPoint<S,T>(key)` Reader stays untouched. An opt-in `CheckedEndPoint<S,T>(key)` Reader verifies the stored request/response `KClass` values before casting. Kotlin generic type arguments remain erased; this is not proof of full generic type safety.
+
+
+## Realistic multi-feature composition test
+
+The `commonTest` suite now has separate authentication, users and banking feature packages, each defining an independent `Api` value. A composition-root test imports them and proves `Api { group(...); module(...) }` yields **identical endpoint map entries** to the original inline declaration, including `{userId}` and `{accountId}` placeholders. These are separate Kotlin source packages, **not a claim that separate Gradle-module compilation has already been tested**.
