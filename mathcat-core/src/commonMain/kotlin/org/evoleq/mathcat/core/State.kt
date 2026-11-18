@@ -19,12 +19,6 @@ typealias KlState<S, A, B> = (A) -> State<S, B>
 fun interface State<S, out A> {
     fun run(state: S): Pair<A, S>
 
-    companion object {
-        /** Inspect the current state, returning that state without changing it. */
-        fun <S> get(): State<S, S> =
-            State { state -> state to state }
-
-    }
 }
 
 operator fun <S, A> State<S, A>.invoke(initial: S): Pair<A, S> = run(initial)
