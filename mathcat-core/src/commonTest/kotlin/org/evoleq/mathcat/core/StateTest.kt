@@ -16,7 +16,7 @@ class StateTest {
         val second: (Int) -> State<Int, String> = { n ->
             State { s -> "${n + s}" to (s + 1) }
         }
-        assertEquals("16" to 16, first.flatMap(second)(5))
+        assertEquals("21" to 16, first.flatMap(second)(5))
         assertEquals(first.flatMap(second)(5), (first * second)(5))
     }
 
