@@ -68,7 +68,7 @@ class StateTest {
         assertEquals("payload" to 8, updated(5))
 
         val observe: KlState<Int, String, String> = { value ->
-            State { current -> "$" + value + "@" + current to current }
+            State { current -> "$value@$current" to current }
         }
         assertEquals("payload@8" to 8, (updated * observe)(5))
     }
