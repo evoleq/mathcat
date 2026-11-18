@@ -189,6 +189,36 @@ class ActionCompositionTest {
     }
 
     @Test
+    fun replacedRootDispatcherCanServeDifferentFocusedStoreWithoutReplacingState() {
+        val memory = Memory(initial)
+        val firstEvents = mutableListOf<ActionEnvelope<Application, *, *>>()
+        val secondEvents = mutableListOf<ActionEnvelope<Application, *, *>>()
+
+        val first = Store(
+            storage = memory,
+            dispatcher = ActionDispatcher<Application> { firstEvents += it }
+        )
+        val oldFocused = first * moduleLens
+        val replacement = first.withDispatcher(
+            ActionDispatcher<Application> { secondEvents += it }
+        )
+        val newFocused = replacement * moduleLens
+
+        assertSame(memory, first.storage)
+        assertSame(memory, replacement.storage)
+
+        runImmediate {
+            oldFocused.dispatch(rename)
+            newFocused.dispatch(rename)
+            oldFocused.dispatch(rename)
+        }
+
+        assertEquals(2, firstEvents.size)
+        assertEquals(1, secondEvents.size)
+        assertEquals(initial, memory.read()) // Dispatcher only accepts messages.
+    }
+
+    @Test
     fun recordingDispatcherTreatsDispatchAsAcceptanceNotExecution() {
         val delivered = mutableListOf<ActionEnvelope<Module, *, *>>()
         val dispatcher = ActionDispatcher<Module> { delivered += it }
