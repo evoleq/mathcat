@@ -6,8 +6,8 @@ import kotlin.test.assertEquals
 class StateTest {
     @Test
     fun returnAndMapDoNotChangeState() {
-        assertEquals(3 to "s", State.Return<String, Int>(3)("s"))
-        assertEquals(8 to "s", State.Return<String, Int>(3).map { it + 5 }("s"))
+        assertEquals(3 to "s", Return<String, Int>(3)("s"))
+        assertEquals(8 to "s", Return<String, Int>(3).map { it + 5 }("s"))
     }
 
     @Test
@@ -42,9 +42,9 @@ class StateTest {
 
         for (s in listOf(-2, 0, 1, 7)) {
             // left identity
-            assertEquals(f(4)(s), (State.Return<Int, Int>(4) bind f)(s))
+            assertEquals(f(4)(s), (Return<Int, Int>(4) bind f)(s))
             // right identity
-            assertEquals(m(s), (m bind { State.Return<Int, Int>(it) })(s))
+            assertEquals(m(s), (m bind { Return<Int, Int>(it) })(s))
             // associativity
             assertEquals(
                 (m bind f bind g)(s),
@@ -61,7 +61,7 @@ class StateTest {
     @Test
     fun updatingStateAsKleisliArrowPreservesItsInputValue() {
         val update: KlState<Int, String, String> = Update { it + 3 }
-        val start: State<Int, String> = State.Return("payload")
+        val start: State<Int, String> = Return("payload")
 
         // The current value is available to subsequent operations.
         val updated = start * update
@@ -77,6 +77,6 @@ class StateTest {
     fun kleisliUpdateActsAsIdentityOnValueNotOnState() {
         val update = Update<Int, Int> { it * 2 }
         assertEquals(9 to 8, update(9)(4))
-        assertEquals(9 to 8, (State.Return<Int, Int>(9) bind update)(4))
+        assertEquals(9 to 8, (Return<Int, Int>(9) bind update)(4))
     }
 }
