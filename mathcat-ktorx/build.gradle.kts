@@ -33,6 +33,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
         }
         jvmMain.dependencies {
+            api(project(":mathcat-result"))
             api("io.ktor:ktor-server-core:3.4.1")
         }
         jvmTest.dependencies {
