@@ -34,18 +34,18 @@ class ResultMathTest {
     }
 
     @Test fun ordinaryExceptionsAreRepresentedAsFailures() {
-        val result = Result.Success(1) map<Int, Int> { error("boom") }
+        val result = Result.Success(1).map<Int, Int> { error("boom") }
         assertIs<Result.Failure.Exception>(result)
         assertEquals("boom", result.value.message)
     }
 
     @Test fun cancellationExceptionsAreNeverSwallowed() {
         assertFailsWith<CancellationException> {
-            Result.Success(1) map<Int, Int> { throw CancellationException("cancel") }
+            Result.Success(1).map<Int, Int> { throw CancellationException("cancel") }
         }
         assertFailsWith<CancellationException> {
             runImmediate {
-                Result.Success(1) mapSuspend<Int, Int> {
+                Result.Success(1).mapSuspend<Int, Int> {
                     throw CancellationException("cancel suspend")
                 }
             }
