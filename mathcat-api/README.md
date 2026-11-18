@@ -88,3 +88,5 @@ The old `EndPoint<S,T>(key)` Reader stays untouched. An opt-in `CheckedEndPoint<
 ## Realistic multi-feature composition test
 
 The `commonTest` suite now has separate authentication, users and banking feature packages, each defining an independent `Api` value. A composition-root test imports them and proves `Api { group(...); module(...) }` yields **identical endpoint map entries** to the original inline declaration, including `{userId}` and `{accountId}` placeholders. These are separate Kotlin source packages, **not a claim that separate Gradle-module compilation has already been tested**.
+
+**Legacy metadata detail:** `module("users", fragment)` and `module("users/", fragment)` now create the same mounted URL, but the existing `EndPoint.group` field still stores the **literal supplied module string**. The full-API equivalence test therefore uses identical module-path arguments, and a separate regression checks URL equivalence without asserting the groups equal. This preserves historical behavior rather than silently normalizing group metadata.

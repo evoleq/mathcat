@@ -37,8 +37,8 @@ class FeatureAssemblyTest {
         }
         val composed = Api {
             group("authentication", authenticationApi)
-            module("users/", usersApi)
-            module("banking/", bankingApi)
+            module("users", usersApi)
+            module("banking", bankingApi)
         }
 
         assertEquals(inline.endPoints, composed.endPoints)
@@ -46,6 +46,19 @@ class FeatureAssemblyTest {
         assertEquals("banking/accounts/{accountId}", composed[ReadAccount::class]?.url)
         assertEquals("authentication", composed[Login::class]?.group)
         assertTrue(composed.validateRoutes().isEmpty())
+    }
+
+    @Test
+    fun slashTolerantPathJoinDoesNotRewriteLegacyGroupMetadata() {
+        // Route URLs are intentionally equivalent, but the legacy group
+        // records the literal module argument. Both facts must be tested.
+        val noTrailingSlash = Api { module("users", usersApi) }
+        val withTrailingSlash = Api { module("users/", usersApi) }
+
+        assertEquals(noTrailingSlash[ReadUser::class]?.url, withTrailingSlash[ReadUser::class]?.url)
+        assertEquals("users", noTrailingSlash[ReadUser::class]?.group)
+        assertEquals("users/", withTrailingSlash[ReadUser::class]?.group)
+        assertEquals("users/{userId}", withTrailingSlash[ReadUser::class]?.url)
     }
 
     @Test
