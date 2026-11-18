@@ -29,17 +29,6 @@ fun interface State<S, out A> {
         fun <S> get(): State<S, S> =
             State { state -> state to state }
 
-        /**
-         * A state change which passes its Kleisli input through unchanged.
-         *
-         * Unlike a state-only operation yielding Unit, this is directly
-         * composable with the next arrow using bind or *.
-         *
-         * Example: State.Return<Int, String>("payload") *
-         *          State.update<Int, String> { it + 1 }
-         */
-        fun <S, A> update(change: (S) -> S): KlState<S, A, A> =
-            { value -> State { state -> value to change(state) } }
     }
 }
 
