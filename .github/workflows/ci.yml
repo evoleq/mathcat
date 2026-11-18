@@ -25,4 +25,4 @@ jobs:
         with:
           gradle-version: '8.6'
       - name: Run JVM and Node.js tests
-        run: gradle --no-daemon :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest
+        run: gradle --no-daemon :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest :mathcat-core:jvmTest :mathcat-core:jsNodeTest
