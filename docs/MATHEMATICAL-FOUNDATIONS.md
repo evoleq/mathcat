@@ -201,23 +201,23 @@ typealias KlState<S, A, B> = (A) -> State<S, B>
 
 Mathematically it is `A → T_S(B)`. Two such arrows compose via `bind`, with `Return` as Kleisli identity.
 
-### State updates that preserve the carried value
+### The standalone `Update` constructor preserves the carried value
 
 An update is often intended to change **only** the state and leave the pipeline value unchanged:
 
 ```text
-update(u) : A → T_S(A)
-update(u)(a)(s) = (a, u(s))
+Update(u) : A → T_S(A)
+Update(u)(a)(s) = (a, u(s))
 ```
 
 ```kotlin
-val increment: KlState<Int, String, String> = State.update { it + 1 }
+val increment: KlState<Int, String, String> = Update { it + 1 }
 val initial = State.Return<Int, String>("request-id")
 val result = (initial * increment)(10)
 // result == ("request-id" to 11)
 ```
 
-Using `Unit` in place of `A` would **discard the value**, so that is not the default `State.update` signature. This decision came from the existing practical Evoleq/Kleisli use case, not from a desire to invent a new abstraction.
+Using `Unit` in place of `A` would **discard the value**, so the top-level `Update` constructor is preferable to a state-only computation yielding `Unit`. This decision came from the existing practical Evoleq/Kleisli use case, not from a desire to invent a new abstraction.
 
 ### Monad laws
 
@@ -266,9 +266,9 @@ Functor composition is automatic given suitable functors; Monad composition is *
 | Monad multiplication `μ` | `State.multiply` | Flatten nested state computations |
 | Kleisli extension | `State.bind` | Chain computations with state threading |
 | Kleisli arrow | `KlState` | Input value + stateful computation |
-| Value-preserving state effect | `State.update` | Change state without discarding input |
+| Value-preserving Kleisli constructor | `Update` | Change state without discarding the incoming value |
 | Functor / kind operators | `mathcat-type-algebra` experiment | Explicit research, not native Kotlin HKT |
 
-**Vocabulary policy:** Keep the author's `Return`, `multiply`, `map`, `bind`, `get`, `KlState`, `Reader`, `Writer`. Do not create redundant `pure`/`flatMap`/`modify` public aliases. Mathematical symbols live in explanations and equations; Kotlin code keeps a conflict-aware vocabulary.
+**Vocabulary policy:** Keep the author's standalone capitalized `Update` as a Kleisli constructor (not `State.update`), along with `Return`, `multiply`, `map`, `bind`, `get`, `KlState`, `Reader`, `Writer`. Do not create redundant `pure`/`flatMap`/`modify` public aliases. Mathematical symbols live in explanations and equations; Kotlin code keeps a conflict-aware vocabulary.
 
 **Boundaries:** No `suspend` in the pure core; IO, Storage, atomicity and cancellation are separately designed effect concerns. All laws mean extensional behavior under the stated pure-function assumptions, not object identity or a statement about arbitrary observable side effects.
