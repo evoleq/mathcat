@@ -112,3 +112,37 @@ In the short term retain `Reader`, `Writer`, `Lens`, `Storage`, `Store` and `Act
 7. Multiple levels of timing (domain tick vs workflow completion vs architectural change) are not silently conflated.
 
 No Solyton changes, no stable API claim, no automatic MathCat release from this documentation/testing slice.
+
+## 7. What did not work yet: limits of Flow as application architecture
+
+This section is an **author-reported experience**, not a runtime benchmark or a universal impossibility theorem. The original Evoleq `Flow` implementation proved useful as a basis for automata and explicit process transitions. It **did not**, by itself, deliver a comparably decisive architectural improvement for an entire application. An application architecture built from flows alone remains an **open design problem**, not an advertised feature of MathCat.
+
+The author experimented with integrating Evoleq into **JavaFX and Swing** and found this difficult. These frameworks already own the event loop, UI thread, component lifetime, rendering/observation and event delivery. A parallel Evoleq runtime competing to own those concerns invites awkward translation layers, synchronization questions and lifecycle mismatches. This observation motivates a strong non-goal: **do not require a host application to become one enormous Evoleq Flow or surrender control of its main loop.**
+
+A more promising research direction is **open/coupled dynamical systems**. Consider a local component with input and output:
+
+```text
+step : D × I -> D × O
+```
+
+A larger system must supply **wiring/coupling**, including which outputs feed which inputs, how asynchronous events are queued, what happens in feedback loops, and which component or framework owns scheduling and lifetime. Composition is not determined by the local transition signatures alone. For a continuously driven or nondeterministic system, refine the model instead of pretending the same discrete step covers everything.
+
+This suggests three separate kinds of interface:
+
+1. A **domain boundary** exposing permitted commands, observations and invariants.
+2. An **environment/port boundary** supplying dependencies as explicit functions or capabilities; tests substitute those ports without recreating infrastructure.
+3. A **runtime adapter** interpreting input/output in the host framework (e.g., JavaFX Application Thread, Swing EDT, Ktor coroutine context, Compose snapshot/effect lifetime), without claiming to own that framework's lifecycle.
+
+These boundaries may be composed but are not necessarily the same object or type. In particular, a domain flow can remain a pure automaton while event loops and schedulers remain outside its algebra.
+
+### Honest success criteria for future implementation
+
+- An ordinary Swing/JavaFX/Ktor consumer can embed a small modeled automaton **without a second application-global runtime**.
+- The host owns event dispatch and lifecycle; the adapter documents threading, cancellation, disposal and backpressure.
+- Two local subsystems can be coupled through typed input/output contracts with explicit feedback and error semantics.
+- Local laws and observable behavior survive integration; integration tests exercise the real event loop where appropriate.
+- The solution reduces code and conceptual overhead compared with a plain state machine plus framework callbacks. If it does not, **do not promote the abstraction to the architectural core**.
+
+The *missing key insight* is therefore left as a testable **research question**, not a claimed solution: *Can we compose open, independently scheduled domain dynamics through typed boundaries in a way that fits naturally inside existing framework lifecycles?*
+
+Keep this result visible in the book. Topological images of gluing, interfaces, cell attachment and surgery are guides to thought, not proofs that a generic flow framework is better.
