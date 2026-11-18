@@ -10,7 +10,7 @@ sealed interface TypeExpr {
     data object One : TypeExpr
     data class Sum(val left: TypeExpr, val right: TypeExpr) : TypeExpr
     data class Product(val left: TypeExpr, val right: TypeExpr) : TypeExpr
-    data class Apply(val constructor: TypeConstructor, val argument: TypeExpr) : TypeExpr
+    data class Apply(val typeConstructor: TypeConstructor, val argument: TypeExpr) : TypeExpr
 }
 
 /**
@@ -37,7 +37,7 @@ fun TypeExpr.normalize(): TypeExpr = when (this) {
     is TypeExpr.Atom, TypeExpr.Zero, TypeExpr.One -> this
     is TypeExpr.Sum -> TypeExpr.Sum(left.normalize(), right.normalize())
     is TypeExpr.Product -> TypeExpr.Product(left.normalize(), right.normalize())
-    is TypeExpr.Apply -> when (val ctor = constructor) {
+    is TypeExpr.Apply -> when (val ctor = typeConstructor) {
         TypeConstructor.Identity -> argument.normalize()
         is TypeConstructor.Named -> TypeExpr.Apply(ctor, argument.normalize())
         is TypeConstructor.Constant -> ctor.value.normalize()
