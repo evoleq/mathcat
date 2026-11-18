@@ -30,7 +30,9 @@ jobs:
             :mathcat-core:jvmTest :mathcat-core:jsNodeTest \
             :mathcat-core:wasmJsNodeTest :mathcat-core:linuxX64Test \
             :mathcat-store:jvmTest :mathcat-store:jsNodeTest \
-            :mathcat-store:wasmJsNodeTest :mathcat-store:linuxX64Test
+            :mathcat-store:wasmJsNodeTest :mathcat-store:linuxX64Test \
+            :mathcat-actions:jvmTest :mathcat-actions:jsNodeTest \
+            :mathcat-actions:wasmJsNodeTest :mathcat-actions:linuxX64Test
 
   android:
     name: Android library compilation
@@ -51,7 +53,7 @@ jobs:
         with:
           gradle-version: '9.2.1'
       - name: Compile Android KMP targets
-        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain
+        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
@@ -73,7 +75,9 @@ jobs:
             :mathcat-core:compileKotlinIosArm64 :mathcat-core:compileKotlinIosSimulatorArm64 \
             :mathcat-core:macosX64Test \
             :mathcat-store:compileKotlinIosArm64 :mathcat-store:compileKotlinIosSimulatorArm64 \
-            :mathcat-store:macosX64Test
+            :mathcat-store:macosX64Test \
+            :mathcat-actions:compileKotlinIosArm64 :mathcat-actions:compileKotlinIosSimulatorArm64 \
+            :mathcat-actions:macosX64Test
 
   windows:
     name: Windows Native
@@ -89,4 +93,4 @@ jobs:
           gradle-version: '9.2.1'
       - name: Test mingwX64
         shell: pwsh
-        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test
+        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test
