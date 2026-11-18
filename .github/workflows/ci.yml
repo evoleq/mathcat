@@ -31,7 +31,7 @@ jobs:
             :mathcat-core:wasmJsNodeTest :mathcat-core:linuxX64Test
 
   android:
-    name: Android library + host tests
+    name: Android library compilation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,8 +41,10 @@ jobs:
           java-version: '17'
       - name: Prepare Android SDK already present on GitHub runner
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          sdkmanager_path="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$sdkmanager_path"
+          yes | "$sdkmanager_path" --licenses > /dev/null || true
+          "$sdkmanager_path" "platforms;android-36" "build-tools;36.0.0"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.2.1'
