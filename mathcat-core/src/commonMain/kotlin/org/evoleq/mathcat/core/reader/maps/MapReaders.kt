@@ -1,6 +1,6 @@
-package org.evoleq.mathcat.core.maps
+package org.evoleq.mathcat.core.reader.maps
 
-import org.evoleq.mathcat.core.Reader
+import org.evoleq.mathcat.core.reader.Reader
 
 /**
  * Map Reader constructor, matching the legacy Evoleq convention.

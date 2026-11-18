@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core
+package org.evoleq.mathcat.core.state
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

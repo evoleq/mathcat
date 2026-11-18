@@ -1,4 +1,7 @@
-package org.evoleq.mathcat.core
+package org.evoleq.mathcat.core.optics
+
+import org.evoleq.mathcat.core.reader.Reader
+import org.evoleq.mathcat.core.writer.Writer
 
 /**
  * Read and write access without assuming any Lens law.
@@ -100,16 +103,3 @@ fun <S, A, B> Selection<S, A>.timesR(reader: Reader<A, B>): Reader<S, B> = this 
 fun <S, A, B> Selection<S, A>.timesW(writer: Writer<A, B>): Writer<S, B> = this * writer
 fun <S, A, B> Lens<S, A>.timesR(reader: Reader<A, B>): Reader<S, B> = this * reader
 fun <S, A, B> Lens<S, A>.timesW(writer: Writer<A, B>): Writer<S, B> = this * writer
-
-/** 
- * Filter/replace selection, deliberately NOT a lawful Lens:
- * replacing the selected values with themselves may reorder a list.
- */
-@Suppress("FunctionName")
-fun <A> FilterBy(predicate: (A) -> Boolean): Selection<List<A>, List<A>> =
-    Selection(
-        get = Reader { source -> source.filter(predicate) },
-        set = Writer { replacement ->
-            { source -> source.filterNot(predicate) + replacement }
-        }
-    )
