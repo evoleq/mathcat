@@ -1,31 +1,50 @@
-# Mathcat
+# MathCat
 
-## Multi Platform Functional Programming
+**Mathematically flavored functional programming for Kotlin Multiplatform.**
 
- - [mathcat-core](https://github.com/evoleq/mathcat-core)
- - [mathcat-continuation](https://github.com/evoleq/mathcat-continuation)
- - [mathcat-morphism](https://github.com/evoleq/mathcat-morphism)
- - [mathcat-lens](https://github.com/evoleq/mathcat-lens)
- - [mathcat-prism](https://github.com/evoleq/mathcat-prism)
- - [mathcat-profunctor-optics](https://github.com/evoleq/mathcat-profunctor-optics)
- - [mathcat-reader](https://github.com/evoleq/mathcat-reader)
- - [mathcat-result](https://github.com/evoleq/mathcat-result)
- - [mathcat-state](https://github.com/evoleq/mathcat-state)
- - [mathcat-store](https://github.com/evoleq/mathcat-store)
- - [mathcat-structure](https://github.com/evoleq/mathcat-structure)
- - [mathcat-yoneda](https://github.com/evoleq/mathcat-yoneda)
- <!-- [mathcat-operator-tree](https://github.com/evoleq/mathcat-operator-tree) -->
- 
-<!--
-## Dependency Tree
- - Core
-    - Morphism
-        - Continuation
-        - Reader
-        - State
-        - Store
-            - Lens
-        - Yoneda    
-    - Result
-    - Structure
--->
+MathCat is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
+
+## MathCat 2.0 (research prototype)
+
+The repository now contains the experimental `mathcat-type-algebra` Kotlin Multiplatform module (JVM + JavaScript/Node.js):
+
+- a value-level **AST** for unary type constructors, identity, composition and pointwise sum/product;
+- tagged `Sum2<A,B>` and `Product2<A,B>`, with explicit distributivity/factorization isomorphisms;
+- common tests run on both platforms in a minimal CI workflow.
+
+**Important:** These are normal Kotlin types and transformations. They are *not* built-in sum/product syntax, an HKT system, a compiler plugin or a proof of the laws.
+
+See [Architecture and research notes](docs/ARCHITECTURE.md) for the mathematical definitions, limits, next steps and the relationship to [fp-axioms](https://github.com/evoleq/fp-axioms).
+
+### Build and test locally
+
+With JDK 17+ and Gradle 8.6 available:
+
+```sh
+gradle :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest
+```
+
+For the JS tests, Kotlin/Gradle downloads the required Node.js environment when necessary. Gradle is pinned in CI; a Gradle wrapper can be added after the initial build has been verified.
+
+**CI:** Pull requests and pushes to `master` run JVM + JS/Node.js tests. The workflow **does not publish** artifacts. Publishing (JitPack, Maven Central or other) and final license selection are open decisions.
+
+## Earlier MathCat experiments
+
+The earlier MathCat libraries remain separate and are **not** implied dependencies of the new module. They are useful historical references; their API quality and contracts are being reassessed before any potential migration.
+
+- [mathcat-core](https://github.com/evoleq/mathcat-core), [mathcat-morphism](https://github.com/evoleq/mathcat-morphism), [mathcat-continuation](https://github.com/evoleq/mathcat-continuation)
+- [mathcat-reader](https://github.com/evoleq/mathcat-reader), [mathcat-state](https://github.com/evoleq/mathcat-state), [mathcat-store](https://github.com/evoleq/mathcat-store)
+- [mathcat-lens](https://github.com/evoleq/mathcat-lens), [mathcat-prism](https://github.com/evoleq/mathcat-prism), [mathcat-profunctor-optics](https://github.com/evoleq/mathcat-profunctor-optics)
+- [mathcat-result](https://github.com/evoleq/mathcat-result), [mathcat-structure](https://github.com/evoleq/mathcat-structure), [mathcat-yoneda](https://github.com/evoleq/mathcat-yoneda)
+
+These repositories have **not** been archived or made private. Existing consumers and references should be evaluated before changing their visibility.
+
+## Design principles
+
+- Prefer explicit mathematical contracts over attractive but unverified names.
+- Separate the laws an operation promises from whether it can be composed.
+- Keep pure operations apart from suspendable execution and platform effects.
+- Preserve useful real-world composition patterns such as `Lens * Writer` and `Writer.contraMap`.
+- Keep experimental language/tooling research separate from the usable library.
+
+The public API, licensing and release policy for MathCat 2.0 are still under review.
