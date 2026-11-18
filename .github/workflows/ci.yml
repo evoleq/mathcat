@@ -50,8 +50,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.2.1'
-      - name: Compile both Android targets
-        run: gradle --no-daemon :mathcat-type-algebra:compileKotlinAndroid :mathcat-core:compileKotlinAndroid :mathcat-storage:compileKotlinAndroid
+      - name: Compile Android KMP targets
+        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-storage:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
