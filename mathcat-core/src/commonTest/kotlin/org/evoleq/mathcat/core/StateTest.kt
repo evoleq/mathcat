@@ -60,7 +60,7 @@ class StateTest {
 
     @Test
     fun updatingStateAsKleisliArrowPreservesItsInputValue() {
-        val update: KlState<Int, String, String> = State.update { it + 3 }
+        val update: KlState<Int, String, String> = Update { it + 3 }
         val start: State<Int, String> = State.Return("payload")
 
         // The current value is available to subsequent operations.
@@ -75,7 +75,7 @@ class StateTest {
 
     @Test
     fun kleisliUpdateActsAsIdentityOnValueNotOnState() {
-        val update = State.update<Int, Int> { it * 2 }
+        val update = Update<Int, Int> { it * 2 }
         assertEquals(9 to 8, update(9)(4))
         assertEquals(9 to 8, (State.Return<Int, Int>(9) bind update)(4))
     }
