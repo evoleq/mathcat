@@ -60,6 +60,16 @@ class CollectionWritersTest {
     }
 
     @Test
+    fun standaloneCollectionConstructorsAreUsableWithoutLensOrCompanion() {
+        val appended = Append<Entry>()(Entry(3, "three"))(initial)
+        assertEquals(initial + Entry(3, "three"), appended)
+        assertEquals(
+            initial + listOf(Entry(3, "three"), Entry(4, "four")),
+            AppendAll<Entry>()(listOf(Entry(3, "three"), Entry(4, "four")))(initial)
+        )
+    }
+
+    @Test
     fun simpleAppendComposesWithLens() {
         val writer: Writer<Dashboard, Entry> = entriesLens.add()
         assertEquals(
