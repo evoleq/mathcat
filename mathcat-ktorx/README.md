@@ -35,3 +35,22 @@ The adapter reads the method/path from the same `EndPoint` declaration and const
 A portable MockEngine client test and a JVM `testApplication` route test verify endpoint method/path binding, named parameters, request body serialization, and two distinct request-local contexts. CI covers the same KMP targets as MathCat API.
 
 **This is an initial adapter, not a migration**: it has not yet wired `mathcat-result`'s JSON envelope, authentication/authorization, serializers registry composition at the application boundary, or Solyton's full `ReceiveContextual` and `Respond` flow. Those are follow-ups after PRs #8, #9 and #10 are accepted and merged; no Solyton changes are made.
+
+## Solyton-style Contextual IO (stacked Draft PR #13)
+
+`Receive`, `ReceiveContextual`, `Context`, and `Respond` are JVM/Ktor-specific adapters over a request-local `RequestBase(call, environment)`. They accept codecs and authentication logic explicitly. The pure transformation parts live in **`mathcat-context`** and **`mathcat-transform`**, which have *no* Ktor dependency.
+
+```kotlin
+import org.evoleq.mathcat.transform.Transform
+
+post("/echo") {
+    val workflow = Receive<Unit, String>(String.serializer()) *
+        Transform<String, String> { it.uppercase() } *
+        Respond(resultStringSerializer)
+    workflow runOn RequestBase(call, Unit)
+}
+```
+
+`ReceiveContextual` has body and query-parameter variants. Both accept an application-supplied `identity: suspend (ApplicationCall) -> Result<RequestIdentity>` returning the authenticated UUID plus context; they short-circuit on failure. `TransformContextual` maps only the contextual value, not identity or tenant context. `Respond` accepts `KSerializer<Result<T>>`, an optional context response header, and `ResponsePolicy` to map exceptions and HTTP status failures.
+
+**Not yet wired here:** Solyton's concrete JWT principal/authorization/DB setup, automatic serializer lookup from PR #9, or final `ResultSerializer` wire-compatibility from PR #12. This branch copies the still-unmerged `mathcat-result` module from PR #10; that duplication must be removed by rebase before integration. The original `Api` DSL and the pure Core `State` remain unchanged.
