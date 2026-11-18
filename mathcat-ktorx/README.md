@@ -35,3 +35,32 @@ The adapter reads the method/path from the same `EndPoint` declaration and const
 A portable MockEngine client test and a JVM `testApplication` route test verify endpoint method/path binding, named parameters, request body serialization, and two distinct request-local contexts. CI covers the same KMP targets as MathCat API.
 
 **This is an initial adapter, not a migration**: it has not yet wired `mathcat-result`'s JSON envelope, authentication/authorization, serializers registry composition at the application boundary, or Solyton's full `ReceiveContextual` and `Respond` flow. Those are follow-ups after PRs #8, #9 and #10 are accepted and merged; no Solyton changes are made.
+
+
+## Contextual + IO: the Solyton composition vocabulary
+
+The server JVM adapter now retains the Solyton-shaped Contextual(userId: UUID, context: String, data: T) with its map operation, and a Ktor-only suspendable Action/ KlAction composition. The pure MathCat Core State remains non-suspend.
+
+The KtorIO<Base> interpreter takes a getter for the application's actual Base.call, a composed Serializers registry, a Result JSON codec, optional authenticated-user resolver (defaults to Ktor JWTPrincipal subject) and independent ExceptionTransforms.
+
+```kotlin
+val io = KtorIO<MyBase>(
+    callOf = { it.call },
+    serializers = applicationSerializers,
+    transforms = applicationExceptionTransforms
+)
+routing {
+    bindEndpoint(applicationApi, CreateAuction::class, environment, ::Base) { base ->
+        with(io) {
+            (ReceiveContextual<CreateAuction>() * checkPermission * createAuction *
+                Respond<Auction> { environment.transformException(this) }) runOn base
+        }
+    }
+}
+```
+
+All four original IO modes exist: Receive<T>() decodes JSON into Result<T>, Receive(value) injects constant input; ReceiveContextual<T>() authenticates the caller and attaches the mandatory Context header and request data; ReceiveContextual(params) transforms query parameters; Respond<T>() serializes the old Result envelope and converts exceptions using the composed error policy. Transform and TransformContextual lift transformations into the suspendable state chain. The provided lambda to Respond<T> can still use the familiar trailing form { transform() } by supplying a compatible exception transformer.
+
+The client-side Contextual(context,data) remains a separate portable type in the context.data package (as in Solyton), used by requestResultEndpoint and sendResultEndpoint. Those methods send/receive typed Result envelopes with explicit serializers from manual or KSP-generated registries, preserve Context response headers and return an HttpStatusMessage on non-2xx responses.
+
+**Compatibility boundaries:** The existing Solyton global registry is replaced by injected composition; its multi-purpose Base(call,database) is still the consumer's responsibility through callOf and createBase. The new Respond writes JSON Result failure envelopes uniformly, including status failures, whereas some legacy Ktor routes returned plain text or a directly serialized Failure.Message. This difference is visible and requires an explicit migration decision. The default principal resolver needs Ktor JWT authentication configured; tests can inject a replacement and never bypass authentication in production by default. No Solyton code has been changed.
