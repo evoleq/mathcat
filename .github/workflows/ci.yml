@@ -10,19 +10,76 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: Kotlin Multiplatform (JVM + JS)
+  portable:
+    name: JVM, JS, Wasm and Linux Native
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Set up Gradle 8.6
-        uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.6'
-      - name: Run JVM and Node.js tests
-        run: gradle --no-daemon :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest :mathcat-core:jvmTest :mathcat-core:jsNodeTest
+          gradle-version: '9.2.1'
+      - name: Compile and test portable targets
+        run: |
+          gradle --no-daemon \
+            :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest \
+            :mathcat-type-algebra:wasmJsNodeTest :mathcat-type-algebra:linuxX64Test \
+            :mathcat-core:jvmTest :mathcat-core:jsNodeTest \
+            :mathcat-core:wasmJsNodeTest :mathcat-core:linuxX64Test
+
+  android:
+    name: Android library + host tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.1'
+      - name: Compile both Android targets
+        run: gradle --no-daemon :mathcat-type-algebra:compileKotlinAndroid :mathcat-core:compileKotlinAndroid
+
+  apple:
+    name: iOS + macOS Native
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.1'
+      - name: Compile iOS targets and test macOS
+        run: |
+          gradle --no-daemon \
+            :mathcat-type-algebra:compileKotlinIosArm64 :mathcat-type-algebra:compileKotlinIosSimulatorArm64 \
+            :mathcat-type-algebra:macosX64Test \
+            :mathcat-core:compileKotlinIosArm64 :mathcat-core:compileKotlinIosSimulatorArm64 \
+            :mathcat-core:macosX64Test
+
+  windows:
+    name: Windows Native
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.1'
+      - name: Test mingwX64
+        shell: pwsh
+        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test
