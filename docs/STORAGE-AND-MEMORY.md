@@ -2,6 +2,8 @@
 
 **MathCat 2.0 · 2026-11-18 · Draft PR #2.** An implementation and architectural note, not an automatic migration of existing Solyton code.
 
+For the algebra of **products, tagged sums and embedding existing Storages**, see [Storage composition research](STORAGE-COMPOSITION.md). The product and sum operators are research proposals, not public APIs yet.
+
 ## A simple algebraic boundary
 
 ```text
