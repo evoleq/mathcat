@@ -51,6 +51,10 @@ For the JS tests, Kotlin/Gradle downloads the required Node.js environment when 
 
 **Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **CI builds and tests only; it does not publish**. JitPack versus Maven Central and the final license remain open decisions.
 
+### Domain, Boundary, Environment and multilevel dynamics
+
+[Architectural research](docs/DOMAIN-BOUNDARY-ENVIRONMENT-DYNAMICS.md) connects Domain, Boundary and Environment with local/whole evolution, coupled flows, the legacy Evoleq `Gap` and `Flow` abstractions, and the existing API DSL. It is accompanied by a small commonTest projection-law example and a counterexample to autonomous local evolution. The document is **research**, not a frozen `Boundary` or `Dynamics` API. Mathematical topology analogies are explicitly distinguished from proved properties.
+
 ## Earlier MathCat experiments
 
 The earlier MathCat libraries remain separate and are **not** implied dependencies of the new module. They are useful historical references; their API quality and contracts are being reassessed before any potential migration.
