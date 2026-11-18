@@ -8,10 +8,12 @@ package org.evoleq.mathcat.core
  * They preserve existing positions and append only genuinely new keys.
  */
 
-fun <A> append(): Writer<List<A>, A> =
+@Suppress("FunctionName")
+fun <A> Append(): Writer<List<A>, A> =
     Writer { value -> { source -> source + value } }
 
-fun <A> appendAll(): Writer<List<A>, List<A>> =
+@Suppress("FunctionName")
+fun <A> AppendAll(): Writer<List<A>, List<A>> =
     Writer { values -> { source -> source + values } }
 
 private fun <A, K> requireDistinctKeys(
@@ -29,7 +31,8 @@ private fun <A, K> requireDistinctKeys(
  * Replace existing items by matching keys; ignore updates with unknown keys.
  * Duplicate keys in either list are rejected; no reordering takes place.
  */
-fun <A, K> listUpdateAllBy(keyOf: (A) -> K): Writer<List<A>, List<A>> =
+@Suppress("FunctionName")
+fun <A, K> UpdateAllBy(keyOf: (A) -> K): Writer<List<A>, List<A>> =
     Writer { updates ->
         { source ->
             requireDistinctKeys(source, keyOf, "source")
@@ -47,13 +50,14 @@ fun <A, K> listUpdateAllBy(keyOf: (A) -> K): Writer<List<A>, List<A>> =
  * Duplicate keys in either list are rejected. Complexity is expected O(n + m)
  * with hash-based key lookup, not guaranteed for pathological hash collisions.
  */
-fun <A, K> listUpsertAllBy(keyOf: (A) -> K): Writer<List<A>, List<A>> =
+@Suppress("FunctionName")
+fun <A, K> UpsertAllBy(keyOf: (A) -> K): Writer<List<A>, List<A>> =
     Writer { updates ->
         { source ->
             requireDistinctKeys(source, keyOf, "source")
             requireDistinctKeys(updates, keyOf, "updates")
             val keys = source.map(keyOf).toSet()
-            val replaced = listUpdateAllBy(keyOf)(updates)(source)
+            val replaced = UpdateAllBy(keyOf)(updates)(source)
             replaced + updates.filter { keyOf(it) !in keys }
         }
     }
@@ -61,10 +65,10 @@ fun <A, K> listUpsertAllBy(keyOf: (A) -> K): Writer<List<A>, List<A>> =
 /** Readable domain-specific facades over the general Lens * Writer operation. */
 fun <S, A, K> Lens<S, List<A>>.updateAllBy(
     keyOf: (A) -> K
-): Writer<S, List<A>> = this * listUpdateAllBy(keyOf)
+): Writer<S, List<A>> = this * UpdateAllBy(keyOf)
 
 fun <S, A, K> Lens<S, List<A>>.upsertAllBy(
     keyOf: (A) -> K
-): Writer<S, List<A>> = this * listUpsertAllBy(keyOf)
+): Writer<S, List<A>> = this * UpsertAllBy(keyOf)
 
-fun <S, A> Lens<S, List<A>>.add(): Writer<S, A> = this * append()
+fun <S, A> Lens<S, List<A>>.add(): Writer<S, A> = this * Append()
