@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-18  
 **Status:** draft implementation / review, NOT released or merged  
-**Scope:** `mathcat-core` Kotlin Multiplatform (JVM and JavaScript/Node.js)  
+**Scope:** `mathcat-core` Kotlin Multiplatform; see [target matrix](MULTIPLATFORM.md) for JVM, JS, Android, Native and Wasm  
 **Parent research PR:** [MathCat PR #1](https://github.com/evoleq/mathcat/pull/1)  
 **Related:** [Evoleq 2.0 exploration](https://github.com/doctor-smith/ai-command/issues/44), [legacy bugfix draft #394](https://github.com/doctor-smith/solawi-bid/pull/394)
 
@@ -18,6 +18,31 @@ val writer: Writer<Dashboard, ApiResponse> =
 ```
 
 The Lens selects **where**; the keyed Writer chooses **how**; `contraMap` translates an API response to the Writer's input. The Action/effect layer can consume the result later.
+
+## Package boundaries
+
+Each independent algebraic structure has its own namespace. This is deliberate **developer-experience and name-safety architecture**, not an additional Gradle module per structure.
+
+```text
+org.evoleq.mathcat.core
+├── state           State, KlState, Return, Update, Get, map, multiply, bind, *
+├── reader          Reader, IdReader, map, *
+│   └── maps        Get(key), GetForSure(key)
+├── writer          Writer, contraMap, write
+├── optics          Lens, Selection, IdLens, Get(lens), Set(lens), *
+└── collections     FilterBy, Append, AppendAll, UpdateAllBy, UpsertAllBy,
+                    lens.updateAllBy, lens.upsertAllBy, lens.add
+```
+
+Thus `core.state.Return` can coexist with a hypothetical future `core.result.Return`, and `core.optics.Get` with `core.state.Get` and `core.reader.maps.Get`. Consumers explicitly import or alias the desired constructor; nobody has to carry a companion qualifier through a Kleisli chain. The public `Reader`/`Writer` types stay nominal for signature safety; they are still lambda-friendly.
+
+```kotlin
+import org.evoleq.mathcat.core.state.Return
+import org.evoleq.mathcat.core.state.Update
+import org.evoleq.mathcat.core.state.times
+import org.evoleq.mathcat.core.optics.Get as LensGet
+import org.evoleq.mathcat.core.state.Get as StateGet
+```
 
 ## Public primitives and guarantees
 
@@ -126,12 +151,12 @@ Get<S>()        // State<S,S>: returns the current state without changing it
 
 The Optics' `get` and `set` remain lowercase properties. `Get(lens)` constructs a Reader that can be composed independently; `Get<S>()` constructs a State computation. This is deliberate overload by **argument shape**, not return type.
 
-The older Evoleq also defines `Get(key)` and `GetForSure(key)` for maps. MathCat preserves these in `org.evoleq.mathcat.core.maps`, separate from the optics package:
+The older Evoleq also defines `Get(key)` and `GetForSure(key)` for maps. MathCat preserves these in `org.evoleq.mathcat.core.reader.maps`, separate from the optics package:
 
 ```kotlin
-import org.evoleq.mathcat.core.Get
-import org.evoleq.mathcat.core.maps.Get as MapGet
-import org.evoleq.mathcat.core.maps.GetForSure
+import org.evoleq.mathcat.core.optics.Get
+import org.evoleq.mathcat.core.reader.maps.Get as MapGet
+import org.evoleq.mathcat.core.reader.maps.GetForSure
 ```
 
 `MapGet(key)` returns a nullable map value; `GetForSure(key)` is **partial** and fails when there is no non-null value. The `Get(key)` compatibility constructor treats a null key as no selection, matching Evoleq's existing helper.
@@ -139,7 +164,7 @@ import org.evoleq.mathcat.core.maps.GetForSure
 **Future monad modules** may each export their own `Return` (e.g., a hypothetical `org.evoleq.mathcat.result.Return`). Kotlin consumers can use import aliases:
 
 ```kotlin
-import org.evoleq.mathcat.core.Return as StateReturn
+import org.evoleq.mathcat.core.state.Return as StateReturn
 // hypothetical future module, NOT currently implemented:
 // import org.evoleq.mathcat.result.Return as ResultReturn
 ```
@@ -164,7 +189,7 @@ The new keyed list writers are **additional initial examples**, not drop-in repl
 
 All operations here are *pure value transformations* and hence not `suspend`. An effects layer may later define `SuspendState<S,A>`, `Storage<A>`, `SuspendStorage<A>`, atomic update abstractions, Ktor adapters and platform-dependent operations. Construction of a suspend-capable computation need not itself be suspend. Storage and IO are intentionally **not** in `mathcat-core`.
 
-`mathcat-core` uses Kotlin standard library only. It shares the Kotlin Multiplatform targets with the type-algebra spike (JVM and JS/Node.js). Neither depends on KSP or `fp-axioms`; generator plugins are separate JVM-hosted build tools.
+`mathcat-core` uses only Kotlin's standard library. It shares JVM, JS, Wasm, Android, Linux, Windows and Apple Native targets with the type-algebra spike. See [Multiplatform status](MULTIPLATFORM.md) for the difference between configured targets, verified compilation and executed tests. Neither module depends on KSP or `fp-axioms`; generator plugins are separate JVM-hosted build tools.
 
 ## Validation plan (implemented commonTest suite)
 
@@ -177,7 +202,7 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 - Keyed `updateAll`, `upsertAll`, no-match behavior, duplicate rejection, ordering.
 - Solyton-style Lens-lifted Writer with response conversion through `contraMap`.
 
-**Compilation and execution:** [GitHub Actions run #44265321148](https://github.com/evoleq/mathcat/actions/runs/44265321148) completed **successfully**, running `:mathcat-core:jvmTest`, `:mathcat-core:jsNodeTest` and both existing type-algebra targets. This validates the tested JVM/JS implementations; it does not constitute formal proof of all laws or compatibility with more platforms.
+**Compilation and execution:** [GitHub Actions run #44270455594](https://github.com/evoleq/mathcat/actions/runs/44270455594) verified JVM and JavaScript/Node.js tests **after package separation**. Additional Android, Native and Wasm jobs were configured subsequently and are tracked in [MULTIPLATFORM.md](MULTIPLATFORM.md). Success in JVM/JS does not imply success on every target.
 
 ## Explicit exclusions and follow-up
 
@@ -199,3 +224,6 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 | 2026-11-18 | Author's naming and value-preserving Kleisli state update applied | Standalone `Return`, `Update`; lowercase `multiply`, `bind`, `map`, `get` |
 | 2026-11-18 | Consistent names for top-level constructors | `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`; CI retest pending |
 | 2026-11-18 | Restore Evoleq Get/Set constructors and map Get variants | `Get(lens/selection)`, `Set(lens/selection)`, `Get<S>()`, `maps.Get(key)`, `maps.GetForSure(key)` + import-alias tests |
+
+| 2026-11-18 | Namespaced core API, with JVM/JS tests passing | [Run #44270455594](https://github.com/evoleq/mathcat/actions/runs/44270455594) |
+| 2026-11-18 | Expanded target configuration and CI matrix | Android, iOS, macOS, Linux, Windows, Wasm; see [status](MULTIPLATFORM.md) (validation pending) |

@@ -14,17 +14,17 @@ The **mathematical origins are part of the API design**: [Mathematical foundatio
 
 The public DSL now follows a simple rule: **constructors** `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy` and `UpsertAllBy` are capitalized and can be used directly; **operations** `map`, `multiply`, `bind`, `get`, `set` and `contraMap` stay lowercase. Future monads may reuse the name `Return` in their own packages; Kotlin's `import ... as ...` syntax disambiguates call sites without changing mathematical vocabulary. A [commonTest import-alias smoke test](mathcat-core/src/commonTest/kotlin/org/evoleq/mathcat/consumer/ConstructorImportsTest.kt) verifies the public core's alias ergonomics.
 
-In particular, **`Get(lens)` and `Set(lens)`** turn an optic into the corresponding `Reader` and `Writer`; `Get<S>()` constructs a pure state-read computation. Map readers use `org.evoleq.mathcat.core.maps.Get(key)` / `GetForSure(key)`; explicit imports or import aliases keep these meanings clear. A `State` is directly callable (`state(s)`) without importing a separate invocation extension.
+In particular, **`Get(lens)` and `Set(lens)`** turn an optic into the corresponding `Reader` and `Writer`; `Get<S>()` constructs a pure state-read computation. Map readers use `org.evoleq.mathcat.core.reader.maps.Get(key)` / `GetForSure(key)`; explicit imports or import aliases keep these meanings clear. A `State` is directly callable (`state(s)`) without importing a separate invocation extension. Packages now keep the standalone constructors unambiguous: `core.state`, `core.reader`, `core.writer`, `core.optics`, `core.collections` and `core.reader.maps`.
 
 See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
 
 ## MathCat 2.0 (research prototype)
 
-The repository now contains the experimental `mathcat-type-algebra` Kotlin Multiplatform module (JVM + JavaScript/Node.js):
+The repository also contains an experimental `mathcat-type-algebra` Kotlin Multiplatform module, sharing the targets described in [Multiplatform support](docs/MULTIPLATFORM.md):
 
 - a value-level **AST** for unary type constructors, identity, composition and pointwise sum/product;
 - tagged `Sum2<A,B>` and `Product2<A,B>`, with explicit distributivity/factorization isomorphisms;
-- common tests run on both platforms in a minimal CI workflow.
+- common tests used by independently configured JVM, JS, Native and WebAssembly targets; Android and Apple cross-compilation are checked separately.
 
 **Important:** These are normal Kotlin types and transformations. They are *not* built-in sum/product syntax, an HKT system, a compiler plugin or a proof of the laws.
 
@@ -32,7 +32,7 @@ See [Architecture and research notes](docs/ARCHITECTURE.md) for the mathematical
 
 ### Build and test locally
 
-With JDK 17+ and Gradle 8.6 available:
+With JDK 17+ and Gradle 9.2.1 available:
 
 ```sh
 gradle :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest \
@@ -41,7 +41,7 @@ gradle :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest \
 
 For the JS tests, Kotlin/Gradle downloads the required Node.js environment when necessary. Gradle is pinned in CI; a Gradle wrapper can be added after the initial build has been verified.
 
-**CI:** Pull requests and pushes to `master` run JVM + JS/Node.js tests for both modules. The workflow **does not publish** artifacts. Publishing (JitPack, Maven Central or other) and final license selection are open decisions.
+**Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **CI builds and tests only; it does not publish**. JitPack versus Maven Central and the final license remain open decisions.
 
 ## Earlier MathCat experiments
 
