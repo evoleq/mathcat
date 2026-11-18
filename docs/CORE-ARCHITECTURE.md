@@ -27,7 +27,7 @@ The Lens selects **where**; the keyed Writer chooses **how**; `contraMap` transl
 | `Writer<S,A>` | `A → (S → S)`, nominal `fun interface` | `contraMap` preserves identity/composition for pure functions | No |
 | `Selection<S,A>` | Reader + Writer | supports composition; **no Lens laws assumed** | No |
 | `Lens<S,A>` | Reader + Writer **subject to laws** | Get–Put, Put–Get, Put–Put are obligations of implementers | No |
-| `State<S,A>` | `S → (A,S)` | `pure`/`flatMap` satisfy State Monad laws for pure functions | No |
+| `State<S,A>` | `S → (A,S)` | `Return`/`map`/`multiply`/`bind` satisfy the State Monad laws for pure functions | No |
 
 `Reader` and `Writer` are intentionally **nominal**, not bare function typealiases: overloads `Selection * Reader` and `Selection * Writer` can otherwise collide in the JVM signature and/or lead to ambiguous inference. `fun interface` preserves lambda construction with explicit type inference and minimal wrappers. The API trade-off (nominal versus aliases) is **proposed**, not final.
 
@@ -68,7 +68,7 @@ This is deliberately **not** a Lens because `set(get(s))(s) ≠ s` in general. I
 | `Lens/Selection<S,A>` | `Reader<A,B>` | `Reader<S,B>` |
 | `Lens/Selection<S,A>` | `Writer<A,B>` | `Writer<S,B>` |
 | `Writer<S,A>` | `contraMap(B→A)` | `Writer<S,B>` |
-| `State<S,A>` | `(A)→State<S,B>` | `State<S,B>` |
+| `State<S,A>` | `KlState<S,A,B> = (A) → State<S,B>` | `State<S,B>` via `bind` / `*` |
 
 The first operator denotes `*` for most rows; `contraMap` is a named method. Readers and Writers are nominal so that the lifted `*` overloads have distinct JVM signatures. Named `timesR` and `timesW` also exist for clarity.
 
@@ -80,6 +80,26 @@ For pure inputs, the composed Selection formulas are:
 ```
 
 Pure extensional equality, not equality of function object identities, is the intended notion. Effects inside supplied lambdas invalidate some algebraic assumptions; no purity enforcement is claimed.
+
+## State vocabulary and value-preserving state updates
+
+The author deliberately uses the existing **Evoleq vocabulary**: `Return`, `map`, `multiply`, `bind`, `KlState` and `get`. It reduces accidental declaration clashes and gives the algebra a consistent set of names. **Do not introduce public `pure`, `flatMap` or `modify` synonyms** without a separate API decision.
+
+```kotlin
+typealias KlState<S, A, B> = (A) -> State<S, B>
+
+// Monad multiplication: State<S, State<S, A>> -> State<S, A>
+val joined = nested.multiply()
+
+// Value is retained, while the state changes:
+val change: KlState<Int, String, String> = State.update { it + 3 }
+val result = (State.Return<Int, String>("payload") * change)(5)
+// result == ("payload" to 8)
+```
+
+The important distinction is between **changing the state** and **discarding the value**. Returning `Unit` is appropriate for an intentionally value-less computation, but not as the default helper for an operation that is meant to be chained. Here the primitive is a `KlState<S,A,A>`: it forwards its input `A` unchanged while updating `S`.
+
+`multiply` threads the **outer successor state** into the inner computation, and `bind` is defined as `map(kleisli).multiply()`. This also makes the connection to the monad multiplication `μ` explicit. The alias `KlState` remains an ordinary function type (no unsupported Higher Kinds claimed).
 
 ## Collection writers: preserve the pattern, tighten contracts
 
@@ -107,7 +127,8 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 - All three Lens laws (representative data models), Lens composition identity/associativity.
 - Lens × Reader / Writer; Selection × Lens / Selection / Reader / Writer.
 - Explicit non-lawful `filterBy` regression.
-- State `pure`, `map`, `flatMap` and monad identities/associativity for representative state functions.
+- State `Return`, `map`, `multiply`, `bind`, `get`, `KlState` and Monad identities/associativity for representative state functions.
+- Kleisli state update: `State.update(change): KlState<S,A,A>` changes state while passing the value through; no implicit `Unit` result or `modify` API.
 - Keyed `updateAll`, `upsertAll`, no-match behavior, duplicate rejection, ordering.
 - Solyton-style Lens-lifted Writer with response conversion through `contraMap`.
 
@@ -130,3 +151,4 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 | 2026-11-18 | Selection and Lens laws separated; FilterBy represented honestly | Draft implementation + tests |
 | 2026-11-18 | Pure State and keyed list Writer examples added | Draft implementation + tests |
 | 2026-11-18 | CI expanded for two modules × two platforms | [Run #44265321148: SUCCESS](https://github.com/evoleq/mathcat/actions/runs/44265321148) |
+| 2026-11-18 | Author's naming and value-preserving Kleisli state update applied | `Return`, `multiply`, `bind`, `KlState`, `get`, `State.update`; JVM/JS retest pending |
