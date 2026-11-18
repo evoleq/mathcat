@@ -188,6 +188,8 @@ The new keyed list writers are **additional initial examples**, not drop-in repl
 
 ## Source, Storage and Memory
 
+The next design slice is [algebraic Storage composition](STORAGE-COMPOSITION.md): independent `x` products, sums that require explicit tagged-branch semantics, and assembling a domain Storage over already-existing independent Memories. These combinators are **not implemented yet**, pending law/operational review.
+
 See [Storage, Memory and Compose architecture](STORAGE-AND-MEMORY.md) for the actual interface and a review of Solyton's observable/non-observable state separation.
 
 ```text
