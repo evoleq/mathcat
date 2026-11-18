@@ -1,7 +1,7 @@
 # Action dispatchers and compositional Storage
 
 **MathCat 2.0 — architecture exploration, 2026-11-18.**  
-**Status: research only.** This document does **not** add new Action/Dispatcher/Store code, start a background processor, port the frontend, or approve an API name.
+**Status: research and incremental implementation.** The original text below distinguishes design candidates from verified code. The separate [Store draft PR #4](https://github.com/evoleq/mathcat/pull/4) has implemented `Store<S,D>` in `mathcat-store`; the [typed Actions draft PR #5](https://github.com/evoleq/mathcat/pull/5) now adds the small `mathcat-actions` module, with standalone `Action`, `ActionEnvelope`, `ActionDispatcher`, their typed Lens transports and `Store * Lens`. Neither PR adds a running processor, coroutine scope, HTTP integration, Compose adapter or a Solyton migration. Both remain drafts.
 
 ## The problem
 
@@ -192,3 +192,37 @@ Do not start a `CoroutineScope(Job()).launch` implicitly inside a composed Stora
 - Existing Action lens lift: https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/commonMain/kotlin/org/evoleq/optics/storage/action.kt
 - Existing frontend action processor: https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-frontend/src/jsMain/kotlin/org/solyton/solawi/bid/application/storage/middleware/action-processor.kt
 - Existing frontend Storage: https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-frontend/src/jsMain/kotlin/org/solyton/solawi/bid/application/storage/storage.kt
+
+## 7. First implementation slice (PR #5)
+
+The experimental `mathcat-actions` module now implements a **transport-neutral subset** of the Evoleq architecture:
+
+```text
+Action<S,I,O>                     name, Reader<S,I>, Writer<S,O>, onSuccess?
+ActionEnvelope<S,I,O>             action, id, parentId, next, nextLazy,
+                                  meta, run, clearOnFinish
+ActionDispatcher<S>                suspend dispatch / dispatchEnvelope
+
+Lens<S,A> * Action<A,I,O>         -> Action<S,I,O>
+Lens<S,A> * ActionEnvelope<A,I,O> -> ActionEnvelope<S,I,O>
+ActionDispatcher<S> * Lens<S,A>   -> ActionDispatcher<A>
+Store<S,ActionDispatcher<S>> * Lens<S,A>
+                                  -> Store<A,ActionDispatcher<A>>
+```
+
+`Action` descriptions **do not include a runnable endpoint or a response
+interpreter**. This is deliberate: the legacy Evoleq API has Ktor-specific
+descriptors, serializers and errors. The new mathematical representation does
+not claim to execute those effects or replace that type one-for-one.
+
+The envelope lift preserves the `id`, `parentId`, metadata, run/cleanup
+flags, recursively lifts all eager children, and wraps deferred suppliers
+rather than evaluating them. The Action lift transports the `onSuccess`
+Writer along with the main Reader and Writer. Common tests check these
+behaviors and demonstrate a recording dispatcher, which only accepts messages.
+
+**Future work, intentionally not implemented yet:** typed endpoint/effect
+description, response/result interpretation, explicit error policies,
+cancellation ownership, persist/retry semantics and compatibility with
+existing Evoleq Action/ActionEnvelope types. No backend or Solyton application
+code was edited. Testing and API review are required before merging PR #5.
