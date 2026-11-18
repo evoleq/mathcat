@@ -8,7 +8,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.serialization.builtins.serializer
-import runTest
+import kotlinx.coroutines.test.runTest
 import org.evoleq.mathcat.api.Api
 import org.evoleq.mathcat.api.EmptyParams
 import kotlin.test.Test
@@ -43,7 +43,7 @@ class KtorClientAdapterTest {
             }
         }
         val client = HttpClient(MockEngine { request ->
-            assertEquals(HttpMethod.GET, request.method)
+            assertEquals(HttpMethod.Get, request.method)
             assertEquals("/api/users/42", request.url.encodedPath)
             respond(
                 content = "\"found\"",
@@ -70,7 +70,7 @@ class KtorClientAdapterTest {
     fun clientCanSerializeRequestBodiesWithoutKsp() = runTest {
         val api = Api { post<String, String>(CreateUser::class, "users/create") }
         val client = HttpClient(MockEngine { request ->
-            assertEquals(HttpMethod.POST, request.method)
+            assertEquals(HttpMethod.Post, request.method)
             assertEquals("/users/create", request.url.encodedPath)
             respond("\"saved\"", headers = headersOf(HttpHeaders.ContentType, "application/json"))
         })

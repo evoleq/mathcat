@@ -3,7 +3,6 @@ package org.evoleq.mathcat.ktorx
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.handle
 import io.ktor.server.routing.route
 import org.evoleq.mathcat.api.Api
 import kotlin.reflect.KClass
