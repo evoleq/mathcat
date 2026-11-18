@@ -16,6 +16,18 @@ class SourceTest {
     }
 
     @Test
+    fun sourceProductIsLazyAndPreservesLeftToRightOrder() {
+        val observed = mutableListOf<String>()
+        val first: Source<Int> = Source { observed += "first"; 4 }
+        val second: Source<String> = Source { observed += "second"; "name" }
+        val pair = first x second
+
+        assertEquals(emptyList(), observed)
+        assertEquals(4 to "name", pair.emit())
+        assertEquals(listOf("first", "second"), observed)
+    }
+
+    @Test
     fun sourceListEmitEvaluatesEachMemberInOrder() {
         var cursor = 0
         val a: Source<Int> = Source { ++cursor }
