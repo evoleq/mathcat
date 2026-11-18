@@ -32,11 +32,13 @@ interface Storage<S> {
  * The factory is capitalized in the existing MathCat constructor vocabulary.
  */
 @Suppress("FunctionName")
-fun <S> Storage(source: Source<S>, write: (S) -> Unit): Storage<S> =
-    object : Storage<S> {
+fun <S> Storage(source: Source<S>, write: (S) -> Unit): Storage<S> {
+    val sink = write
+    return object : Storage<S> {
         override val source: Source<S> = source
-        override fun write(value: S) = write.invoke(value)
+        override fun write(value: S) = sink(value)
     }
+}
 
 /** Convenience factory for existing callback-style backends. */
 @Suppress("FunctionName")
