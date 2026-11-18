@@ -1,150 +1,223 @@
 package org.evoleq.mathcat.api
 
-/** HTTP vocabulary, deliberately independent of server/client frameworks. */
-enum class HttpMethod { GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS }
+import org.evoleq.mathcat.core.reader.Reader
+import kotlin.reflect.KClass
 
-/**
- * Typed declaration handle. Use the *same instance* when declaring and binding a route.
- *
- * Type parameters are checked by Kotlin at call sites; they are not runtime codecs.
- * Reference identity prevents an unrelated same-named declaration from being bound
- * with mismatched request/response types.
- */
-class Endpoint<Request : Any, Response : Any>(
-    val id: String,
-    val method: HttpMethod,
-    path: String
-) {
-    init {
-        require(id.isNotBlank() && id == id.trim() && id.none(Char::isWhitespace)) {
-            "Endpoint id must be nonblank and contain no whitespace"
-        }
+
+@DslMarker
+annotation class MathDsl
+
+@Suppress("TooManyFunctions")
+data class Api(
+    val endPoints: HashMap<KClass<*>, EndPoint<*,*>> = hashMapOf()
+): Map<KClass<*>, EndPoint<*,*>> by endPoints {
+
+    inline fun < reified S, reified T> head(key: KClass<*>, url: String): Api = with(this) {
+        endPoints[key] = EndPoint.Head<S,T>(url, S::class, T::class)
+        this
+    }
+    inline fun < reified S, reified T> get(key: KClass<*>, url: String, parameters: Set<String> = emptySet()): Api where S: Parameters = with(this) {
+        endPoints[key] = EndPoint.Get<S,T>(url, S::class, T::class, parameters = parameters)
+        this
+    }
+    inline fun < reified S, reified T> post(key: KClass<*>, url: String): Api = with(this) {
+        endPoints[key] = EndPoint.Post<S,T>(url, S::class, T::class)
+        this
+    }
+    inline fun < reified S, reified T> put(key: KClass<*>, url: String): Api = with(this) {
+        endPoints[key] = EndPoint.Put<S,T>(url, S::class, T::class)
+        this
+    }
+    inline fun < reified S, reified T> patch(key: KClass<*>, url: String): Api = with(this) {
+        endPoints[key] = EndPoint.Patch<S,T>(url, S::class, T::class)
+        this
+    }
+    inline fun < reified S, reified T> delete(key: KClass<*>, url: String): Api = with(this) {
+        endPoints[key] = EndPoint.Delete<S,T>(url, S::class, T::class)
+        this
     }
 
-    val path: String = normalizePath(path)
+    inline fun <reified N: Any, reified S, reified T> get(url: String, parameters: Set<String> = emptySet()): Api where S: Parameters = with(this) {
+        endPoints[N::class] = EndPoint.Get<S,T>(url,  S::class, T::class, parameters = parameters)
+        this
+    }
+    inline fun <reified N: Any, reified S, reified T> post(url: String): Api = with(this) {
+        endPoints[N::class] = EndPoint.Post<S, T>(url, S::class, T::class)
+        this
+    }
+    inline fun <reified N: Any, reified S, reified T> put(url: String): Api = with(this) {
+        endPoints[N::class] = EndPoint.Put<S,T>(url, S::class, T::class)
+        this
+    }
+    inline fun <reified N: Any,  reified S, reified T> patch(url: String): Api = with(this) {
+        endPoints[N::class] = EndPoint.Patch<S,T>(url, S::class, T::class)
+        this
+    }
+    inline fun <reified N: Any,  reified S, reified T> delete(url: String): Api = with(this) {
+        endPoints[N::class] = EndPoint.Delete<S,T>(url, S::class, T::class)
+        this
+    }
+    inline fun <reified N: Any,  reified S, reified T> head(url: String): Api = with(this) {
+        endPoints[N::class] = EndPoint.Head<S,T>(url, S::class, T::class)
+        this
 
-    override fun toString(): String = "Endpoint($id, $method $path)"
-}
+    }
 
-/** The original module remains visible even when mounted below several parents. */
-data class EndpointOrigin(
-    val moduleId: String,
-    val groups: List<String> = emptyList()
-)
+    // Helper to copy endpoints with new url
+    private fun <S, T> EndPoint<S, T>.withUrl(newUrl: String): EndPoint<S, T> = when(this) {
+        is EndPoint.Get -> copy(url = newUrl)
+        is EndPoint.Post -> copy(url = newUrl)
+        is EndPoint.Put -> copy(url = newUrl)
+        is EndPoint.Patch -> copy(url = newUrl)
+        is EndPoint.Delete -> copy(url = newUrl)
+        is EndPoint.Head -> copy(url = newUrl)
+    }
 
-/** Framework-neutral description of a mounted endpoint. */
-data class EndpointDescriptor internal constructor(
-    val endpoint: Endpoint<*, *>,
-    val path: String,
-    val origin: EndpointOrigin
-) {
-    val id: String get() = endpoint.id
-    val method: HttpMethod get() = endpoint.method
-}
+    // Helper to copy endpoints with new group
+    private fun <S, T> EndPoint<S, T>.withGroup(newGroup: String): EndPoint<S, T> = when(this) {
+        is EndPoint.Get -> copy(group = newGroup)
+        is EndPoint.Post -> copy(group = newGroup)
+        is EndPoint.Put -> copy(group = newGroup)
+        is EndPoint.Patch -> copy(group = newGroup)
+        is EndPoint.Delete -> copy(group = newGroup)
+        is EndPoint.Head -> copy(group = newGroup)
+    }
 
-/** A typed binding returned only for the exact declaration handle in an API. */
-data class ResolvedEndpoint<Request : Any, Response : Any>(
-    val endpoint: Endpoint<Request, Response>,
-    val path: String,
-    val origin: EndpointOrigin
-) {
-    val method: HttpMethod get() = endpoint.method
-}
 
-/** Immutable result of validating a compositional API declaration. */
-class Api internal constructor(
-    val id: String,
-    entries: List<EndpointDescriptor>
-) {
-    private val records = entries.toList()
-
-    /** Copy-on-read avoids exposing the builder's mutable collection. */
-    val endpoints: List<EndpointDescriptor> get() = records.toList()
+    @Suppress("UNUSED_PARAMETER")
+    fun group(name: String, configure: Api.() -> Api): Api = with(this) {
+        val subApi = Api().configure()
+        subApi.endPoints.forEach { (key, value) ->
+            endPoints[key] = value.withGroup(name).withUrl(value.url)
+        }
+        this
+    }
 
     /**
-     * No unchecked cast: metadata is looked up by referential identity, while the
-     * caller's already-typed Endpoint supplies Request and Response.
+     * Compose a group declared in another source module. Identical semantics
+     * to the existing group(name) { ... } builder: group changes metadata,
+     * never the URL.
      */
-    fun <Request : Any, Response : Any> resolve(
-        endpoint: Endpoint<Request, Response>
-    ): ResolvedEndpoint<Request, Response>? =
-        records.firstOrNull { it.endpoint === endpoint }?.let { found ->
-            ResolvedEndpoint(endpoint, found.path, found.origin)
+    fun group(name: String, group: Api): Api = with(this) {
+        group.endPoints.forEach { (key, value) ->
+            endPoints[key] = value.withGroup(name).withUrl(value.url)
         }
-
-    fun <Request : Any, Response : Any> requireEndpoint(
-        endpoint: Endpoint<Request, Response>
-    ): ResolvedEndpoint<Request, Response> =
-        requireNotNull(resolve(endpoint)) { "Endpoint '" + endpoint.id + "' is not part of API '$id'" }
-}
-
-/**
- * A small mutable *construction* DSL; the built Api is a validated snapshot.
- * group adds logical metadata. module prefixes the path but retains the
- * contributing API's original module identity.
- */
-class ApiBuilder internal constructor(private val moduleId: String) {
-    private val declarations = mutableListOf<EndpointDescriptor>()
-
-    fun <Request : Any, Response : Any> endpoint(value: Endpoint<Request, Response>) {
-        declarations += EndpointDescriptor(value, value.path, EndpointOrigin(moduleId))
+        this
     }
 
-    fun group(name: String, configure: ApiBuilder.() -> Unit) {
-        requireName(name, "Group")
-        val nested = ApiBuilder(moduleId).apply(configure)
-        declarations += nested.declarations.map { entry ->
-            entry.copy(origin = entry.origin.copy(groups = listOf(name) + entry.origin.groups))
+    fun module(path: String, module: Api): Api = with(this) {
+        module.endPoints.forEach { (key, value) ->
+            endPoints[key] = value.withGroup(path).withUrl("$path/${value.url}")
         }
+        this
+    }
+    fun module(path: String, configure: Api.() -> Api): Api = with(this) {
+        val subApi = Api().configure()
+        subApi.endPoints.forEach { (key, value) ->
+            endPoints[key] = value.withGroup(path).withUrl("$path/${value.url}")
+         }
+        this
     }
 
-    /** A fragment may be assembled in another Gradle module, without Ktor. */
-    fun module(prefix: String, fragment: Api) {
-        val mount = normalizePath(prefix)
-        declarations += fragment.endpoints.map { entry ->
-            entry.copy(path = joinPaths(mount, entry.path))
-        }
+    /**
+     * Merge a previously defined Api fragment without adding a group or path.
+     * The existing KClass key and overwrite semantics are retained.
+     */
+    fun include(fragment: Api): Api = with(this) {
+        endPoints.putAll(fragment.endPoints)
+        this
     }
 
-    internal fun build(): Api {
-        // Validate at assembly time, before returning anything to the consumer.
-        val identities = mutableSetOf<Pair<String, String>>()
-        val routes = mutableSetOf<Pair<HttpMethod, String>>()
-        val handles = mutableSetOf<Endpoint<*, *>>()
-        for (entry in declarations) {
-            require(identities.add(entry.origin.moduleId to entry.id)) {
-                "Duplicate endpoint '" + entry.origin.moduleId + ":" + entry.id + "' in API '$moduleId'"
-            }
-            require(handles.add(entry.endpoint)) {
-                "The same Endpoint instance '" + entry.id + "' was mounted more than once"
-            }
-            require(routes.add(entry.method to entry.path)) {
-                "Duplicate route '" + entry.method + " " + entry.path + "' in API '$moduleId'"
-            }
-        }
-        return Api(moduleId, declarations)
+    companion object {
+        operator fun invoke(configure: Api.() -> Api): Api = Api().configure()
     }
 }
 
-fun api(id: String, configure: ApiBuilder.() -> Unit): Api {
-    requireName(id, "API module")
-    return ApiBuilder(id).apply(configure).build()
-}
+@MathDsl
+@Suppress("UNCHECKED_CAST", "FunctionName")
+fun <S, T> EndPoint(key: KClass<*>): Reader<Api, EndPoint<S, T>> = Reader { api -> api[key]!! as EndPoint<S, T> }
 
-private fun requireName(name: String, kind: String) {
-    require(name.isNotBlank() && name == name.trim() && name.none(Char::isWhitespace)) {
-        "$kind id must be nonblank and contain no whitespace"
+sealed class EndPoint<in S, out T>(
+    open val url: String,
+    open val requestType: KClass<*>,
+    open val responseType: KClass<*>,
+    open val group: String? = null,
+    open val parameters: Set<String> = emptySet()
+) {
+    data class Get<in S, out T>(
+        override val url: String,
+        override val requestType: KClass<*>,
+        override val responseType: KClass<*>,
+        override val group: String? = null,
+        override val parameters: Set<String> = emptySet()
+    ) : EndPoint<S, T>(
+        url,
+        requestType,
+        responseType,
+        group
+    ) where S : Parameters
+    data class Post<in S, out T>(
+        override val url: String,
+        override val requestType: KClass<*>,
+        override val responseType: KClass<*>,
+        override val group: String? = null
+    ) : EndPoint<S, T>(
+        url,
+        requestType,
+        responseType,
+        group
+    )
+    data class Put<in S, out T>(
+        override val url: String,
+        override val requestType: KClass<*>,
+        override val responseType: KClass<*>,
+        override val group: String? = null
+    ) : EndPoint<S, T>(
+        url,
+        requestType,
+        responseType,
+        group
+    )
+    data class Patch<in S, out T>(
+        override val url: String,
+        override val requestType: KClass<*>,
+        override val responseType: KClass<*>,
+        override val group: String? = null
+    ): EndPoint<S, T>(
+        url,
+        requestType,
+        responseType,
+        group
+    )
+    data class Delete<in S, out T>(
+        override val url: String,
+        override val requestType: KClass<*>,
+        override val responseType: KClass<*>,
+        override val group: String? = null
+    ) : EndPoint<S, T>(
+        url,
+        requestType,
+        responseType,
+        group
+    )
+    data class Head<in S, out T>(
+        override val url: String,
+        override val requestType: KClass<*>,
+        override val responseType: KClass<*>,
+        override val group: String? = null
+    ) : EndPoint<S, T>(
+        url,
+        requestType,
+        responseType,
+        group
+    )
+
+    val method: String = when(this) {
+        is Head<*, *> -> "HEAD"
+        is Delete<*, *> -> "DELETE"
+        is Get<*, *> -> "GET"
+        is Patch<*, *> -> "PATCH"
+        is Post<*, *> -> "POST"
+        is Put<*, *> -> "PUT"
     }
 }
-
-/** Canonical absolute URL path; supports named parameters such as {id}. */
-internal fun normalizePath(path: String): String {
-    require('?' !in path && '#' !in path) { "Query and fragment are not part of an endpoint path: '$path'" }
-    val segments = path.split('/').filter(String::isNotEmpty)
-    require(segments.none { it == "." || it == ".." || it.any(Char::isWhitespace) }) {
-        "Invalid path segment in '$path'"
-    }
-    return if (segments.isEmpty()) "/" else "/" + segments.joinToString("/")
-}
-
-private fun joinPaths(prefix: String, path: String): String = normalizePath("$prefix/$path")

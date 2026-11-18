@@ -53,9 +53,12 @@ For the JS tests, Kotlin/Gradle downloads the required Node.js environment when 
 
 ## Composable HTTP API declarations
 
-The [`mathcat-api`](mathcat-api) module introduces typed endpoint handles, independently constructed `Api` fragments, logical `group` metadata, path-prefix `module` composition and deterministic conflict detection. Assembled APIs preserve the original module ID and resolve typed declarations without unsafe casts. This is HTTP-aware but **independent of Ktor and every other application framework**.
+[`mathcat-api`](mathcat-api) now preserves the existing Evoleq `Api { ... }` DSL: the `KClass`-keyed `Map`, `EndPoint.Get/Post/Put/Patch/Delete/Head`, reified overloads, URL and group metadata, and existing `group`/`module` blocks. It is still independent of Ktor.
 
-Its first nine tests live in `commonTest`; platform CI is configured separately. The **planned** `mathcat-ktorx` module will be responsible for Ktor Routes, `Receive`, `Respond` and per-request `Base(call, environment)`. Nothing in this first slice changes Ktor or Solyton. See [the module's usage and contract documentation](mathcat-api/README.md).
+The **only functional additions** are `include(fragment: Api)` (combine modules without a path/group), and `group(name, fragment: Api)` (apply an existing group to a separately declared `Api`). The existing `module(path, fragment: Api)` already supports independently declared modules. There is no new `Endpoint` / `ApiBuilder` design: [usage and compatibility notes](mathcat-api/README.md) document the faithful port and the small portability seam for `Parameters`.
+
+Ktor route binding and request-scoped `Base(call, environment)` belong in the later **`mathcat-ktorx`** module. No change to Solyton or the currently released MathCat Core.
+
 
 ## Earlier MathCat experiments
 
