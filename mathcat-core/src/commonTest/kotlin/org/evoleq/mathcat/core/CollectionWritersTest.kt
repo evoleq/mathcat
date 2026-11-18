@@ -18,7 +18,7 @@ class CollectionWritersTest {
 
     @Test
     fun updateAllPreservesPositionsAndIgnoresUnknownKeys() {
-        val writer = listUpdateAllBy<Entry, Int> { it.id }
+        val writer = UpdateAllBy<Entry, Int> { it.id }
         assertEquals(
             listOf(Entry(1, "ONE"), Entry(2, "two")),
             writer(listOf(Entry(1, "ONE"), Entry(3, "three")))(initial)
@@ -27,7 +27,7 @@ class CollectionWritersTest {
 
     @Test
     fun upsertAllPreservesExistingOrderAndAppendsNewKeys() {
-        val writer = listUpsertAllBy<Entry, Int> { it.id }
+        val writer = UpsertAllBy<Entry, Int> { it.id }
         assertEquals(
             listOf(Entry(1, "one"), Entry(2, "TWO"), Entry(3, "three")),
             writer(listOf(Entry(3, "three"), Entry(2, "TWO")))(initial)
@@ -36,7 +36,7 @@ class CollectionWritersTest {
 
     @Test
     fun duplicateBusinessKeysAreRejectedInSourceAndUpdates() {
-        val writer = listUpsertAllBy<Entry, Int> { it.id }
+        val writer = UpsertAllBy<Entry, Int> { it.id }
         assertFailsWith<IllegalArgumentException> {
             writer(listOf(Entry(3, "first"), Entry(3, "second")))(initial)
         }
