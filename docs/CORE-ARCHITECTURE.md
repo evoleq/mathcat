@@ -31,7 +31,7 @@ The Lens selects **where**; the keyed Writer chooses **how**; `contraMap` transl
 
 `Reader` and `Writer` are intentionally **nominal**, not bare function typealiases: overloads `Selection * Reader` and `Selection * Writer` can otherwise collide in the JVM signature and/or lead to ambiguous inference. `fun interface` preserves lambda construction with explicit type inference and minimal wrappers. The API trade-off (nominal versus aliases) is **proposed**, not final.
 
-The name `Writer` preserves the vocabulary from Solyton/Evoleq but here means **state updater**, *not* the conventional Writer monad. Rename to `Updater` is an open decision before stabilization.
+The name `Writer` preserves the vocabulary from Solyton/Evoleq but here means **state updater**, *not* the conventional Writer monad. Keep the existing name for developer experience; do not rename it to `Updater` without an explicit request.
 
 ### Lens laws
 
@@ -47,7 +47,7 @@ A constructor accepting arbitrary lambdas does **not** establish these laws at c
 
 ### Selections
 
-`filterBy(predicate): Selection<List<A>,List<A>>` preserves the historic filter-and-append semantics:
+`FilterBy(predicate): Selection<List<A>,List<A>>` preserves the historic filter-and-append semantics:
 
 ```text
 get([1,2,3])                 = [2]       (select even)
@@ -83,7 +83,7 @@ Pure extensional equality, not equality of function object identities, is the in
 
 ## State vocabulary and value-preserving state updates
 
-The author deliberately uses the existing **Evoleq vocabulary**: `Return`, `map`, `multiply`, `bind`, `KlState` and `get`. It reduces accidental declaration clashes and gives the algebra a consistent set of names. **Do not introduce public `pure`, `flatMap` or `modify` synonyms** without a separate API decision.
+The author deliberately uses the existing **Evoleq vocabulary**: standalone `Return`, standalone `Update`, `map`, `multiply`, `bind`, `KlState` and `get`. It reduces accidental declaration clashes and gives the algebra a consistent set of names. **Do not introduce public `pure`, `flatMap` or `modify` synonyms** without a separate API decision.
 
 ```kotlin
 typealias KlState<S, A, B> = (A) -> State<S, B>
@@ -93,7 +93,7 @@ val joined = nested.multiply()
 
 // Value is retained, while the state changes:
 val change: KlState<Int, String, String> = Update { it + 3 }
-val result = (State.Return<Int, String>("payload") * change)(5)
+val result = (Return<Int, String>("payload") * change)(5)
 // result == ("payload" to 8)
 ```
 
@@ -103,14 +103,35 @@ The important distinction is between **changing the state** and **discarding the
 
 `multiply` threads the **outer successor state** into the inner computation, and `bind` is defined as `map(kleisli).multiply()`. This also makes the connection to the monad multiplication `μ` explicit. The alias `KlState` remains an ordinary function type (no unsupported Higher Kinds claimed).
 
+### Construction, composition and import aliases
+
+MathCat follows Evoleq's deliberate developer-experience convention: **standalone constructors** read as mathematical names (for example `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`), while **operations on existing objects** are named `map`, `multiply`, `bind`, `get`, `set`, `contraMap` and composed using `*`. Natural type constructors such as `Reader { ... }`, `Writer { ... }` and `Lens(...)` keep their existing type names; no redundant factories.
+
+Receiver-based convenience functions such as `entriesLens.upsertAllBy(key)` remain lowercase, because the receiver carries the context. Do not force capitalization where it makes the DSL less fluid.
+
+```kotlin
+val increment: KlState<Int, String, String> = Update { it + 1 }
+val run = Return<Int, String>("payload") * increment
+```
+
+**Future monad modules** may each export their own `Return` (e.g., a hypothetical `org.evoleq.mathcat.result.Return`). Kotlin consumers can use import aliases:
+
+```kotlin
+import org.evoleq.mathcat.core.Return as StateReturn
+// hypothetical future module, NOT currently implemented:
+// import org.evoleq.mathcat.result.Return as ResultReturn
+```
+
+Import aliases disambiguate **separate importable declarations**; they cannot resolve same-package conflicting signatures or two functions distinguishable only by return type. Therefore constructors for different structures should live in distinct packages/modules with deliberate signatures. We do not invent wrapper names such as `pure` merely to avoid imports.
+
 ## Collection writers: preserve the pattern, tighten contracts
 
 The new keyed list writers are **additional initial examples**, not drop-in replacements for the older arbitrary-predicate update methods.
 
-- `append(): Writer<List<A>,A>`: append a single element.
-- `appendAll(): Writer<List<A>,List<A>>`: append several elements.
-- `listUpdateAllBy(keyOf)`: replace existing entries for matching keys; ignore unknown updates.
-- `listUpsertAllBy(keyOf)`: replace existing entries in position and append unknown keys **in incoming order**.
+- `Append(): Writer<List<A>,A>`: append a single element.
+- `AppendAll(): Writer<List<A>,List<A>>`: append several elements.
+- `UpdateAllBy(keyOf)`: replace existing entries for matching keys; ignore unknown updates.
+- `UpsertAllBy(keyOf)`: replace existing entries in position and append unknown keys **in incoming order**.
 - `Lens<S,List<A>>.updateAllBy(keyOf)`, `.upsertAllBy(keyOf)`, `.add()`: facade over `Lens * Writer`.
 
 **Explicit duplicate policy:** duplicate keys in the source or update batch throw `IllegalArgumentException`, rather than hiding conflicts by first-match resolution, dropping updates or using inconsistent `equals`-based append behavior. Ordering of pre-existing items is preserved. Lookup is hash-backed and expected linear average-case; performance is not benchmarked.
@@ -128,7 +149,7 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 - Reader identity/associativity, `map`; Writer `contraMap` identity and composition.
 - All three Lens laws (representative data models), Lens composition identity/associativity.
 - Lens × Reader / Writer; Selection × Lens / Selection / Reader / Writer.
-- Explicit non-lawful `filterBy` regression.
+- Explicit non-lawful `FilterBy` regression.
 - State `Return`, `map`, `multiply`, `bind`, `get`, `KlState` and Monad identities/associativity for representative state functions.
 - Kleisli state update: `Update(change): KlState<S,A,A>` changes state while passing the value through; no implicit `Unit` result or `modify` API.
 - Keyed `updateAll`, `upsertAll`, no-match behavior, duplicate rejection, ordering.
@@ -153,4 +174,5 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 | 2026-11-18 | Selection and Lens laws separated; FilterBy represented honestly | Draft implementation + tests |
 | 2026-11-18 | Pure State and keyed list Writer examples added | Draft implementation + tests |
 | 2026-11-18 | CI expanded for two modules × two platforms | [Run #44265321148: SUCCESS](https://github.com/evoleq/mathcat/actions/runs/44265321148) |
-| 2026-11-18 | Author's naming and value-preserving Kleisli state update applied | `Return`, `multiply`, `bind`, `KlState`, `get` and top-level `Update`; JVM/JS retest pending |
+| 2026-11-18 | Author's naming and value-preserving Kleisli state update applied | Standalone `Return`, `Update`; lowercase `multiply`, `bind`, `map`, `get` |
+| 2026-11-18 | Consistent names for top-level constructors | `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`; CI retest pending |
