@@ -4,9 +4,9 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.request.contentType
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.routing.routing
@@ -72,12 +72,12 @@ class KtorIoCompositionTest {
         }
 
         val first = client.post("/greeting") {
-            contentType(ContentType.Application.Json)
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(CONTEXT_HEADER, "workspace-one")
             setBody("\"hello\"")
         }
         val second = client.post("/greeting") {
-            contentType(ContentType.Application.Json)
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(CONTEXT_HEADER, "workspace-two")
             setBody("\"bye\"")
         }
@@ -114,7 +114,7 @@ class KtorIoCompositionTest {
             }
         }
         val response = client.post("/greeting") {
-            contentType(ContentType.Application.Json)
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody("\"hello\"")
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -141,7 +141,7 @@ class KtorIoCompositionTest {
             }
         }
         val response = client.post("/greeting") {
-            contentType(ContentType.Application.Json)
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody("\"hello\"")
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)

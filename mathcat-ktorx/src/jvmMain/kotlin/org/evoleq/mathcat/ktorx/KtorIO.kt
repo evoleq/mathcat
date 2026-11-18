@@ -8,6 +8,7 @@ import io.ktor.server.auth.principal
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respondText
+import io.ktor.server.response.header
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import org.evoleq.mathcat.result.ExceptionTransforms
@@ -145,9 +146,9 @@ class KtorIO<B>(
         Action { base ->
             val call = callOf(base)
             if (context.isNotEmpty() && context != call.request.headers[contextHeader]) {
-                call.response.headers.append(contextHeader, context)
+                call.response.header(contextHeader, context)
             }
-            val (status, envelope): Pair<HttpStatusCode, Result<T>> = when (result) {
+            val response: Pair<HttpStatusCode, Result<T>> = when (result) {
                 is Result.Success -> HttpStatusCode.OK to result
                 is Result.Failure.Message -> HttpStatusCode.InternalServerError to result
                 is Result.Failure.HttpStatusMessage ->
@@ -158,6 +159,7 @@ class KtorIO<B>(
                     code to message
                 }
             }
+            val (status, envelope) = response
             call.respondText(
                 text = json.encodeToString(ResultSerializer(serializer), envelope),
                 contentType = ContentType.Application.Json,
