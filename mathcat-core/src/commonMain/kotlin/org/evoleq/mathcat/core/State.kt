@@ -20,11 +20,6 @@ fun interface State<S, out A> {
     fun run(state: S): Pair<A, S>
 
     companion object {
-        /** Monad return / unit: a value becomes a computation without changing S. */
-        @Suppress("FunctionName")
-        fun <S, A> Return(value: A): State<S, A> =
-            State { state -> value to state }
-
         /** Inspect the current state, returning that state without changing it. */
         fun <S> get(): State<S, S> =
             State { state -> state to state }
