@@ -7,6 +7,8 @@ import org.evoleq.mathcat.core.Selection
 import org.evoleq.mathcat.core.Set
 import org.evoleq.mathcat.core.Writer
 import org.evoleq.mathcat.core.FilterBy
+import org.evoleq.mathcat.core.times
+import org.evoleq.mathcat.core.contraMap
 import org.evoleq.mathcat.core.maps.Get as MapGet
 import org.evoleq.mathcat.core.maps.GetForSure
 import kotlin.test.Test
@@ -29,6 +31,9 @@ class GetSetImportsTest {
 
         assertEquals(1, read(original))
         assertEquals(User(8), write(8)(original))
+        assertEquals(2, (Get(points) * Reader<Int, Int> { it * 2 })(original))
+        val fromText = Set(points).contraMap { text: String -> text.length }
+        assertEquals(User(4), fromText("four")(original))
     }
 
     @Test
