@@ -60,7 +60,7 @@ class StorageTest {
         assertEquals("first", source.emit())
         store.write(Whole(Part("second", 2), emptyList()))
         assertEquals("second", source.emit())
-        assertEquals("second", (source.map { it.uppercase() }).emit())
+        assertEquals("SECOND", (source.map { it.uppercase() }).emit())
         assertEquals(store.read(), Read(store).emit())
     }
 
