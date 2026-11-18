@@ -45,17 +45,17 @@ class OpticsTest {
         assertLensLaws(detailsLens, source, Details(3, "b"), Details(4, "c"))
         assertLensLaws(countLens, source.details, 9, 10)
         assertLensLaws(detailsLens * countLens, source, 9, 10)
-        assertLensLaws(identityLens<Whole>(), source, source.copy(items = emptyList()), source)
+        assertLensLaws(IdLens<Whole>(), source, source.copy(items = emptyList()), source)
     }
 
     @Test
     fun lensAssociativityAndIdentityAgreeOnReadsAndWrites() {
-        val id = identityLens<Int>()
+        val id = IdLens<Int>()
         val left = (detailsLens * countLens) * id
         val right = detailsLens * (countLens * id)
         assertEquals(left.get(source), right.get(source))
         assertEquals(left.set(12)(source), right.set(12)(source))
-        assertEquals((identityLens<Whole>() * detailsLens).get(source), detailsLens.get(source))
+        assertEquals((IdLens<Whole>() * detailsLens).get(source), detailsLens.get(source))
     }
 
     @Test
@@ -71,7 +71,7 @@ class OpticsTest {
 
     @Test
     fun filterByIsComposableButNotLawfulLens() {
-        val selection = filterBy<Int> { it % 2 == 0 }
+        val selection = FilterBy<Int> { it % 2 == 0 }
         val list = listOf(1, 2, 3)
         assertEquals(listOf(2), selection.get(list))
         assertEquals(listOf(1, 3, 2), selection.set(selection.get(list))(list))
@@ -86,9 +86,9 @@ class OpticsTest {
     @Test
     fun selectionsComposeWithSelectionsAndLenses() {
         val selector = itemsLens.asSelection()
-        val evens = filterBy<Int> { it % 2 == 0 }
-        val left = (selector * evens) * identityLens<List<Int>>()
-        val right = selector * (evens * identityLens<List<Int>>())
+        val evens = FilterBy<Int> { it % 2 == 0 }
+        val left = (selector * evens) * IdLens<List<Int>>()
+        val right = selector * (evens * IdLens<List<Int>>())
 
         assertEquals(left.get(source), right.get(source))
         assertEquals(left.set(listOf(4, 6))(source), right.set(listOf(4, 6))(source))
