@@ -18,7 +18,7 @@ feature-C API definitions ─┘              ↑
                                Ktor request lifecycle
 ```
 
-The API description/composition layer should have at most Kotlin standard-library dependencies, and **no Ktor, coroutine, database, Compose or application dependency**. It should not depend on `mathcat-store` or `mathcat-actions` merely to combine endpoint metadata. Whether this remains a small independent package or is extracted into a `mathcat-api` module is a later build/packaging decision. A new generic Boundary framework is **not** a prerequisite.
+The API description/composition layer should have at most Kotlin standard-library dependencies, and **no Ktor, coroutine, database, Compose or application dependency**. It should not depend on `mathcat-store` or `mathcat-actions` merely to combine endpoint metadata. The reusable API declarations may live in a small independent package or a future `mathcat-api` Gradle module; that choice should minimize dependencies. **All Ktor-specific abstractions belong in a dedicated `mathcat-ktorx` module**, which depends on this API description layer, not vice versa. A new generic Boundary framework is **not** a prerequisite.
 
 ## Illustrative DSL (not implemented)
 
@@ -53,4 +53,4 @@ A resolved endpoint carries `(endpointId, moduleOrigin, method, canonicalPath, r
 - Equivalent valid groupings resolve to equivalent endpoint descriptions. If the API uses mutable builders, they produce a validated immutable result before consumers use it.
 - A module can be declared and tested **without any Ktor dependency or running server**.
 
-A transport-specific interpreter is optional. The Ktor integration is described in [Ktor route adapter](KTOR-API-COMPOSITION.md). Keep the author’s original `Boundary` dependency-injection insights conceptually separate; API grouping does not need to become a full-scale architecture framework.
+A transport-specific interpreter is optional. The Ktor integration belongs **exclusively in `mathcat-ktorx`** and is described in [its adapter design](KTOR-API-COMPOSITION.md). Keep the author’s original `Boundary` dependency-injection insights conceptually separate; API grouping does not need to become a full-scale architecture framework.

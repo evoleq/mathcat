@@ -53,7 +53,7 @@ For the JS tests, Kotlin/Gradle downloads the required Node.js environment when 
 
 ### Domain, Boundary, Environment and multilevel dynamics
 
-[Architectural research](docs/DOMAIN-BOUNDARY-ENVIRONMENT-DYNAMICS.md) connects Domain, Boundary and Environment with local/whole evolution, coupled flows, the legacy Evoleq `Gap` and `Flow` abstractions, and the existing API DSL. It is accompanied by a small commonTest projection-law example and a counterexample to autonomous local evolution. The document is **research**, not a frozen `Boundary` or `Dynamics` API. [API group/module composition](docs/API-MODULE-COMPOSITION.md) is explicitly Ktor-free; [the Ktor adapter](docs/KTOR-API-COMPOSITION.md) alone binds those endpoint descriptions to Ktor routes, `Receive`/`Respond` and request-scoped `Base`. Mathematical topology analogies are explicitly distinguished from proved properties.
+[Architectural research](docs/DOMAIN-BOUNDARY-ENVIRONMENT-DYNAMICS.md) connects Domain, Boundary and Environment with local/whole evolution, coupled flows, the legacy Evoleq `Gap` and `Flow` abstractions, and the existing API DSL. It is accompanied by a small commonTest projection-law example and a counterexample to autonomous local evolution. The document is **research**, not a frozen `Boundary` or `Dynamics` API. [API group/module composition](docs/API-MODULE-COMPOSITION.md) is explicitly Ktor-free; [the separate `mathcat-ktorx` module](docs/KTOR-API-COMPOSITION.md) alone binds those endpoint descriptions to Ktor routes, `Receive`/`Respond` and request-scoped `Base`. Mathematical topology analogies are explicitly distinguished from proved properties.
 
 ## Earlier MathCat experiments
 
