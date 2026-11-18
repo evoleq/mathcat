@@ -1,4 +1,7 @@
-package org.evoleq.mathcat.core
+package org.evoleq.mathcat.core.optics
+
+import org.evoleq.mathcat.core.reader.Reader
+import org.evoleq.mathcat.core.writer.Writer
 
 /**
  * Extract the Reader from a lawful Lens.
@@ -24,14 +27,3 @@ fun <S, A> Get(selection: Selection<S, A>): Reader<S, A> = selection.get
 
 @Suppress("FunctionName")
 fun <S, A> Set(selection: Selection<S, A>): Writer<S, A> = selection.set
-
-/**
- * Construct a pure State that returns the current state without changing it:
- *
- * Get<S>()(s) = (s, s).
- *
- * This is a DIFFERENT overload from Get(lens) / Get(selection), determined by
- * its zero-argument invocation and resulting State type.
- */
-@Suppress("FunctionName")
-fun <S> Get(): State<S, S> = State { s -> s to s }

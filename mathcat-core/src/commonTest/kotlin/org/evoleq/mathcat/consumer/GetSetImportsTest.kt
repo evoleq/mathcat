@@ -1,16 +1,17 @@
 package org.evoleq.mathcat.consumer
 
-import org.evoleq.mathcat.core.Get
-import org.evoleq.mathcat.core.Lens
-import org.evoleq.mathcat.core.Reader
-import org.evoleq.mathcat.core.Selection
-import org.evoleq.mathcat.core.Set
-import org.evoleq.mathcat.core.Writer
-import org.evoleq.mathcat.core.FilterBy
-import org.evoleq.mathcat.core.times
-import org.evoleq.mathcat.core.contraMap
-import org.evoleq.mathcat.core.maps.Get as MapGet
-import org.evoleq.mathcat.core.maps.GetForSure
+import org.evoleq.mathcat.core.optics.Get
+import org.evoleq.mathcat.core.state.Get as StateGet
+import org.evoleq.mathcat.core.optics.Lens
+import org.evoleq.mathcat.core.reader.Reader
+import org.evoleq.mathcat.core.optics.Selection
+import org.evoleq.mathcat.core.optics.Set
+import org.evoleq.mathcat.core.writer.Writer
+import org.evoleq.mathcat.core.collections.FilterBy
+import org.evoleq.mathcat.core.reader.times
+import org.evoleq.mathcat.core.writer.contraMap
+import org.evoleq.mathcat.core.reader.maps.Get as MapGet
+import org.evoleq.mathcat.core.reader.maps.GetForSure
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -45,7 +46,7 @@ class GetSetImportsTest {
 
     @Test
     fun stateGetConstructsAReadOnlyStateComputation() {
-        assertEquals(7 to 7, Get<Int>()(7))
+        assertEquals(7 to 7, StateGet<Int>()(7))
     }
 
     @Test

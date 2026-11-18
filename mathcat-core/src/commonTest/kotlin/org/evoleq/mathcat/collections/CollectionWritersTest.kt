@@ -1,4 +1,9 @@
-package org.evoleq.mathcat.core
+package org.evoleq.mathcat.core.collections
+
+import org.evoleq.mathcat.core.optics.Lens
+import org.evoleq.mathcat.core.reader.Reader
+import org.evoleq.mathcat.core.writer.Writer
+import org.evoleq.mathcat.core.writer.contraMap
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
