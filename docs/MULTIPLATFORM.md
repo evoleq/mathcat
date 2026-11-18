@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-18 · **Status:** Draft (platform verification underway) · **PR:** [#2](https://github.com/evoleq/mathcat/pull/2)
 
-MathCat's `mathcat-core` and `mathcat-type-algebra` modules deliberately share one supported-target declaration. All mathematical primitives are in `commonMain`; neither module includes Android, Apple, web browser, platform IO, Compose, or JVM-only runtime code.
+MathCat's `mathcat-core`, `mathcat-type-algebra` and `mathcat-storage` modules deliberately share one supported-target declaration. `mathcat-storage` depends on the public API of `mathcat-core`, with no platform-specific implementation. All mathematical primitives are in `commonMain`; neither module includes Android, Apple, web browser, platform IO, Compose, or JVM-only runtime code.
 
 ## Target and CI matrix
 
@@ -43,3 +43,7 @@ Kotlin's official compatibility chart supports this chosen combination of Kotlin
 - 2026-11-18: Original Kotlin 2.1.0 / Gradle 8.6 JVM+JS baseline built and tested.
 - 2026-11-18: Core packages separated into `core.state`, `core.reader`, `core.writer`, `core.optics`, `core.collections`; baseline JVM+JS retest [passed](https://github.com/evoleq/mathcat/actions/runs/44270455594).
 - 2026-11-18: Toolchain updated to Kotlin 2.3.20, Gradle 9.2.1, AGP 9.0.0; expanded jobs for JVM, JS, Wasm, Android, Linux, Windows, Apple targets. **CI verification is ongoing**, including external SDK/toolchain constraints.
+
+## Storage follow-up (stacked PR #3)
+
+The [Storage and Source PR](https://github.com/evoleq/mathcat/pull/3) adds a third KMP module. `mathcat-storage` declares exactly the same targets as the pure modules and includes tests for the live storage focus, `Source` and `Dispatcher`. CI runs all three modules per platform. Platform verification still must be checked in the PR job results; configuring a target does not establish that its build or tests have passed. No device/emulator tests are claimed.
