@@ -125,10 +125,10 @@ Open/coupled dynamics remain an interesting **research question**, not a pending
 
 ## 8. Ktor API DSL is a concrete transport-boundary composition
 
-The author's specific request is to extend the **existing Evoleq/Ktor API DSL**—alongside `Receive` and `Respond`—rather than invent a new generic Flow framework:
+The author's specific request is to extend the **existing Evoleq API description DSL independently of Ktor**, then add a separate **Ktor route adapter** alongside `Receive` and `Respond`—rather than invent a new generic Flow framework:
 
-1. Aggregate independently declared `Api` fragments using `group` / `module` into a complete API.
-2. Associate a Ktor route explicitly with the endpoint declaration it implements; enable route-level knowledge of the originating module and endpoint.
-3. Centralize the repeated `runOn Base(call, environment)` assembly inside the Ktor route adapter, preserving **per-request** `call` semantics.
+1. Aggregate independently declared `Api` fragments using Ktor-free `group` / `module` composition into a complete API description.
+2. In the Ktor adapter only, associate a route explicitly with the endpoint declaration it implements; retain originating module and endpoint metadata.
+3. In the Ktor adapter only, centralize repeated `runOn Base(call, environment)` assembly while preserving **per-request** `call` semantics.
 
-See [Ktor API composition design notes](KTOR-API-COMPOSITION.md). The DSL belongs at the **Ktor/transport interpretation boundary**. The general `Domain`, `Boundary`, `Environment` and coupled-dynamics reasoning can inform its contracts, but we must not force transport details into `mathcat-core`. The design is not implemented by this research draft. No changes to Solyton.
+See [framework-independent API module composition](API-MODULE-COMPOSITION.md) and the [Ktor-specific route adapter](KTOR-API-COMPOSITION.md). **`group` and `module` do not depend on Ktor**; only the route binder and request execution do. The general `Domain`, `Boundary`, `Environment` and coupled-dynamics reasoning can inform both layers, but neither layer belongs to a global Flow runtime. The design is not implemented by this research draft. No changes to Solyton.

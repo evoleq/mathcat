@@ -1,33 +1,21 @@
-# Composing the existing API DSL into Ktor routes
+# Ktor adapter for composed API descriptions
 
 **Design note · 18 November 2026 · draft, not implemented.**
 
-## Motivation from the actual code
+## The dependency boundary
 
-In [the existing `Api` DSL](https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/commonMain/kotlin/org/evoleq/ktorx/api/api.kt), a feature can declare endpoint metadata with `post/get/patch/...`, `group(name)` and `module(path, ...)`. The registry uses mutable `HashMap<KClass<*>, EndPoint<*,*>>` and a typed lookup performs an unchecked cast. In [the backend routing DSL](https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-backend/src/main/kotlin/org/solyton/solawi/bid/module/bid/routing/routing.auction.kt), the Ktor `post("create") { ... }` path is declared separately from that metadata. Almost every handler repeats `... runOn Base(call, environment)`.
+The reusable DSL for `Api`, `group` and `module` is **independent of Ktor**. Its design and contracts are specified in [API module composition](API-MODULE-COMPOSITION.md). These are HTTP endpoint descriptions, not live Ktor routing objects.
 
-**Author request:** allow several feature modules to contribute API declarations; at the Ktor route declaration, make the owning API endpoint visible; and centralize the repeated request-base assembly. This is a **Ktor integration**, like `Receive` and `Respond`, not a proposal to turn the whole application into a Flow.
+**Only the Ktor adapter knows Ktor.** It consumes the assembled API description and connects each typed endpoint to a Ktor route and an Action workflow. This belongs beside the existing `Receive` and `Respond` integration. The dependency points **from the Ktor adapter to the API descriptions**, never the reverse.
 
-## Sketch — notation only, NOT an available Kotlin API
+The existing [API implementation](https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/commonMain/kotlin/org/evoleq/ktorx/api/api.kt) already defines `group` / `module` without Ktor-specific routing calls. Separately, [backend routes](https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-backend/src/main/kotlin/org/solyton/solawi/bid/module/bid/routing/routing.auction.kt) repeat `post("create")` and `... runOn Base(call, environment)`. The proposed adapter links these **existing** mechanisms without duplicating endpoint identity.
+
+## Illustrative Ktor-only syntax (not an implemented API)
 
 ```kotlin
-// Owning feature module:
-val auctionsApi = apiModule("auctions", prefix = "/auctions") {
-    post<CreateAuction, Auction>(CreateAuctionEndpoint, path = "create")
-}
-val usersApi = apiModule("users", prefix = "/users") {
-    get<GetUsers, Users>(GetUsersEndpoint, path = "all")
-}
-
-// Application assembly: no feature needs to know the other features.
-val appApi = api {
-    module(auctionsApi)
-    module(usersApi)
-}
-
-// Ktor interpreter (the handler sees its endpoint identity):
+// 'api' was assembled elsewhere, with no Ktor dependency.
 routing {
-    installApi(appApi, environment) {
+    installApi(api, environment) {
         handle(CreateAuctionEndpoint) {
             ReceiveContextual<CreateAuction>() *
                 IsGrantedInSpecialContext("CREATE_AUCTION") *
@@ -38,37 +26,24 @@ routing {
 }
 ```
 
-An adapter is free to choose a more idiomatic Kotlin DSL once a small prototype is compiled and tested. The important goal is to **bind route and endpoint using the same typed identity**, not repeat their HTTP method/path as disconnected strings. A route should be able to expose `origin = (moduleId, endpointId, method, resolvedPath)` for debugging, routing audits and documentation, including when a module is mounted inside another module. The endpoint descriptor is not automatically a substitute for actual authorization.
+The handler is associated with the endpoint definition: Ktor method/path are obtained from the resolved descriptor, **not repeated separately** in a `post("create")` literal. It can access `origin = (moduleId, endpointId, method, resolvedPath)` to identify which original API endpoint it implements. This remains descriptive metadata; the real authorization check must still enforce permissions.
 
-## Semantics worth making explicit
+The adapter captures the chosen application environment when installing routes, but it must create `Base(call, environment)` **separately for each Ktor request** and invoke the composed Action once. Removing this repeated boilerplate may not cause a cached `ApplicationCall`, a global coroutine context, or altered database connection/transaction semantics. The application and Ktor retain scheduling and request lifecycle ownership.
 
-- **Modularity:** each feature publishes an `Api` fragment; root assembly combines them. `group` (logical grouping) and `module` (mount path/ownership) should have clearly different semantics.
-- **Composition:** nested mounts normalize paths consistently. For valid, conflict-free module trees, equivalent groupings of module composition should resolve to identical route descriptors and provenance.
-- **Conflicts:** detect duplicate endpoint identities and collisions on (HTTP method, canonical path) with a diagnostic, not silent mutation/overwriting. Distinct methods may legitimately share a path.
-- **Typing:** endpoint identity should preserve request/response types. Runtime codecs and request failures remain explicit; the old `KClass` registry/unchecked cast is a motivation to improve, not proof of type safety.
-- **Handler association:** every Ktor route references a descriptor already declared in its module. Unbound descriptors and handlers should be reportable rather than silently ignored.
-- **Per-request execution:** the Ktor adapter captures an application-level `environment`, but Ktor supplies a fresh `ApplicationCall` on each request. It should construct and invoke `Base(call, environment)` **inside the handler**. Eliminating the repeated text must *not* capture the first call, alter DB connection/transaction lifetime, or make `runOn` global.
-- **Ownership:** Ktor continues to own event delivery, coroutine context, routing and lifecycle. We are extending a Ktor-specific DSL, not adding another scheduler or application-global Flow runtime.
+## Minimal coupling
 
-The old route was:
+- The API DSL depends on no Ktor types.
+- The Ktor adapter depends on the compiled API descriptor interface and the smallest Action execution contract it needs, rather than the entire application.
+- Feature modules need not import Ktor merely to declare `group`, `module`, endpoints or origin metadata.
+- Other interpreters (tests, docs, clients, alternative servers) can consume the same descriptors later without changing the API DSL.
+- No JavaFX/Swing integration or Flow runtime is part of this slice. No changes to Solyton.
 
-```kotlin
-post("create") {
-    ReceiveContextual<CreateAuction>() *
-        IsGrantedInSpecialContext("CREATE_AUCTION") *
-        CreateAuction *
-        Respond<Auction> { transform() } runOn Base(call, environment)
-}
-```
+## Focused verification
 
-The intended new route is an **endpoint-associated** handler that returns or executes the same Action composition; the Ktor adapter supplies the base. `Base(call, environment)` remains a real execution requirement, simply no longer duplicated at every call site.
+1. Compose API fragments and detect collisions **without** Ktor.
+2. Resolve a nested endpoint and verify its original module, ID, method and canonical path.
+3. Install a Ktor route by **the same endpoint identity**; report missing or duplicate handlers.
+4. Run two separate requests in a Ktor test application, proving each gets its own `ApplicationCall` while sharing the intended environment.
+5. Compare success, authorization failure, serialization error and cancellation behavior with the current explicit `runOn Base(call, environment)` routes.
 
-## Small verification slice, not a framework rewrite
-
-1. Compose two API modules and one nested submodule, verify resolved paths and original endpoint ownership.
-2. Verify rejected duplicate IDs and method/path collisions; no partial mutation.
-3. Bind a route by endpoint identity, check its provenance and detect missing/duplicate handlers.
-4. Exercise two independent Ktor test requests and show that each gets its own call, while both use the intended environment.
-5. Check `Receive`, `Respond`, authorization, failure and cancellation behavior matches the existing route before replacing any code.
-
-Keep Solyton unchanged while trying this in an isolated Ktor adapter/test project. Flow/Gap and topology are relevant to the *explanation* of boundaries, not required runtime machinery for these tasks.
+Start with a narrow adapter proof of concept. Do not let the conceptual analysis force a generic runtime, new framework integrations, or unnecessary dependencies.
