@@ -24,6 +24,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":mathcat-api"))
+            api(project(":mathcat-result"))
+            api(project(":mathcat-serialization"))
             api("io.ktor:ktor-client-core:3.4.1")
             api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
         }
@@ -34,6 +36,7 @@ kotlin {
         }
         jvmMain.dependencies {
             api("io.ktor:ktor-server-core:3.4.1")
+            implementation("io.ktor:ktor-server-auth-jwt:3.4.1")
         }
         jvmTest.dependencies {
             implementation("io.ktor:ktor-server-test-host:3.4.1")
