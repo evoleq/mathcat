@@ -16,6 +16,12 @@ The public DSL now follows a simple rule: **constructors** `Return`, `Update`, `
 
 In particular, **`Get(lens)` and `Set(lens)`** turn an optic into the corresponding `Reader` and `Writer`; `Get<S>()` constructs a pure state-read computation. Map readers use `org.evoleq.mathcat.core.reader.maps.Get(key)` / `GetForSure(key)`; explicit imports or import aliases keep these meanings clear. A `State` is directly callable (`state(s)`) without importing a separate invocation extension. Packages now keep the standalone constructors unambiguous: `core.state`, `core.reader`, `core.writer`, `core.optics`, `core.collections` and `core.reader.maps`.
 
+### Storage and Memory
+
+`Source<T> = Reader<Unit,T>` is restored from legacy Evoleq. The `storage` package now provides a synchronous `Storage<T>` interface with a first-class `source: Source<T>`, plus a plain `Memory(initial)` backend. `Storage * Reader` yields a live Source, while `Storage * Lens` and `Storage * Selection` yield focused Storage handles.
+
+**Memory is not Compose-observable.** A future Compose adapter can back the **same** Storage interface with `MutableState<T>`, allowing the caller to decide which data should participate in snapshot-driven recomposition. The core intentionally has **no Compose dependency**. See [Storage, Memory and Compose boundaries](docs/STORAGE-AND-MEMORY.md), including observations from Solyton's existing mixed observable/non-observable frontend Storage.
+
 See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
 
 ## MathCat 2.0 (research prototype)
