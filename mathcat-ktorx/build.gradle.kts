@@ -34,6 +34,8 @@ kotlin {
         }
         jvmMain.dependencies {
             api(project(":mathcat-result"))
+            api(project(":mathcat-context"))
+            api(project(":mathcat-transform"))
             api("io.ktor:ktor-server-core:3.4.1")
         }
         jvmTest.dependencies {

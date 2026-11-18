@@ -38,7 +38,8 @@ jobs:
             :mathcat-ktorx:jvmTest :mathcat-ktorx:jsNodeTest \
             :mathcat-ktorx:wasmJsNodeTest :mathcat-ktorx:linuxX64Test \
             :mathcat-result:jvmTest :mathcat-result:jsNodeTest \
-            :mathcat-result:wasmJsNodeTest :mathcat-result:linuxX64Test
+            :mathcat-result:wasmJsNodeTest :mathcat-result:linuxX64Test \
+            :mathcat-context:test :mathcat-transform:test
 
   android:
     name: Android library compilation

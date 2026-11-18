@@ -1,5 +1,9 @@
 package org.evoleq.mathcat.ktorx
 
+import org.evoleq.mathcat.context.Contextual
+import org.evoleq.mathcat.transform.Transform
+import org.evoleq.mathcat.transform.TransformContextual
+
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

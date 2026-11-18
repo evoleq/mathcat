@@ -1,5 +1,9 @@
 package org.evoleq.mathcat.ktorx
 
+import org.evoleq.mathcat.context.Contextual
+import org.evoleq.mathcat.transform.ResultTransform
+import org.evoleq.mathcat.transform.ContextualTransform
+
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -7,6 +11,7 @@ import io.ktor.http.Parameters
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respondText
+import io.ktor.server.response.header
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import org.evoleq.mathcat.result.Result
@@ -163,7 +168,7 @@ class Responder<T : Any>(
     private val context: String?
 ) {
     suspend fun <E> respond(value: Result<T>, base: RequestBase<E>): RequestBase<E> {
-        val (status, actual): Pair<HttpStatusCode, Result<T>> = when (value) {
+        val (status, actual) = when (value) {
             is Result.Success -> HttpStatusCode.OK to value
             is Result.Failure.HttpStatusMessage ->
                 HttpStatusCode.fromValue(value.statusCode) to value
@@ -174,7 +179,7 @@ class Responder<T : Any>(
             }
         }
         if (context != null && context != base.call.request.headers[policy.contextHeader]) {
-            base.call.response.headers.append(policy.contextHeader, context)
+            base.call.response.header(policy.contextHeader, context)
         }
         base.call.respondText(
             text = json.encodeToString(serializer, actual),
