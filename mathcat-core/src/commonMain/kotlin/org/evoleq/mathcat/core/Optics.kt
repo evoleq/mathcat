@@ -29,8 +29,14 @@ data class Lens<S, A>(
     fun asSelection(): Selection<S, A> = Selection(get, set)
 }
 
-/** Identity lens, whose laws hold for every ordinary value. */
-fun <S> identityLens(): Lens<S, S> =
+/**
+ * Identity Lens on S: get = id_S and set(a)(s) = a.
+ *
+ * This is the identity for lawful Lens composition; unlike arbitrary Lens
+ * constructors, it satisfies all three laws by construction.
+ */
+@Suppress("FunctionName")
+fun <S> IdLens(): Lens<S, S> =
     Lens(
         get = Reader { it },
         set = Writer { newValue -> { _ -> newValue } }
@@ -99,7 +105,8 @@ fun <S, A, B> Lens<S, A>.timesW(writer: Writer<A, B>): Writer<S, B> = this * wri
  * Filter/replace selection, deliberately NOT a lawful Lens:
  * replacing the selected values with themselves may reorder a list.
  */
-fun <A> filterBy(predicate: (A) -> Boolean): Selection<List<A>, List<A>> =
+@Suppress("FunctionName")
+fun <A> FilterBy(predicate: (A) -> Boolean): Selection<List<A>, List<A>> =
     Selection(
         get = Reader { source -> source.filter(predicate) },
         set = Writer { replacement ->
