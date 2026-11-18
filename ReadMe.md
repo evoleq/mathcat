@@ -22,6 +22,8 @@ In particular, **`Get(lens)` and `Set(lens)`** turn an optic into the correspond
 
 **Memory is not Compose-observable.** A future Compose adapter can back the **same** Storage interface with `MutableState<T>`, allowing the caller to decide which data should participate in snapshot-driven recomposition. The core intentionally has **no Compose dependency**. See [Storage, Memory and Compose boundaries](docs/STORAGE-AND-MEMORY.md) and the [composition research note](docs/STORAGE-COMPOSITION.md) on products, sums, and using existing storage handles. The latter is **design-only**; no generic sum, product or absorb operator is exposed yet. The Storage review includes a **read-only** review of Solyton's existing mixed observable/non-observable frontend Storage. The concrete frontend implementation is **not ported** in this draft.
 
+**Action dispatch is a separate, composable capability.** The [action-dispatcher architecture note](docs/ACTION-DISPATCH-AND-STORAGE.md) explores pairing `Storage<S>` with `ActionDispatcher<S>` as an application Store, transporting both through the same Lens, and routing a **tagged sum of commands** over product storage. This is research, not an implemented API; the existing Solyton frontend is unchanged.
+
 See [Core architecture, laws and tests](docs/CORE-ARCHITECTURE.md). This is still a **draft proposal**: there is no stable API, release, or publishing decision.
 
 ## MathCat 2.0 (research prototype)
