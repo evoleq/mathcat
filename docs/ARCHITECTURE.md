@@ -11,7 +11,7 @@ MathCat aims for a small, mathematically explicit Kotlin Multiplatform foundatio
 3. **Tooling:** code generators and optional compiler diagnostics, to be developed separately from the runtime library.
 4. **Effects:** storage, suspend operations and platform-specific adapters, also separate from the pure core.
 
-The initial Gradle build targets JVM and JavaScript/Node.js; CI runs the `commonTest` suite against both targets. There is **no publishing pipeline**.
+The first Gradle build targeted JVM and JavaScript/Node.js. A subsequent [multiplatform expansion](MULTIPLATFORM.md) also declares Android, WebAssembly and native targets with host-scoped CI. Platform support must only be claimed after successful corresponding jobs. There is **no publishing pipeline**.
 
 ## Proposed type algebra (hypothetical syntax, NOT Kotlin)
 
@@ -137,4 +137,4 @@ Pure type operations, lenses, collection transformations and function compositio
 - Existing Traversal and trampoline explorations: https://github.com/doctor-smith/ai-command/issues/36 and https://github.com/doctor-smith/ai-command/issues/37
 - Kotlin documentation: https://kotlinlang.org/docs/ksp-overview.html and https://kotlinlang.org/docs/custom-compiler-plugins.html
 
-**Change log — 2026-11-18:** Established scope, implemented first-order AST and tagged sum/product representations; introduced JVM/JS tests and CI; inspected fp-axioms and legacy frontend writer helpers; deferred all licensing, publishing, repository privacy and compiler-fork decisions. **The CI result is not established until the workflow runs.**
+**Change log — 2026-11-18:** Established scope, implemented first-order AST and tagged sum/product representations; introduced JVM/JS tests and CI; inspected fp-axioms and legacy frontend writer helpers; deferred all licensing, publishing, repository privacy and compiler-fork decisions. **The original JVM/JS CI passed; expanded-platform verification is tracked separately in [MULTIPLATFORM.md](MULTIPLATFORM.md).**

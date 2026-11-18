@@ -313,7 +313,7 @@ These are **ordinary Kotlin constructs**, not a claim that Kotlin supports nativ
 When different future monads supply a `Return`, the constructors should live in **their corresponding packages**. A caller can use Kotlin import aliases:
 
 ```kotlin
-import org.evoleq.mathcat.core.Return as StateReturn
+import org.evoleq.mathcat.core.state.Return as StateReturn
 // illustrative only; a result monad is not implemented yet:
 // import org.evoleq.mathcat.result.Return as ResultReturn
 ```
@@ -323,12 +323,16 @@ The alias changes the local name, **not** the mathematical meaning. It cannot so
 
 ### Map readers and name scopes
 
-The old Evoleq also offers `Get(key): Reader<Map<K,V>,V?>` and the partial `GetForSure(key): Reader<Map<K,V>,V>`. The MathCat port preserves them in `org.evoleq.mathcat.core.maps`:
+The old Evoleq also offers `Get(key): Reader<Map<K,V>,V?>` and the partial `GetForSure(key): Reader<Map<K,V>,V>`. The MathCat port preserves them in `org.evoleq.mathcat.core.reader.maps`:
 
 ```kotlin
-import org.evoleq.mathcat.core.Get
-import org.evoleq.mathcat.core.maps.Get as MapGet
+import org.evoleq.mathcat.core.optics.Get
+import org.evoleq.mathcat.core.reader.maps.Get as MapGet
 ```
 
 This is an intentional use of **separate namespaces**, not a demand to rename mathematical constructors. See the test `GetSetImportsTest` for concrete interoperability.
 
+
+## 8. Portability
+
+These formulas are part of `commonMain`. The semantics of a pure Reader, Writer, Selection, Lens and State do not depend on JVM, Android, JS, Wasm or Native execution. The **platforms actually verified by CI** are explicitly listed in [MULTIPLATFORM.md](MULTIPLATFORM.md), not inferred from the presence of a Gradle target. Neither `suspend` nor platform-specific storage APIs are hidden inside the mathematical core.
