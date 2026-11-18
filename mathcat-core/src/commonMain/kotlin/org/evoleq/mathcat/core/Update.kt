@@ -18,7 +18,7 @@ package org.evoleq.mathcat.core
  * Example:
  *
  *     val increment: KlState<Int, String, String> = Update { it + 1 }
- *     val result = (State.Return<Int, String>("payload") * increment)(5)
+ *     val result = (Return<Int, String>("payload") * increment)(5)
  *     // result == ("payload" to 6)
  */
 @Suppress("FunctionName")
