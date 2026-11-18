@@ -83,7 +83,7 @@ Pure extensional equality, not equality of function object identities, is the in
 
 ## State vocabulary and value-preserving state updates
 
-The author deliberately uses the existing **Evoleq vocabulary**: standalone `Return`, standalone `Update`, `map`, `multiply`, `bind`, `KlState` and `get`. It reduces accidental declaration clashes and gives the algebra a consistent set of names. **Do not introduce public `pure`, `flatMap` or `modify` synonyms** without a separate API decision.
+The author deliberately uses the existing **Evoleq vocabulary**: standalone `Return`, standalone `Update`, standalone `Get`, `map`, `multiply`, `bind`, `KlState` and the lowercase `get` property on optics. It reduces accidental declaration clashes and gives the algebra a consistent set of names. **Do not introduce public `pure`, `flatMap` or `modify` synonyms** without a separate API decision.
 
 ```kotlin
 typealias KlState<S, A, B> = (A) -> State<S, B>
@@ -113,6 +113,28 @@ Receiver-based convenience functions such as `entriesLens.upsertAllBy(key)` rema
 val increment: KlState<Int, String, String> = Update { it + 1 }
 val run = Return<Int, String>("payload") * increment
 ```
+
+**Get and Set as constructions.** The existing Evoleq pattern is retained:
+
+```kotlin
+Get(lens)       // Reader<S,A>; exactly lens.get
+Set(lens)       // Writer<S,A>; exactly lens.set
+Get(selection)  // Reader<S,A>; no lawfulness claim
+Set(selection)  // Writer<S,A>; no lawfulness claim
+Get<S>()        // State<S,S>: returns the current state without changing it
+```
+
+The Optics' `get` and `set` remain lowercase properties. `Get(lens)` constructs a Reader that can be composed independently; `Get<S>()` constructs a State computation. This is deliberate overload by **argument shape**, not return type.
+
+The older Evoleq also defines `Get(key)` and `GetForSure(key)` for maps. MathCat preserves these in `org.evoleq.mathcat.core.maps`, separate from the optics package:
+
+```kotlin
+import org.evoleq.mathcat.core.Get
+import org.evoleq.mathcat.core.maps.Get as MapGet
+import org.evoleq.mathcat.core.maps.GetForSure
+```
+
+`MapGet(key)` returns a nullable map value; `GetForSure(key)` is **partial** and fails when there is no non-null value. The `Get(key)` compatibility constructor treats a null key as no selection, matching Evoleq's existing helper.
 
 **Future monad modules** may each export their own `Return` (e.g., a hypothetical `org.evoleq.mathcat.result.Return`). Kotlin consumers can use import aliases:
 
@@ -150,7 +172,7 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 - All three Lens laws (representative data models), Lens composition identity/associativity.
 - Lens × Reader / Writer; Selection × Lens / Selection / Reader / Writer.
 - Explicit non-lawful `FilterBy` regression.
-- State `Return`, `map`, `multiply`, `bind`, `get`, `KlState` and Monad identities/associativity for representative state functions.
+- State `Return`, `map`, `multiply`, `bind`, `Get`, `KlState` and Monad identities/associativity for representative state functions.
 - Kleisli state update: `Update(change): KlState<S,A,A>` changes state while passing the value through; no implicit `Unit` result or `modify` API.
 - Keyed `updateAll`, `upsertAll`, no-match behavior, duplicate rejection, ordering.
 - Solyton-style Lens-lifted Writer with response conversion through `contraMap`.
@@ -176,3 +198,4 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 | 2026-11-18 | CI expanded for two modules × two platforms | [Run #44265321148: SUCCESS](https://github.com/evoleq/mathcat/actions/runs/44265321148) |
 | 2026-11-18 | Author's naming and value-preserving Kleisli state update applied | Standalone `Return`, `Update`; lowercase `multiply`, `bind`, `map`, `get` |
 | 2026-11-18 | Consistent names for top-level constructors | `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`; CI retest pending |
+| 2026-11-18 | Restore Evoleq Get/Set constructors and map Get variants | `Get(lens/selection)`, `Set(lens/selection)`, `Get<S>()`, `maps.Get(key)`, `maps.GetForSure(key)` + import-alias tests |
