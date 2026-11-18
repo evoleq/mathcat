@@ -55,3 +55,31 @@ The original `Api.kt` imports the old `org.evoleq.math.Reader` and `org.evoleq.k
 `commonTest` contains regression tests for the original DSL and Map behavior, all six HTTP methods, explicit/reified keys, `get` parameters, nested groups/modules and the old Reader. New tests compare the assembled API to the inline DSL, check importing without a prefix, and preserve key-overwrite behavior.
 
 **Only after this is reviewed** should `mathcat-ktorx` bind endpoint descriptors to Ktor Routes. Nothing about the Ktor-specific adapter needs to reshape this DSL.
+
+
+## Named path parameters `{param}`
+
+The existing `EndPoint.url: String` accepts Ktor-style route placeholders without requiring a new endpoint type. A feature may declare:
+
+```kotlin
+val users = Api {
+    get<EmptyParams, User>(ReadUser::class, "{userId}")
+}
+val application = Api { module("users", users) }
+// application[ReadUser::class]?.url == "users/{userId}"
+```
+
+`module` now joins the *mount boundary* safely, so `module("users/", users)` with `url = "/{userId}"` gives `"users/{userId}"`. Existing ordinary paths such as `"users"` + `"create"` keep their previous result. Path parameter names are passed through untouched; this layer does **not** parse or convert request values. The future Ktor adapter will use `call.parameters["userId"]`. Query parameter metadata in `EndPoint.Get.parameters` is independent.
+
+## Optional diagnostics and checked lookup
+
+The original mutable `KClass` registry keeps its existing overwrite behavior. Diagnostics **never** reject an ordinary `Api` declaration:
+
+```kotlin
+val warnings = application.validateRoutes()
+val beforeImport = application.conflictsWith(otherFeatureApi)
+```
+
+`validateRoutes()` detects duplicate method/path shapes (including `users/{id}` vs `users/{userId}`) and malformed/repeated `{name}` segments. `conflictsWith(fragment)` checks endpoint-key clashes and overlapping route patterns **before** a fragment is merged. Already overwritten keys cannot be reconstructed from the final HashMap.
+
+The old `EndPoint<S,T>(key)` Reader stays untouched. An opt-in `CheckedEndPoint<S,T>(key)` Reader verifies the stored request/response `KClass` values before casting. Kotlin generic type arguments remain erased; this is not proof of full generic type safety.

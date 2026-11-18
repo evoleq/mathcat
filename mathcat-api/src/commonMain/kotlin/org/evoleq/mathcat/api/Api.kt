@@ -105,16 +105,29 @@ data class Api(
         this
     }
 
+    // Join only the mount boundary: preserve all existing inner URL segments,
+    // including Ktor-style placeholders such as {userId}.
+    private fun mountedPath(path: String, url: String): String {
+        val prefix = path.trimEnd('/')
+        val suffix = url.trimStart('/')
+        return when {
+            prefix.isEmpty() && path.startsWith("/") -> "/" + suffix
+            prefix.isEmpty() -> suffix
+            suffix.isEmpty() -> prefix
+            else -> prefix + "/" + suffix
+        }
+    }
+
     fun module(path: String, module: Api): Api = with(this) {
         module.endPoints.forEach { (key, value) ->
-            endPoints[key] = value.withGroup(path).withUrl("$path/${value.url}")
+            endPoints[key] = value.withGroup(path).withUrl(mountedPath(path, value.url))
         }
         this
     }
     fun module(path: String, configure: Api.() -> Api): Api = with(this) {
         val subApi = Api().configure()
         subApi.endPoints.forEach { (key, value) ->
-            endPoints[key] = value.withGroup(path).withUrl("$path/${value.url}")
+            endPoints[key] = value.withGroup(path).withUrl(mountedPath(path, value.url))
          }
         this
     }
