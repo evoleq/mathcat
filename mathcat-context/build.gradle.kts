@@ -7,3 +7,11 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("junit:junit:4.13.2")
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+}
