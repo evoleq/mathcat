@@ -53,27 +53,47 @@ class MiddlewareEffect<State, out Value>(
 }
 
 /**
- * Standalone middleware DSL:
+ * Standalone effectful call which also acts as an A -> Result<Contextual<B>>
+ * middleware step. The standalone runOn reads the current state once;
+ * a composed Read * Call pipeline shares the *same* initial snapshot.
+ */
+class MiddlewareCall<State, Input : Any, Output : Any>(
+    val action: EndpointAction<State, Input, Output>,
+    private val send: suspend (Input, MiddlewareExecution<State>) -> Result<Contextual<Output>>
+) : MiddlewareStep<State, Input, Result<Contextual<Output>>> {
+    override suspend fun execute(
+        input: Input,
+        execution: MiddlewareExecution<State>
+    ): Result<Contextual<Output>> = send(input, execution)
+
+    suspend infix fun runOn(runtime: MiddlewareRuntime<State>): Result<Contextual<Output>> {
+        val state = runtime.storage.read()
+        return execute(action.action.reader(state), MiddlewareExecution(runtime, state))
+    }
+
+    fun <Next> map(transform: suspend (Result<Contextual<Output>>) -> Next):
+        MiddlewareEffect<State, Next> = MiddlewareEffect { runtime ->
+        transform(this.runOn(runtime))
+    }
+}
+
+/**
+ * A free-standing Call(action), not a method on a gateway.
  *
- *   val response = Call(loginAction) runOn runtime
- *
- * Endpoint key is read from the action descriptor; the registry and selected
- * HttpClient are resolved at execution time, from a *single* Storage snapshot.
- * HTTP does not mutate Storage or silently invoke Action.writer.
- *
- * Reified payload types identify codecs in a manual or KSP-generated registry.
+ * No extra endpoint key, reader or serializer at the call site. The pure
+ * Action reader is evaluated only by standalone runOn; in a composed pipeline
+ * its input is received directly from the preceding Read stage.
  */
 @Suppress("FunctionName")
 inline fun <State, reified Input : Any, reified Output : Any> Call(
     action: EndpointAction<State, Input, Output>
-): MiddlewareEffect<State, Result<Contextual<Output>>> =
-    MiddlewareEffect { runtime ->
-        val state = runtime.storage.read()
-        val apiClient = runtime.client.resolve(state)
+): MiddlewareCall<State, Input, Output> =
+    MiddlewareCall(action) { input, execution ->
+        val apiClient = execution.runtime.client.resolve(execution.state)
         apiClient.executeAction<State, Input, Output>(
             action.endPoint,
-            state,
-            action.action.reader,
-            action.pathParameters(state)
+            execution.state,
+            Reader { input },
+            action.pathParameters(execution.state)
         )
     }
