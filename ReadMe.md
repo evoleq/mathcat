@@ -49,7 +49,7 @@ gradle :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest \
 
 For the JS tests, Kotlin/Gradle downloads the required Node.js environment when necessary. Gradle is pinned in CI; a Gradle wrapper can be added after the initial build has been verified.
 
-**Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **CI builds and tests only; it does not publish**. JitPack versus Maven Central and the final license remain open decisions.
+**Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **GitHub CI verifies MathCat; JitPack is configured for on-demand builds of tagged source releases.** See [experimental modular JitPack publishing](docs/JITPACK-PUBLISHING.md), including a separate JVM artifact-consumer smoke test and remaining target verification. Maven Central and the final license remain open decisions.
 
 ## Earlier MathCat experiments
 
