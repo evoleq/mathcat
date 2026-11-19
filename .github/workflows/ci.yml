@@ -98,3 +98,34 @@ jobs:
       - name: Test mingwX64
         shell: pwsh
         run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test
+  
+  publication:
+    name: Publish JVM variants and compile an external consumer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.1'
+      - name: Publish KMP root and JVM variants to Maven Local with JitPack coordinates
+        env:
+          JITPACK: 'true'
+          VERSION: 'v0.0.0-smoke'
+        run: |
+          gradle --no-daemon \
+            :mathcat-type-algebra:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-type-algebra:publishJvmPublicationToMavenLocal \
+            :mathcat-core:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-core:publishJvmPublicationToMavenLocal \
+            :mathcat-store:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-store:publishJvmPublicationToMavenLocal \
+            :mathcat-actions:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-actions:publishJvmPublicationToMavenLocal
+      - name: Verify Maven metadata and internal coordinates
+        run: python3 scripts/verify_published_jvm.py v0.0.0-smoke
+      - name: Compile independent JVM consumer using Maven Local
+        run: gradle --no-daemon -p publishing-smoke compileKotlin

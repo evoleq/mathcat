@@ -5,12 +5,26 @@ plugins {
 
 // All MathCat modules currently share one verified repository release version.
 // Passing a release version is explicit; ordinary local builds are snapshots.
+// JitPack exposes individual modules under com.github.<owner>.<repository>.
+// Match the group on every publication so internal dependencies resolve.
+val isJitPack = providers.environmentVariable("JITPACK")
+    .map { it.equals("true", ignoreCase = true) }
+    .orElse(false)
+    .get()
+
 val artifactVersion = providers.gradleProperty("releaseVersion")
     .orElse(providers.environmentVariable("RELEASE_VERSION"))
-    .orElse("0.0.0-SNAPSHOT")
+    .orElse(
+        if (isJitPack) providers.environmentVariable("VERSION")
+        else providers.provider { "0.0.0-SNAPSHOT" }
+    )
+
+if (isJitPack && !artifactVersion.isPresent) {
+    error("JITPACK=true requires VERSION (Git tag) or an explicit releaseVersion")
+}
 
 allprojects {
-    group = "org.evoleq"
+    group = if (isJitPack) "com.github.evoleq.mathcat" else "org.evoleq"
     version = artifactVersion.get()
 }
 
