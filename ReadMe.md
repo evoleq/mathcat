@@ -1,5 +1,10 @@
 # MathCat
 
+<p align="center">
+  <img src="assets/mathcat-original-stokes.png" alt="MathCat – Original Stokes: cat mascot, turquoise lambda and Stokes formula" width="360" />
+</p>
+
+
 **Mathematically flavored functional programming for Kotlin Multiplatform.**
 
 MathCat is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
