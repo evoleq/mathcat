@@ -120,6 +120,28 @@ contract; other supported methods send JSON request bodies. Authentication
 and base URL remain application environment concerns; a configured HttpClient
 provides authentication headers and custom client plugins.
 
+For login-aware applications that hold the current state in `Storage`, use a
+request-time resolver (instead of closing over a potentially stale client):
+
+```kotlin
+val gateway = ApiClientResolver<Application> { app ->
+    ApiClient(
+        client = app.client(app.userData.seemsToBeLoggedIn()),
+        api = app.api,
+        baseUrl = app.environment.backendUrl,
+        serializers = applicationSerializers
+    )
+}
+val result = gateway.Call<Application, Login, LoggedIn>(
+    LoginKey::class, applicationStorage, loginAction.reader
+)
+```
+
+The resolver reads Storage **once per call**, and the same snapshot determines
+the selected client, environment and pure Reader input. A caller can use
+`Storage * Lens` to assemble and focus those dependencies; the application
+alone owns its authentication policy, ports and state updates.
+
 **Important:** `Call` is a suspending IO interpreter, not a fake
 `KlState<Storage<Application>, ...>`: pure core State cannot execute network
 requests without changing its semantics. No global registry, serializer lookup
