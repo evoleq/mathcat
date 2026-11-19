@@ -146,3 +146,12 @@ alone owns its authentication policy, ports and state updates.
 `KlState<Storage<Application>, ...>`: pure core State cannot execute network
 requests without changing its semantics. No global registry, serializer lookup
 by a server-provided class name or automatic Action.writer mutation is added.
+
+### Standalone middleware publication
+
+For the shortest frontend expression, use the separately published
+[`mathcat-middleware`](../mathcat-middleware) module. Bind the endpoint key
+**once** at Action declaration with `action.at(LoginKey::class)` and then
+write only `Call(action) runOn runtime`. The standalone `Call` is not an
+`ApiClient`/gateway member; its client and serializers are injected by the
+execution context. The original transport-neutral Action is unchanged.
