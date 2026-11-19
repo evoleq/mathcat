@@ -18,7 +18,7 @@ PROJECT_DEP = re.compile(
     r'project\s*\(\s*["\']:([^"\']+)["\']\s*\)\s*\)'
 )
 BUILD_TOOL_DEP = re.compile(
-    r'\\bksp\\s*\\(\\s*project\\s*\\(\\s*["\\\']:([^"\\\']+)["\\\']\\s*\\)\\s*\\)'
+    r'\bksp\s*\(\s*project\s*\(\s*["\']:([^"\']+)["\']\s*\)\s*\)'
 )
 BREAKING = re.compile(r"(?m)^(?:[a-z][\w-]*(?:\([^)]+\))?!:|BREAKING[ -]CHANGE\s*:)")
 FEATURE = re.compile(r"(?m)^feat(?:\([^)]+\))?:")
