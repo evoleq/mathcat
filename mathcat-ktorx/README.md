@@ -64,3 +64,63 @@ All four original IO modes exist: Receive<T>() decodes JSON into Result<T>, Rece
 The client-side Contextual(context,data) remains a separate portable type in the context.data package (as in Solyton), used by requestResultEndpoint and sendResultEndpoint. Those methods send/receive typed Result envelopes with explicit serializers from manual or KSP-generated registries, preserve Context response headers and return an HttpStatusMessage on non-2xx responses.
 
 **Compatibility boundaries:** The existing Solyton global registry is replaced by injected composition; its multi-purpose Base(call,database) is still the consumer's responsibility through callOf and createBase. The new Respond writes JSON Result failure envelopes uniformly, including status failures, whereas some legacy Ktor routes returned plain text or a directly serialized Failure.Message. This difference is visible and requires an explicit migration decision. The default principal resolver needs Ktor JWT authentication configured; tests can inject a replacement and never bypass authentication in production by default. No Solyton code has been changed.
+
+## Ergonomic server and frontend bindings (Issue #17)
+
+The opt-in `installApi` DSL interprets the original `Api` endpoint keys.
+It validates routes before registering handlers, installs a composed serializer
+registry once and constructs an independent `RequestContext(call, environment)`
+per HTTP request. The context is Ktor-specific; **it is not the mathematical
+Boundary or a replacement for Domain ports**.
+
+```kotlin
+val api = Api { post<String, String>(Greeting::class, "greeting") }
+val codecs = Serializers { include(GeneratedFeatureSerializers) } // or manual
+
+routing {
+    installApi(api, environment, codecs) {
+        handle(Greeting::class) { base ->
+            (Receive<String>() *
+                Transform<String, String> { base.environment.greet(it) } *
+                Respond<String>()) runOn base
+        }
+    }
+}
+```
+
+`Receive<String>()` and `Respond<String>()` now obtain their codecs from the
+installed registry: **no explicit serializer at the call site**. Supplying a
+generated registry is optional; custom serializers and parameterized types
+can still use the explicit overloads.
+
+### Frontend: State Reader / Action interpreter
+
+The transport-independent `mathcat-actions.Action` deliberately has no HTTP
+method, KClass endpoint or serializer. Its pure `reader` can be interpreted
+at a frontend boundary without changing its structure:
+
+```kotlin
+val apiClient = ApiClient(
+    client = application.client(isLoggedIn), // chosen by the application
+    api = applicationApi,
+    baseUrl = environment.backendUrl,
+    serializers = Serializers { include(GeneratedFeatureSerializers) }
+)
+
+val result: Result<Contextual<LoggedIn>> =
+    apiClient.Call(ApplicationLogin::class, applicationState, loginAction.reader)
+// In application code, decide whether to apply loginAction.writer / onSuccess.
+```
+
+For direct calls, use `apiClient.request<T>(key, pathParameters, queryParameters)`
+and `apiClient.send<S, T>(key, payload, pathParameters)`. They select codecs
+automatically from the provided registry, including KSP-generated registries.
+`Call` derives GET query parameters from the existing `Api.Parameters`
+contract; other supported methods send JSON request bodies. Authentication
+and base URL remain application environment concerns; a configured HttpClient
+provides authentication headers and custom client plugins.
+
+**Important:** `Call` is a suspending IO interpreter, not a fake
+`KlState<Storage<Application>, ...>`: pure core State cannot execute network
+requests without changing its semantics. No global registry, serializer lookup
+by a server-provided class name or automatic Action.writer mutation is added.
