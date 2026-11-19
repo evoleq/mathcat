@@ -4,6 +4,17 @@
 
 MathCat is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
 
+## Current module integration (draft)
+
+The [integration branch](https://github.com/evoleq/mathcat/pull/18) combines
+the original Ktor-independent API DSL, portable Result, composable serializer
+registry and optional KSP, Ktor client/server adapters, JVM Contextual and pure
+transforms. Compatibility tracking and JitPack smoke testing cover the
+expanded module graph. This remains a **draft until CI has passed**.
+The deliberately deferred API/Boundary/Environment DX work is tracked in
+[issue #17](https://github.com/evoleq/mathcat/issues/17).
+See [integration decisions](docs/INTEGRATION-2026-11-19.md).
+
 ## MathCat Core (new draft module)
 
 The experimental [`mathcat-core`](mathcat-core) module introduces small, nominal, lambda-friendly `Reader` and `Writer` types; **lawful** `Lens` contracts; composable but **not necessarily lawful** `Selection`; and a pure, non-`suspend` State monad.
@@ -49,7 +60,7 @@ gradle :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest \
 
 For the JS tests, Kotlin/Gradle downloads the required Node.js environment when necessary. Gradle is pinned in CI; a Gradle wrapper can be added after the initial build has been verified.
 
-**Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **CI builds and tests only; it does not publish**. JitPack versus Maven Central and the final license remain open decisions.
+**Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **CI validates all integrated modules and publishes no artifacts to Maven Central.** Experimental JitPack publication of tagged source is available on demand, but remote JitPack and cross-platform artifact verification are still pending. The final license remains open.
 
 ## Earlier MathCat experiments
 

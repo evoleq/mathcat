@@ -1,6 +1,6 @@
 # Versioning and compatibility — initial implementation
 
-MathCat currently uses **one repository SemVer version for all four published-module candidates**. Its module dependencies are declared by Gradle projects and mirrored in [compatibility/modules.json](../compatibility/modules.json). Independent module versions, a cross-repository compatibility resolver, API/ABI checking and wire-compatibility claims are **not implemented** here.
+MathCat currently uses **one repository SemVer version for all publishable MathCat modules**. The KSP test fixture is explicitly non-publishable. Runtime and build-time project dependencies are declared by Gradle and mirrored in [compatibility/modules.json](../compatibility/modules.json). Independent module versions, a cross-repository compatibility resolver, API/ABI checking and wire-compatibility claims are **not implemented** here.
 
 ## Local use
 
@@ -34,7 +34,7 @@ The existing CI tests JVM, JS, Wasm, Linux and Windows native, and compiles Andr
 4. A planned new tag is strictly above the highest reachable SemVer tag, and is only emitted for package-relevant changes.
 5. Tagging runs only after a successful CI run against the exact current master commit.
 
-The compatibility record is a **release snapshot**, not a computed compatibility matrix across historical versions. The validator currently recognizes standard api(project(...))/implementation(project(...)) declarations; unusual dynamic Gradle dependency declarations require extending the adapter.
+The compatibility record is a **release snapshot**, not a computed compatibility matrix across historical versions. The validator recognizes static api(project(...))/implementation(project(...)) and ksp(project(...)) declarations. The release planner treats JVM src/main changes as package-relevant and excludes explicitly non-published test fixtures. Unusual dynamic dependency declarations require extending the adapter.
 
 ## Next stages
 

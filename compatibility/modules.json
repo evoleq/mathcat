@@ -67,7 +67,10 @@
       "requires": {
         "mathcat-serialization": "same-release"
       },
-      "publication": "none"
+      "publication": "none",
+      "buildRequires": {
+        "mathcat-serialization-ksp": "same-release"
+      }
     }
   }
 }

@@ -72,15 +72,7 @@ advertising any platform as released.
 With JDK 17 and Gradle 9.2.1 installed:
 
 ```bash
-JITPACK=true VERSION=v0.0.0-smoke gradle --no-daemon \
-  :mathcat-type-algebra:publishKotlinMultiplatformPublicationToMavenLocal \
-  :mathcat-type-algebra:publishJvmPublicationToMavenLocal \
-  :mathcat-core:publishKotlinMultiplatformPublicationToMavenLocal \
-  :mathcat-core:publishJvmPublicationToMavenLocal \
-  :mathcat-store:publishKotlinMultiplatformPublicationToMavenLocal \
-  :mathcat-store:publishJvmPublicationToMavenLocal \
-  :mathcat-actions:publishKotlinMultiplatformPublicationToMavenLocal \
-  :mathcat-actions:publishJvmPublicationToMavenLocal
+JITPACK=true VERSION=v0.0.0-smoke gradle --no-daemon publishToMavenLocal
 python3 scripts/verify_published_jvm.py v0.0.0-smoke
 gradle --no-daemon -p publishing-smoke compileKotlin
 ```
