@@ -65,14 +65,14 @@ class ApiClient(
     }
 
     /**
-     * Interpret an Action's pure Reader at the HTTP boundary, without adding
+     * Low-level interpreter for an Action's pure Reader at the HTTP boundary, without adding
      * endpoint keys or serializers to the transport-independent Action model.
      *
      * This is suspendable transport IO, deliberately NOT the pure core State.
      * Applying Action.writer/onSuccess after success is the caller's policy.
      */
     @Suppress("FunctionName")
-    suspend inline fun <State, reified S : Any, reified T : Any> Call(
+    suspend inline fun <State, reified S : Any, reified T : Any> executeAction(
         key: KClass<*>,
         state: State,
         reader: Reader<State, S>,

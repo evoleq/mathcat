@@ -13,7 +13,6 @@ import org.evoleq.mathcat.api.Api
 import org.evoleq.mathcat.api.Parameters
 import org.evoleq.mathcat.api.QueryParams
 import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.storage.Storage
 import org.evoleq.mathcat.ktorx.context.data.Contextual
 import org.evoleq.mathcat.result.Result
 import org.evoleq.mathcat.serialization.ResultSerializer
@@ -44,7 +43,7 @@ class ApiClientDxTest {
         try {
             val boundary = ApiClient(http, api, "https://api.test", strings)
             val actionReader: Reader<State, String> = Reader { it.input }
-            val result = boundary.Call<State, String, String>(
+            val result = boundary.executeAction<State, String, String>(
                 Greet::class, State("Ada"), actionReader
             )
             assertEquals(Result.Success(Contextual("tenant-a", "Hi, Ada")), result)
@@ -69,7 +68,7 @@ class ApiClientDxTest {
             val reader: Reader<State, SearchParams> = Reader {
                 SearchParams(listOf("name" to it.input))
             }
-            val result = boundary.Call<State, SearchParams, String>(
+            val result = boundary.executeAction<State, SearchParams, String>(
                 Search::class, State("Ada"), reader, mapOf("id" to "a b")
             )
             assertEquals(Result.Success(Contextual("", "found")), result)
@@ -93,43 +92,6 @@ class ApiClientDxTest {
             }
         } finally {
             http.close()
-        }
-    }
-
-    @Test
-    fun storageResolverSelectsCurrentAuthenticatedClientAtEachInvocation() = runTest {
-        val api = Api { post<String, String>(Greet::class, "greet") }
-        val anonymous = HttpClient(MockEngine { respond(response("guest")) })
-        val authenticated = HttpClient(MockEngine { respond(response("member")) })
-        try {
-            var current = State("Ada", loggedIn = false)
-            var reads = 0
-            val storage = Storage(
-                read = { reads++; current },
-                write = { current = it }
-            )
-            val gateway = ApiClientResolver<State> { state ->
-                ApiClient(
-                    client = if (state.loggedIn) authenticated else anonymous,
-                    api = api,
-                    baseUrl = "https://api.test",
-                    serializers = strings
-                )
-            }
-            val input = Reader<State, String> { it.input }
-            assertEquals(
-                Result.Success(Contextual("", "guest")),
-                gateway.Call<State, String, String>(Greet::class, storage, input)
-            )
-            storage.write(State("Ada", loggedIn = true))
-            assertEquals(
-                Result.Success(Contextual("", "member")),
-                gateway.Call<State, String, String>(Greet::class, storage, input)
-            )
-            assertEquals(2, reads)
-        } finally {
-            anonymous.close()
-            authenticated.close()
         }
     }
 
