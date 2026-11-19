@@ -103,7 +103,7 @@ class ReleaseTests(unittest.TestCase):
                 "publication": "none",
             }
             (root / "settings.gradle.kts").write_text(
-                "\\n".join(f'include(":{m}")' for m in manifest["modules"])
+                "\n".join(f'include(":{m}")' for m in manifest["modules"])
             )
             for module, info in manifest["modules"].items():
                 (root / module).mkdir()
@@ -111,7 +111,7 @@ class ReleaseTests(unittest.TestCase):
                 build = [f'ksp(project(":{dep}"))'
                          for dep in info.get("buildRequires", {})]
                 (root / module / "build.gradle.kts").write_text(
-                    "\\n".join(regular + build)
+                    "\n".join(regular + build)
                 )
             path = root / "compatibility/modules.json"
             path.write_text(json.dumps(manifest))
