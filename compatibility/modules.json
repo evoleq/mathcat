@@ -66,7 +66,8 @@
     "mathcat-serialization-ksp-fixture": {
       "requires": {
         "mathcat-serialization": "same-release",
-        "mathcat-ktorx": "same-release"
+        "mathcat-ktorx": "same-release",
+        "mathcat-middleware": "same-release"
       },
       "publication": "none",
       "buildRequires": {

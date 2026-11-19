@@ -7,6 +7,7 @@ plugins {
 dependencies {
     implementation(project(":mathcat-serialization"))
     implementation(project(":mathcat-ktorx"))
+    implementation(project(":mathcat-middleware"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
     ksp(project(":mathcat-serialization-ksp"))
 
