@@ -1,0 +1,9 @@
+# JitPack builds tagged sources on demand after GitHub's pre-tag CI gate.
+# The upstream wrapper jar is not yet checked in; use CI's exact Gradle version.
+jdk:
+  - openjdk17
+before_install:
+  - sdk install gradle 9.2.1
+  - sdk use gradle 9.2.1
+install:
+  - gradle --no-daemon publishToMavenLocal

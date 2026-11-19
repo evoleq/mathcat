@@ -1,6 +1,6 @@
 # Versioning and compatibility — initial implementation
 
-MathCat currently uses **one repository SemVer version for all four published-module candidates**. Its module dependencies are declared by Gradle projects and mirrored in [compatibility/modules.json](../compatibility/modules.json). Independent module versions, a cross-repository compatibility resolver, artifact publication, API/ABI checking and wire-compatibility claims are **not implemented** here.
+MathCat currently uses **one repository SemVer version for all four published-module candidates**. Its module dependencies are declared by Gradle projects and mirrored in [compatibility/modules.json](../compatibility/modules.json). Independent module versions, a cross-repository compatibility resolver, API/ABI checking and wire-compatibility claims are **not implemented** here.
 
 ## Local use
 
@@ -24,7 +24,7 @@ The existing CI tests JVM, JS, Wasm, Linux and Windows native, and compiles Andr
 - A reachable vMAJOR.MINOR.PATCH tag is the base for the next version. feat: increments MINOR; BREAKING CHANGE:/feat!: increments MAJOR, or MINOR while 0.x; other package-relevant changes increment PATCH. A new repository starts at v0.1.0. Conventional Commit messages describe intent, **not a proof of compatibility**.
 - Changed modules and the transitive reverse-dependency impact are recorded in the plan. In this first phase, affected modules are verified together, but all modules share one version on release.
 - A successful build of a package-relevant change creates an annotated Git tag and a GitHub source release with a machine-readable compatibility record attached. The record contains the module-version mapping and the exact passing CI run. The evidence covers CI only, **not** a formal proof of source, binary, behavior or wire compatibility.
-- Releases are never created for stale CI commits, and tags are never replaced. GitHub Releases and tagged source commits are separate from Maven publication; the latter needs additional publishing and signing configuration.
+- Releases are never created for stale CI commits, and tags are never replaced. GitHub Releases and tagged source commits are separate from Maven publication. JitPack can build tagged source releases on demand; see [experimental JitPack publishing](JITPACK-PUBLISHING.md). Maven Central signing and publication are not configured.
 
 ## Invariants implemented in the first phase
 
@@ -38,4 +38,4 @@ The compatibility record is a **release snapshot**, not a computed compatibility
 
 ## Next stages
 
-Add published multiplatform artifacts and a BOM/version catalog; implement ABI baselines and serialization contract checks; define cross-repository compatibility and independently versioned modules only when release cycles diverge. Preserve checked evidence separately from declared compatibility constraints.
+Verify all JitPack platform artifacts and add a BOM/version catalog; implement ABI baselines and serialization contract checks; define cross-repository compatibility and independently versioned modules only when release cycles diverge. Preserve checked evidence separately from declared compatibility constraints.
