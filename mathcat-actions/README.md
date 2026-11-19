@@ -66,3 +66,19 @@ is written in parallel, and Solyton only adopts reviewed, mature components.
 Nothing is merged into `master`, published or integrated by this draft.
 
 See [Action and Storage architectural research](../docs/ACTION-DISPATCH-AND-STORAGE.md).
+
+## Profunctor shape of Action
+
+For fixed state `S`, MathCat's
+`Action<S, I, O> = Reader<S, I> × Writer<S, O>` is **covariant in I** and
+**contravariant in O**. It is a profunctor in standard argument order
+`P_S<O, I> = Action<S, I, O>`, not `P_S<I, O>`.
+
+Pure `map(I -> J)`, `contraMap(P -> O)`, and
+`dimap(before: P -> O, after: I -> J)` preserve the Action's name and
+also transform `onSuccess` on the writer side. Tests cover identity and
+composition laws, including both writers.
+
+These operations transform a **pure Action descriptor**, not an HTTP codec.
+When binding a transformed Action to a transport endpoint, the declared
+request/response types must still match the transformed input/output.

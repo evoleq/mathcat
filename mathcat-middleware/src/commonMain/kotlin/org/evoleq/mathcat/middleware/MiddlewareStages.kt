@@ -168,6 +168,16 @@ fun <S, T> Debug(
  * Read * Call * OnError * Dispatch * React
  */
 @Suppress("FunctionName")
+inline fun <S, reified I : Any, reified O : Any> ProcessAction(
+    action: EndpointAction<S, I, O>,
+    policy: FailurePolicy<S> = FailurePolicy { failure, _ -> failure },
+    noinline onContext: suspend (String, MiddlewareRuntime<S>) -> Unit = { _, _ -> },
+    noinline onSuccess: suspend (O, MiddlewareRuntime<S>) -> Unit = { _, _ -> }
+): MiddlewareStep<S, Unit, Result<O>> =
+    ProcessAction(action, Call(action), policy, onContext, onSuccess)
+
+/** Fully explicit form accepts an application-supplied Call interpreter. */
+@Suppress("FunctionName")
 fun <S, I : Any, O : Any> ProcessAction(
     action: EndpointAction<S, I, O>,
     call: MiddlewareCall<S, I, O>,
