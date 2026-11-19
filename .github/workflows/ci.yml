@@ -22,6 +22,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.2.1'
+      - name: Validate compatibility manifest and release planner
+        run: |
+          python3 -m unittest discover -s scripts/tests -v
+          python3 scripts/release.py validate
       - name: Compile and test portable targets
         run: |
           gradle --no-daemon \
