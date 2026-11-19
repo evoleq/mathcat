@@ -1,4 +1,5 @@
 plugins {
+    `maven-publish`
     kotlin("multiplatform")
     id("com.android.kotlin.multiplatform.library")
 }
@@ -37,6 +38,7 @@ kotlin {
         jvmMain.dependencies {
             api("io.ktor:ktor-server-core:3.4.1")
             implementation("io.ktor:ktor-server-auth-jwt:3.4.1")
+            api(project(":mathcat-transform"))
         }
         jvmTest.dependencies {
             implementation("io.ktor:ktor-server-test-host:3.4.1")

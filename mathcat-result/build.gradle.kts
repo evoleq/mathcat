@@ -1,4 +1,5 @@
 plugins {
+    `maven-publish`
     kotlin("multiplatform")
     id("com.android.kotlin.multiplatform.library")
 }
