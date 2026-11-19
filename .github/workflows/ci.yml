@@ -36,7 +36,24 @@ jobs:
             :mathcat-store:jvmTest :mathcat-store:jsNodeTest \
             :mathcat-store:wasmJsNodeTest :mathcat-store:linuxX64Test \
             :mathcat-actions:jvmTest :mathcat-actions:jsNodeTest \
-            :mathcat-actions:wasmJsNodeTest :mathcat-actions:linuxX64Test
+            :mathcat-actions:wasmJsNodeTest :mathcat-actions:linuxX64Test \
+            :mathcat-api:jvmTest \
+            :mathcat-api:jsNodeTest \
+            :mathcat-api:wasmJsNodeTest \
+            :mathcat-api:linuxX64Test \
+            :mathcat-result:jvmTest \
+            :mathcat-result:jsNodeTest \
+            :mathcat-result:wasmJsNodeTest \
+            :mathcat-result:linuxX64Test \
+            :mathcat-serialization:jvmTest \
+            :mathcat-serialization:jsNodeTest \
+            :mathcat-serialization:wasmJsNodeTest \
+            :mathcat-serialization:linuxX64Test \
+            :mathcat-ktorx:jvmTest \
+            :mathcat-ktorx:jsNodeTest \
+            :mathcat-ktorx:wasmJsNodeTest \
+            :mathcat-ktorx:linuxX64Test \
+            :mathcat-serialization-ksp-fixture:test :mathcat-context:test :mathcat-transform:test
 
   android:
     name: Android library compilation
@@ -57,7 +74,7 @@ jobs:
         with:
           gradle-version: '9.2.1'
       - name: Compile Android KMP targets
-        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain
+        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-api:compileAndroidMain :mathcat-result:compileAndroidMain :mathcat-serialization:compileAndroidMain :mathcat-ktorx:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
@@ -81,7 +98,19 @@ jobs:
             :mathcat-store:compileKotlinIosArm64 :mathcat-store:compileKotlinIosSimulatorArm64 \
             :mathcat-store:macosX64Test \
             :mathcat-actions:compileKotlinIosArm64 :mathcat-actions:compileKotlinIosSimulatorArm64 \
-            :mathcat-actions:macosX64Test
+            :mathcat-actions:macosX64Test \
+            :mathcat-api:compileKotlinIosArm64 \
+            :mathcat-api:compileKotlinIosSimulatorArm64 \
+            :mathcat-api:macosX64Test \
+            :mathcat-result:compileKotlinIosArm64 \
+            :mathcat-result:compileKotlinIosSimulatorArm64 \
+            :mathcat-result:macosX64Test \
+            :mathcat-serialization:compileKotlinIosArm64 \
+            :mathcat-serialization:compileKotlinIosSimulatorArm64 \
+            :mathcat-serialization:macosX64Test \
+            :mathcat-ktorx:compileKotlinIosArm64 \
+            :mathcat-ktorx:compileKotlinIosSimulatorArm64 \
+            :mathcat-ktorx:macosX64Test
 
   windows:
     name: Windows Native
@@ -97,7 +126,7 @@ jobs:
           gradle-version: '9.2.1'
       - name: Test mingwX64
         shell: pwsh
-        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test
+        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-api:mingwX64Test :mathcat-result:mingwX64Test :mathcat-serialization:mingwX64Test :mathcat-ktorx:mingwX64Test
   
   publication:
     name: Publish JVM variants and compile an external consumer
@@ -124,7 +153,18 @@ jobs:
             :mathcat-store:publishKotlinMultiplatformPublicationToMavenLocal \
             :mathcat-store:publishJvmPublicationToMavenLocal \
             :mathcat-actions:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-actions:publishJvmPublicationToMavenLocal
+            :mathcat-actions:publishJvmPublicationToMavenLocal \
+            :mathcat-api:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-api:publishJvmPublicationToMavenLocal \
+            :mathcat-result:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-result:publishJvmPublicationToMavenLocal \
+            :mathcat-serialization:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-serialization:publishJvmPublicationToMavenLocal \
+            :mathcat-ktorx:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-ktorx:publishJvmPublicationToMavenLocal \
+            :mathcat-context:publishToMavenLocal \
+            :mathcat-transform:publishToMavenLocal \
+            :mathcat-serialization-ksp:publishToMavenLocal
       - name: Verify Maven metadata and internal coordinates
         run: python3 scripts/verify_published_jvm.py v0.0.0-smoke
       - name: Compile independent JVM consumer using Maven Local

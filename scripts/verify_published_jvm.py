@@ -8,18 +8,22 @@ from xml.etree import ElementTree
 def verify(maven_local: Path, version: str) -> None:
     manifest = json.loads((Path(__file__).resolve().parent.parent /
                            "compatibility/modules.json").read_text())
-    modules = set(manifest["modules"])
+    modules = {
+        name: spec.get("publication", "kmp")
+        for name, spec in manifest["modules"].items()
+        if spec.get("publication", "kmp") != "none"
+    }
     base = maven_local / "com/github/evoleq/mathcat"
     errors = []
     for module in sorted(modules):
-        for suffix in ("", "-jvm"):
+        for suffix in (("", "-jvm") if modules[module] == "kmp" else ("",)):
             artifact = module + suffix
             directory = base / artifact / version
             pom = directory / f"{artifact}-{version}.pom"
             if not pom.is_file():
                 errors.append(f"Missing publication: {pom}")
                 continue
-            if suffix == "-jvm":
+            if suffix == "-jvm" or modules[module] == "jvm":
                 jar = directory / f"{artifact}-{version}.jar"
                 if not jar.is_file():
                     errors.append(f"Missing JVM jar: {jar}")
