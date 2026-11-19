@@ -1,4 +1,5 @@
 plugins {
+    `maven-publish`
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.android.kotlin.multiplatform.library")
