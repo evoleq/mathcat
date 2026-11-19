@@ -70,7 +70,7 @@ inline fun <State, reified Input : Any, reified Output : Any> Call(
     MiddlewareEffect { runtime ->
         val state = runtime.storage.read()
         val apiClient = runtime.client.resolve(state)
-        apiClient.Call<State, Input, Output>(
+        apiClient.executeAction<State, Input, Output>(
             action.endPoint,
             state,
             action.action.reader,
