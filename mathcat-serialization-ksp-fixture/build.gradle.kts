@@ -6,10 +6,12 @@ plugins {
 
 dependencies {
     implementation(project(":mathcat-serialization"))
+    implementation(project(":mathcat-ktorx"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
     ksp(project(":mathcat-serialization-ksp"))
 
     testImplementation(kotlin("test-junit"))
+    testImplementation("io.ktor:ktor-client-mock:3.4.1")
     testImplementation("junit:junit:4.13.2")
 }
 
