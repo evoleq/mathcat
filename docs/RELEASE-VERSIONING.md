@@ -8,8 +8,8 @@ MathCat currently uses **one repository SemVer version for all four published-mo
 python3 -m unittest discover -s scripts/tests -v
 python3 scripts/release.py validate
 python3 scripts/release.py plan --output build/release-plan.json
-./gradlew verifyReleaseCompatibility
-./gradlew planRelease
+gradle verifyReleaseCompatibility
+gradle planRelease
 ~~~
 
 The two Gradle tasks are adapters to the same standard-library release planner. planRelease writes build/release/plan.json. No command above tags, publishes or modifies Git history.
