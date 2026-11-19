@@ -4,7 +4,6 @@ import org.evoleq.mathcat.actions.Action
 import org.evoleq.mathcat.core.reader.Reader
 import org.evoleq.mathcat.core.storage.Storage
 import org.evoleq.mathcat.ktorx.ApiClientResolver
-import org.evoleq.mathcat.ktorx.Call
 import org.evoleq.mathcat.ktorx.context.data.Contextual
 import org.evoleq.mathcat.result.Result
 import kotlin.reflect.KClass
