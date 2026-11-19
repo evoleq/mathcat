@@ -72,6 +72,13 @@
       "buildRequires": {
         "mathcat-serialization-ksp": "same-release"
       }
+    },
+    "mathcat-middleware": {
+      "requires": {
+        "mathcat-actions": "same-release",
+        "mathcat-ktorx": "same-release"
+      },
+      "publication": "kmp"
     }
   }
 }
