@@ -122,12 +122,12 @@ class KtorIO<B>(
     @Suppress("FunctionName")
     fun <S : Any, T : Any> Transform(f: (S) -> T):
         KlAction<B, Result<S>, Result<T>> =
-        { input -> Action { base -> (input map f) to base } }
+        { input -> Action { base -> org.evoleq.mathcat.transform.Transform(f).apply(input) to base } }
 
     @Suppress("FunctionName")
     fun <S : Any, T : Any> TransformContextual(f: (S) -> T):
         KlAction<B, Result<Contextual<S>>, Result<Contextual<T>>> =
-        { input -> Action { base -> (input map { contextual -> contextual map f }) to base } }
+        { input -> Action { base -> org.evoleq.mathcat.transform.TransformContextual(f).apply(input) to base } }
 
     /**
      * Keep Solyton's Respond<T> { transform() } extension-lambda shape.

@@ -24,7 +24,7 @@ implementation("com.github.evoleq.mathcat:mathcat-core:v0.2.0")
 implementation("com.github.evoleq.mathcat:mathcat-actions:v0.2.0")
 ```
 
-The other modules are `mathcat-store` and `mathcat-type-algebra`.
+The publishable modules are `mathcat-type-algebra`, `mathcat-core`, `mathcat-store`, `mathcat-actions`, `mathcat-api`, `mathcat-result`, `mathcat-serialization`, `mathcat-ktorx`, `mathcat-context`, `mathcat-transform` and `mathcat-serialization-ksp`. The `mathcat-serialization-ksp-fixture` is test-only and is **not** published.
 Kotlin Multiplatform publishes root and target-specific Maven modules;
 the root publication selects a suitable platform variant. Gradle
 transitively resolves internal dependencies, including `mathcat-actions`
@@ -56,7 +56,7 @@ The final public license decision is still open.
 
 ## Smoke verification
 
-GitHub CI publishes all four root and JVM publications into Maven Local under
+GitHub CI publishes KMP root/JVM publications and standalone JVM-only modules into Maven Local under
 JitPack coordinates. It parses their POM dependencies for correct module
 group/versions, then compiles a **separate Gradle consumer** in
 `publishing-smoke/` using Maven Local, not `project(...)` dependencies.
@@ -84,3 +84,11 @@ JITPACK=true VERSION=v0.0.0-smoke gradle --no-daemon \
 python3 scripts/verify_published_jvm.py v0.0.0-smoke
 gradle --no-daemon -p publishing-smoke compileKotlin
 ```
+
+## Integrated module graph (2026-11-19)
+
+The compatibility manifest covers each Gradle module. The `publication` field
+is `kmp` (root and JVM artifacts), `jvm` (standalone JVM artifact), or `none`
+(test-only fixture excluded from publishing). The CI smoke test checks all
+publishable JVM artifacts and an independent external consumer.
+See `docs/INTEGRATION-2026-11-19.md` and issue #17 for remaining DX work.
