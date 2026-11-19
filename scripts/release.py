@@ -17,6 +17,9 @@ PROJECT_DEP = re.compile(
     r'\b(?:api|implementation|compileOnly|runtimeOnly)\s*\(\s*'
     r'project\s*\(\s*["\']:([^"\']+)["\']\s*\)\s*\)'
 )
+BUILD_TOOL_DEP = re.compile(
+    r'\\bksp\\s*\\(\\s*project\\s*\\(\\s*["\\\']:([^"\\\']+)["\\\']\\s*\\)\\s*\\)'
+)
 BREAKING = re.compile(r"(?m)^(?:[a-z][\w-]*(?:\([^)]+\))?!:|BREAKING[ -]CHANGE\s*:)")
 FEATURE = re.compile(r"(?m)^feat(?:\([^)]+\))?:")
 REPOSITORY = "evoleq/mathcat"
@@ -52,12 +55,21 @@ def validate(root: Path) -> dict:
         requires = definition.get("requires") if isinstance(definition, dict) else None
         if not isinstance(requires, dict) or any(value != "same-release" for value in requires.values()):
             raise ReleaseError(f"{module}: requires must map module names to 'same-release'")
-        if module in requires or not set(requires).issubset(modules):
+        publication = definition.get("publication", "kmp")
+        if publication not in ("kmp", "jvm", "none"):
+            raise ReleaseError(f"{module}: invalid publication kind {publication!r}")
+        build_requires = definition.get("buildRequires", {})
+        if not isinstance(build_requires, dict) or any(value != "same-release" for value in build_requires.values()):
+            raise ReleaseError(f"{module}: buildRequires must map module names to 'same-release'")
+        if module in (requires.keys() | build_requires.keys()) or not (requires.keys() | build_requires.keys()) <= modules.keys():
             raise ReleaseError(f"{module}: invalid, unknown or self dependency")
         build = (root / module / "build.gradle.kts").read_text()
         actual = set(PROJECT_DEP.findall(build))
         if actual != set(requires):
             raise ReleaseError(f"{module}: Gradle requires={sorted(actual)}, manifest requires={sorted(requires)}")
+        actual_build = set(BUILD_TOOL_DEP.findall(build))
+        if actual_build != set(build_requires):
+            raise ReleaseError(f"{module}: Gradle buildRequires={sorted(actual_build)}, manifest buildRequires={sorted(build_requires)}")
     visited, visiting = set(), set()
 
     def visit(module: str) -> None:
@@ -66,7 +78,8 @@ def validate(root: Path) -> dict:
         if module in visited:
             return
         visiting.add(module)
-        for dependency in modules[module]["requires"]:
+        for dependency in (modules[module]["requires"].keys() |
+                           modules[module].get("buildRequires", {}).keys()):
             visit(dependency)
         visiting.remove(module)
         visited.add(module)
@@ -79,23 +92,29 @@ def validate(root: Path) -> dict:
 def release_impact(paths: list[str], manifest: dict) -> tuple[list[str], list[str]]:
     """Return changed and transitively affected modules (tests/docs excluded)."""
     modules = manifest["modules"]
+    publishable = {name for name, spec in modules.items()
+                   if spec.get("publication", "kmp") != "none"}
     global_changes = {"settings.gradle.kts", "build.gradle.kts", "gradle.properties", "compatibility/modules.json"}
     if any(p in global_changes or p.startswith(("gradle/", "build-logic/")) for p in paths):
-        return sorted(modules), sorted(modules)
+        return sorted(publishable), sorted(publishable)
     changed = set()
     for path in paths:
         parts = path.split("/")
-        if parts[0] not in modules:
+        if parts[0] not in publishable:
             continue
         if len(parts) == 2 and parts[1] == "build.gradle.kts":
             changed.add(parts[0])
-        elif len(parts) >= 4 and parts[1] == "src" and parts[2].endswith("Main"):
+        elif len(parts) >= 4 and parts[1] == "src" and (
+            parts[2].endswith("Main") or parts[2] == "main"
+        ):
             changed.add(parts[0])
     affected = set(changed)
     while True:
         expanded = affected | {
             name for name, details in modules.items()
-            if set(details["requires"]) & affected
+            if name in publishable and (
+                (set(details["requires"]) | set(details.get("buildRequires", {}))) & affected
+            )
         }
         if expanded == affected:
             break
@@ -161,7 +180,11 @@ def make_record(proposal: dict, manifest: dict, ci_run: str) -> dict:
         "modules": {
             module: {
                 "version": version,
+                "publication": spec.get("publication", "kmp"),
                 "requires": {dep: version for dep in spec["requires"]},
+                "buildRequires": {
+                    dep: version for dep in spec.get("buildRequires", {})
+                },
             } for module, spec in sorted(manifest["modules"].items())
         },
         "verification": {

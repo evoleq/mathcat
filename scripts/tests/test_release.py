@@ -68,6 +68,58 @@ class ReleaseTests(unittest.TestCase):
             with self.assertRaisesRegex(ReleaseError, "cycle"):
                 validate(root)
 
+    def test_jvm_changes_and_test_only_fixtures(self):
+        manifest = json.loads(json.dumps(MANIFEST))
+        manifest["modules"]["mathcat-transform"] = {
+            "requires": {"mathcat-core": "same-release"}, "publication": "jvm",
+        }
+        manifest["modules"]["mathcat-build-fixture"] = {
+            "requires": {"mathcat-transform": "same-release"}, "publication": "none",
+        }
+        self.assertEqual(
+            release_impact(["mathcat-transform/src/main/kotlin/Transform.kt"], manifest),
+            (["mathcat-transform"], ["mathcat-transform"]),
+        )
+        self.assertEqual(
+            release_impact(["mathcat-build-fixture/src/main/kotlin/Fixture.kt"], manifest),
+            ([], []),
+        )
+        self.assertEqual(
+            release_impact(["mathcat-core/src/commonMain/kotlin/A.kt"], manifest),
+            (["mathcat-core"],
+             ["mathcat-actions", "mathcat-core", "mathcat-store", "mathcat-transform"]),
+        )
+
+    def test_build_tool_dependency_and_publication_policy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "compatibility").mkdir()
+            manifest = json.loads(json.dumps(MANIFEST))
+            manifest["modules"]["mathcat-ksp"] = {
+                "requires": {}, "publication": "jvm",
+            }
+            manifest["modules"]["mathcat-fixture"] = {
+                "requires": {}, "buildRequires": {"mathcat-ksp": "same-release"},
+                "publication": "none",
+            }
+            (root / "settings.gradle.kts").write_text(
+                "\\n".join(f'include(":{m}")' for m in manifest["modules"])
+            )
+            for module, info in manifest["modules"].items():
+                (root / module).mkdir()
+                regular = [f'api(project(":{dep}"))' for dep in info["requires"]]
+                build = [f'ksp(project(":{dep}"))'
+                         for dep in info.get("buildRequires", {})]
+                (root / module / "build.gradle.kts").write_text(
+                    "\\n".join(regular + build)
+                )
+            path = root / "compatibility/modules.json"
+            path.write_text(json.dumps(manifest))
+            validate(root)
+            (root / "mathcat-fixture/build.gradle.kts").write_text("")
+            with self.assertRaisesRegex(ReleaseError, "buildRequires"):
+                validate(root)
+
     def test_plan_with_real_git_history(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
