@@ -16,7 +16,6 @@ import org.evoleq.mathcat.ktorx.context.data.Contextual
 import org.evoleq.mathcat.middleware.Call
 import org.evoleq.mathcat.middleware.MiddlewareRuntime
 import org.evoleq.mathcat.middleware.at
-import org.evoleq.mathcat.middleware.runOn
 import org.evoleq.mathcat.result.Result
 import org.evoleq.mathcat.serialization.ResultSerializer
 import kotlin.test.Test
