@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "versionPolicy": "repository",
+  "modules": {
+    "mathcat-type-algebra": {"requires": {}},
+    "mathcat-core": {"requires": {}},
+    "mathcat-store": {"requires": {"mathcat-core": "same-release"}},
+    "mathcat-actions": {"requires": {"mathcat-core": "same-release", "mathcat-store": "same-release"}}
+  }
+}
