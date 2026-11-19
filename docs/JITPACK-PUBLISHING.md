@@ -43,6 +43,14 @@ A Gradle Wrapper jar is **not** currently committed; add the official,
 validated wrapper separately, then switch the JitPack install command to
 `./gradlew publishToMavenLocal`. Do not substitute an improvised wrapper.
 
+Kotlin 2.3.20 root-publication currently needs a `kotlin-stdlib` metadata
+artifact with the `all` classifier that the CI run could not fetch from
+Maven Central. In JitPack/smoke builds only, `settings.gradle.kts` therefore
+resolves **just `org.jetbrains.kotlin:kotlin-stdlib`** from JetBrains'
+versioned development repository. Reassess and remove this exception once
+upstream dependency resolution works without it. Stable builds should not
+depend indefinitely on a development repository.
+
 No credentials, signing, webhook or Maven Central publication is configured.
 The final public license decision is still open.
 
