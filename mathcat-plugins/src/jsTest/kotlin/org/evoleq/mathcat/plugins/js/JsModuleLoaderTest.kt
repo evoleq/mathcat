@@ -40,12 +40,12 @@ class JsModuleLoaderTest {
         val plugin = PluginId("bridge")
         val callbacks = object : PluginCallbacks {
             override suspend fun dispatchAction(plugin: PluginId, actionKey: String): Boolean {
-                events += "action:${plugin.value}:$" + "{actionKey}"
+                events += "action:${plugin.value}:${actionKey}"
                 return plugin == PluginId("bridge") && actionKey == "shares.refresh"
             }
 
             override suspend fun navigate(plugin: PluginId, destinationKey: String): Boolean {
-                events += "route:${plugin.value}:$" + "{destinationKey}"
+                events += "route:${plugin.value}:${destinationKey}"
                 return plugin == PluginId("bridge") && destinationKey == "shares.home"
             }
         }
