@@ -96,6 +96,23 @@
         "toolkit-actions": "same-release"
       },
       "publication": "kmp"
+    },
+    "toolkit-evolution": {
+      "requires": {},
+      "publication": "kmp"
+    },
+    "toolkit-routing": {
+      "requires": {
+        "toolkit-type-algebra": "same-release",
+        "toolkit-evolution": "same-release"
+      },
+      "publication": "kmp"
+    },
+    "toolkit-evolution-runtime": {
+      "requires": {
+        "toolkit-evolution": "same-release"
+      },
+      "publication": "kmp"
     }
   }
 }

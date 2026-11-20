@@ -31,6 +31,9 @@ The complete current module map is:
 | mathcat-transform | toolkit-transform |
 | mathcat-serialization-ksp | toolkit-serialization-ksp |
 | mathcat-serialization-ksp-fixture | toolkit-serialization-ksp-fixture |
+| mathcat-routing | toolkit-routing |
+| mathcat-evolution | toolkit-evolution |
+| mathcat-evolution-runtime | toolkit-evolution-runtime |
 
 ## Updating consumers
 

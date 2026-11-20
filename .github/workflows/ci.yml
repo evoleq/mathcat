@@ -59,6 +59,12 @@ jobs:
             :toolkit-plugins:wasmJsNodeTest :toolkit-plugins:linuxX64Test \
             :toolkit-plugins-actions:jvmTest :toolkit-plugins-actions:jsNodeTest \
             :toolkit-plugins-actions:wasmJsNodeTest :toolkit-plugins-actions:linuxX64Test \
+            :toolkit-routing:jvmTest :toolkit-routing:jsNodeTest \
+            :toolkit-routing:wasmJsNodeTest :toolkit-routing:linuxX64Test \
+            :toolkit-evolution:jvmTest :toolkit-evolution:jsNodeTest \
+            :toolkit-evolution:wasmJsNodeTest :toolkit-evolution:linuxX64Test \
+            :toolkit-evolution-runtime:jvmTest :toolkit-evolution-runtime:jsNodeTest \
+            :toolkit-evolution-runtime:wasmJsNodeTest :toolkit-evolution-runtime:linuxX64Test \
             :toolkit-serialization-ksp-fixture:test :toolkit-context:test :toolkit-transform:test
 
   android:
@@ -80,7 +86,7 @@ jobs:
         with:
           gradle-version: '9.2.1'
       - name: Compile Android KMP targets
-        run: gradle --no-daemon :toolkit-type-algebra:compileAndroidMain :toolkit-core:compileAndroidMain :toolkit-store:compileAndroidMain :toolkit-actions:compileAndroidMain :toolkit-api:compileAndroidMain :toolkit-result:compileAndroidMain :toolkit-serialization:compileAndroidMain :toolkit-ktorx:compileAndroidMain :toolkit-middleware:compileAndroidMain :toolkit-plugins:compileAndroidMain :toolkit-plugins-actions:compileAndroidMain
+        run: gradle --no-daemon :toolkit-type-algebra:compileAndroidMain :toolkit-core:compileAndroidMain :toolkit-store:compileAndroidMain :toolkit-actions:compileAndroidMain :toolkit-api:compileAndroidMain :toolkit-result:compileAndroidMain :toolkit-serialization:compileAndroidMain :toolkit-ktorx:compileAndroidMain :toolkit-middleware:compileAndroidMain :toolkit-plugins:compileAndroidMain :toolkit-plugins-actions:compileAndroidMain :toolkit-routing:compileAndroidMain :toolkit-evolution:compileAndroidMain :toolkit-evolution-runtime:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
@@ -125,7 +131,13 @@ jobs:
             :toolkit-plugins:macosX64Test \
             :toolkit-plugins-actions:compileKotlinIosArm64 \
             :toolkit-plugins-actions:compileKotlinIosSimulatorArm64 \
-            :toolkit-plugins-actions:macosX64Test
+            :toolkit-plugins-actions:macosX64Test \
+            :toolkit-routing:compileKotlinIosArm64 :toolkit-routing:compileKotlinIosSimulatorArm64 \
+            :toolkit-routing:macosX64Test \
+            :toolkit-evolution:compileKotlinIosArm64 :toolkit-evolution:compileKotlinIosSimulatorArm64 \
+            :toolkit-evolution:macosX64Test \
+            :toolkit-evolution-runtime:compileKotlinIosArm64 :toolkit-evolution-runtime:compileKotlinIosSimulatorArm64 \
+            :toolkit-evolution-runtime:macosX64Test
 
   windows:
     name: Windows Native
@@ -141,7 +153,7 @@ jobs:
           gradle-version: '9.2.1'
       - name: Test mingwX64
         shell: pwsh
-        run: gradle --no-daemon :toolkit-type-algebra:mingwX64Test :toolkit-core:mingwX64Test :toolkit-store:mingwX64Test :toolkit-actions:mingwX64Test :toolkit-api:mingwX64Test :toolkit-result:mingwX64Test :toolkit-serialization:mingwX64Test :toolkit-ktorx:mingwX64Test :toolkit-middleware:mingwX64Test :toolkit-plugins:mingwX64Test :toolkit-plugins-actions:mingwX64Test
+        run: gradle --no-daemon :toolkit-type-algebra:mingwX64Test :toolkit-core:mingwX64Test :toolkit-store:mingwX64Test :toolkit-actions:mingwX64Test :toolkit-api:mingwX64Test :toolkit-result:mingwX64Test :toolkit-serialization:mingwX64Test :toolkit-ktorx:mingwX64Test :toolkit-middleware:mingwX64Test :toolkit-plugins:mingwX64Test :toolkit-plugins-actions:mingwX64Test :toolkit-routing:mingwX64Test :toolkit-evolution:mingwX64Test :toolkit-evolution-runtime:mingwX64Test
   
   publication:
     name: Publish JVM variants and compile an external consumer
@@ -183,6 +195,12 @@ jobs:
             :toolkit-plugins:publishJvmPublicationToMavenLocal \
             :toolkit-plugins-actions:publishKotlinMultiplatformPublicationToMavenLocal \
             :toolkit-plugins-actions:publishJvmPublicationToMavenLocal \
+            :toolkit-routing:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-routing:publishJvmPublicationToMavenLocal \
+            :toolkit-evolution:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-evolution:publishJvmPublicationToMavenLocal \
+            :toolkit-evolution-runtime:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-evolution-runtime:publishJvmPublicationToMavenLocal \
             :toolkit-context:publishToMavenLocal \
             :toolkit-transform:publishToMavenLocal \
             :toolkit-serialization-ksp:publishToMavenLocal

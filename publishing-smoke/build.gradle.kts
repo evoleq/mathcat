@@ -16,4 +16,7 @@ dependencies {
     implementation("com.github.evoleq.mathcat:toolkit-core:v0.0.0-smoke")
     implementation("com.github.evoleq.mathcat:toolkit-store:v0.0.0-smoke")
     implementation("com.github.evoleq.mathcat:toolkit-actions:v0.0.0-smoke")
+    implementation("com.github.evoleq.mathcat:toolkit-routing:v0.0.0-smoke")
+    implementation("com.github.evoleq.mathcat:toolkit-evolution:v0.0.0-smoke")
+    implementation("com.github.evoleq.mathcat:toolkit-evolution-runtime:v0.0.0-smoke")
 }

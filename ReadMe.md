@@ -113,3 +113,8 @@ The build uses [Gradle Version Catalog](gradle/libs.versions.toml) for external
 Kotlin, Android, KSP, Ktor, kotlinx and JUnit versions. See the
 [dependency versioning guide](docs/GRADLE-VERSION-CATALOG.md) for the
 separation from ToolKit's shared release SemVer and compatibility manifest.
+
+
+## Pure Routing and Evolution (experimental)
+
+The independent modules [`toolkit-routing`](toolkit-routing), [`toolkit-evolution`](toolkit-evolution) and [`toolkit-evolution-runtime`](toolkit-evolution-runtime) provide the route compiler and pure router automaton, a type-safe event/command Flow DSL and an optional host-owned coroutine runner. These are experimental modules and keep effect interpretation and lifecycle ownership explicit. See [pure Flow and routing](docs/PURE-FLOW-AND-ROUTING.md), [router automaton](docs/ROUTER-SUBAUTOMATON.md), and [runtime lifecycle](docs/OWNED-FLOW-RUNTIME.md).
