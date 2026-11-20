@@ -13,6 +13,16 @@ Mathematically grounded, compositional software tools for Kotlin Multiplatform.
 
 ToolKit is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
 
+## Maven Central release path
+
+The separately gated **Maven Central staging workflow** produces signed,
+platform-complete distributions under `org.evoleq.toolkit:toolkit-*:VERSION`
+and submits them to Sonatype for **manual validation/publication**.
+The source release alone does not establish that these artifacts are live.
+See [Central publishing](docs/CENTRAL-PUBLISHING.md) for requirements,
+release provenance, the operator checklist and post-release verification.
+JitPack remains a separate legacy compatibility path.
+
 ## Current module integration (draft)
 
 The [integration branch](https://github.com/evoleq/toolkit/pull/18) combines

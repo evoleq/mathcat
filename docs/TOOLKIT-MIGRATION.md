@@ -1,6 +1,6 @@
 # From MathCat to Evoleq ToolKit
 
-This repository's public library identity is **Evoleq ToolKit**. The repository slug `evoleq/mathcat` remains unchanged during this migration; the distinction is intentional.
+This repository's public library identity is **Evoleq ToolKit**. The repository has since been renamed to `evoleq/toolkit`. Historical `evoleq/mathcat` references are migration history, not the active source location.
 
 ## What changed
 
@@ -31,6 +31,9 @@ The complete current module map is:
 | mathcat-transform | toolkit-transform |
 | mathcat-serialization-ksp | toolkit-serialization-ksp |
 | mathcat-serialization-ksp-fixture | toolkit-serialization-ksp-fixture |
+| mathcat-routing | toolkit-routing |
+| mathcat-evolution | toolkit-evolution |
+| mathcat-evolution-runtime | toolkit-evolution-runtime |
 
 ## Updating consumers
 
@@ -49,15 +52,15 @@ import evoleq.toolkit.api.*
 
 ### Publishing and repository coordinates
 
-As long as the GitHub repository remains `evoleq/mathcat`, the **JitPack group stays** `com.github.evoleq.mathcat`. For example, after a new tag builds successfully:
+For historical compatibility, the existing Gradle JitPack smoke build still uses `com.github.evoleq.mathcat`. The repository is now `evoleq/toolkit`; remote resolution of these legacy coordinates must be verified before advertising them. An illustrative old coordinate:
 
 ```kotlin
 implementation("com.github.evoleq.mathcat:toolkit-core:<tag>")
 ```
 
-This is **not** a published release guarantee. Repository-derived JitPack coordinates cannot be silently switched to `com.github.evoleq.toolkit` by changing `rootProject.name`. A future GitHub repository rename would require a separate release/consumer migration with explicit compatibility handling.
+This is **not** a published release guarantee. JitPack's repository-derived coordinates must not be silently changed without an independent consumer test. Maven Central staging uses `org.evoleq.toolkit:toolkit-*:<version>` under separate release gates.
 
-The non-JitPack Gradle group remains `org.evoleq`; group and Kotlin package are distinct concepts. Historic published MathCat artifacts and old Git tags are not modified or republished.
+The ordinary non-publication Gradle group remains `org.evoleq`; the opt-in Maven Central group is `org.evoleq.toolkit`. Group and Kotlin package are distinct concepts. Historic published MathCat artifacts and old Git tags are not modified or republished.
 
 ### Compatibility
 
@@ -73,7 +76,7 @@ python3 scripts/release.py validate
 gradle :toolkit-core:jvmTest :toolkit-api:jvmTest :toolkit-serialization-ksp-fixture:test
 ```
 
-The cross-platform and Maven-local publication tests are specified in `.github/workflows/ci.yml` and must pass before merging. An open routing/flow PR built against `mathcat-*` may need rebasing onto this change.
+The cross-platform and Maven-local publication tests are specified in `.github/workflows/ci.yml` and must pass before merging. The routing, pure Flow and runtime slices are already incorporated into `master`; current CI checks all 18 modules.
 
 ## Branding
 

@@ -45,11 +45,11 @@ class ToolkitBrandingTests(unittest.TestCase):
         self.assertIn('"toolkit.serializers.package"', content)
         self.assertIn('"toolkit.serializers.name"', content)
 
-    def test_jitpack_repository_group_stays_stable_until_repo_rename(self):
+    def test_jitpack_group_and_release_repository_are_distinct(self):
         root_build = (ROOT / "build.gradle.kts").read_text()
         self.assertIn('"com.github.evoleq.mathcat"', root_build)
         self.assertIn("toolkit-api", (ROOT / "publishing-smoke/build.gradle.kts").read_text())
-        self.assertIn('REPOSITORY = "evoleq/mathcat"', (ROOT / "scripts/release.py").read_text())
+        self.assertIn('REPOSITORY = "evoleq/toolkit"', (ROOT / "scripts/release.py").read_text())
 
     def test_branding_asset_present(self):
         self.assertTrue((ROOT / "assets/toolkit-original-stokes.png").is_file())
