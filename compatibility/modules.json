@@ -107,6 +107,12 @@
         "toolkit-evolution": "same-release"
       },
       "publication": "kmp"
+    },
+    "toolkit-evolution-runtime": {
+      "requires": {
+        "toolkit-evolution": "same-release"
+      },
+      "publication": "kmp"
     }
   }
 }
