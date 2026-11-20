@@ -79,3 +79,12 @@ These names/types are **illustrative only**. Finalize after a working Compose HT
 **S4:** pilot one Solyton feature behind a reversible switch and publish only after JS/Compose lifecycle and consumer smoke tests pass.
 
 Use the shared [Evolution Flow proposal](EVOLUTION-FLOW.md), **but do not invent a Store-internal machine**. An ordinary thin Composable Store wrapper may be all that is needed.
+
+## Persistent browser data is an external boundary
+
+The Compose Store must not silently read from or write to cookies,
+`localStorage`, `sessionStorage` or IndexedDB while rendering. The
+surrounding Application Flow performs hydration and persists explicit
+commands; the Store merely exposes the resulting state to the UI.
+See [Browser Persistence](BROWSER-PERSISTENCE.md) and
+[IndexedDB/Offline](INDEXEDDB-OFFLINE.md).

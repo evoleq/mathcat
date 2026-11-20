@@ -95,3 +95,12 @@ The closure is **stateful**, not pure; only `transition` is pure. Avoid naming t
 ## Executable specification
 
 Tests must prove transition determinism, state-phase validity, terminal-state behavior, ordered effect descriptions, one load per active plugin, no lost events, controlled queue overflow policy, cancellation, idempotent disposal, stale completion rejection and **no leaked coroutine** after Composition disposal.
+
+## Persistence effects owned by this Flow
+
+Web Storage, cookies and IndexedDB are effect interpreters, not State/Lens
+implementations. Startup hydration, preference persistence, context updates,
+database migration and eventual offline synchronization belong to the
+Application Flow's event/command lifecycle. For the concrete split and safety
+constraints see [Browser Persistence](BROWSER-PERSISTENCE.md) and
+[IndexedDB/Offline](INDEXEDDB-OFFLINE.md).
