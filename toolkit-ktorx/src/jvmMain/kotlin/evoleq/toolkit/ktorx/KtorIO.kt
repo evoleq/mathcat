@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.ktorx
+package evoleq.toolkit.ktorx
 
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -11,11 +11,11 @@ import io.ktor.server.response.respondText
 import io.ktor.server.response.header
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import org.evoleq.mathcat.result.ExceptionTransforms
-import org.evoleq.mathcat.result.Result
-import org.evoleq.mathcat.result.map
-import org.evoleq.mathcat.serialization.ResultSerializer
-import org.evoleq.mathcat.serialization.Serializers
+import evoleq.toolkit.result.ExceptionTransforms
+import evoleq.toolkit.result.Result
+import evoleq.toolkit.result.map
+import evoleq.toolkit.serialization.ResultSerializer
+import evoleq.toolkit.serialization.Serializers
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -122,12 +122,12 @@ class KtorIO<B>(
     @Suppress("FunctionName")
     fun <S : Any, T : Any> Transform(f: (S) -> T):
         KlAction<B, Result<S>, Result<T>> =
-        { input -> Action { base -> org.evoleq.mathcat.transform.Transform(f).apply(input) to base } }
+        { input -> Action { base -> evoleq.toolkit.transform.Transform(f).apply(input) to base } }
 
     @Suppress("FunctionName")
     fun <S : Any, T : Any> TransformContextual(f: (S) -> T):
         KlAction<B, Result<Contextual<S>>, Result<Contextual<T>>> =
-        { input -> Action { base -> org.evoleq.mathcat.transform.TransformContextual(f).apply(input) to base } }
+        { input -> Action { base -> evoleq.toolkit.transform.TransformContextual(f).apply(input) to base } }
 
     /**
      * Keep Solyton's Respond<T> { transform() } extension-lambda shape.

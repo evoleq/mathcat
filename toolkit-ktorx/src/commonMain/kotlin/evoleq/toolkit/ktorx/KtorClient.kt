@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.ktorx
+package evoleq.toolkit.ktorx
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.HttpRequestBuilder
@@ -10,7 +10,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import org.evoleq.mathcat.api.Api
+import evoleq.toolkit.api.Api
 import kotlin.reflect.KClass
 
 /**

@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.ktorx
+package evoleq.toolkit.ktorx
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -9,8 +9,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.serialization.builtins.serializer
 import kotlinx.coroutines.test.runTest
-import org.evoleq.mathcat.api.Api
-import org.evoleq.mathcat.api.EmptyParams
+import evoleq.toolkit.api.Api
+import evoleq.toolkit.api.EmptyParams
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

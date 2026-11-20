@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.ktorx
+package evoleq.toolkit.ktorx
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.HttpRequestBuilder
@@ -11,11 +11,11 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import org.evoleq.mathcat.api.Api
-import org.evoleq.mathcat.ktorx.context.data.Contextual
-import org.evoleq.mathcat.result.Result
-import org.evoleq.mathcat.result.map
-import org.evoleq.mathcat.serialization.ResultSerializer
+import evoleq.toolkit.api.Api
+import evoleq.toolkit.ktorx.context.data.Contextual
+import evoleq.toolkit.result.Result
+import evoleq.toolkit.result.map
+import evoleq.toolkit.serialization.ResultSerializer
 import kotlin.reflect.KClass
 
 /** Original Solyton Context header; no app-level context dependency. */

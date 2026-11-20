@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.ktorx
+package evoleq.toolkit.ktorx
 
 import io.ktor.http.encodeURLPathPart
 

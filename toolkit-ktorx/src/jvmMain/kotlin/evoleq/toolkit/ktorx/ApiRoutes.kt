@@ -1,13 +1,13 @@
-package org.evoleq.mathcat.ktorx
+package evoleq.toolkit.ktorx
 
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.routing.Route
 import kotlinx.serialization.json.Json
-import org.evoleq.mathcat.api.Api
-import org.evoleq.mathcat.api.validateRoutes
-import org.evoleq.mathcat.result.ExceptionTransforms
-import org.evoleq.mathcat.result.Result
-import org.evoleq.mathcat.serialization.Serializers
+import evoleq.toolkit.api.Api
+import evoleq.toolkit.api.validateRoutes
+import evoleq.toolkit.result.ExceptionTransforms
+import evoleq.toolkit.result.Result
+import evoleq.toolkit.serialization.Serializers
 import java.util.UUID
 import kotlin.reflect.KClass
 

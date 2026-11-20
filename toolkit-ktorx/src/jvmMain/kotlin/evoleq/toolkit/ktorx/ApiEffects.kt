@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.ktorx
+package evoleq.toolkit.ktorx
 
 /**
  * Suspendable state computation only for this Ktor adapter.
- * The pure MathCat Core State is intentionally not made suspending.
+ * The pure Toolkit Core State is intentionally not made suspending.
  */
 fun interface Action<B, T> {
     suspend fun execute(base: B): Pair<T, B>
