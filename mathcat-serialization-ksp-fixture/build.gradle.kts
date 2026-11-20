@@ -1,19 +1,19 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
     implementation(project(":mathcat-serialization"))
     implementation(project(":mathcat-ktorx"))
     implementation(project(":mathcat-middleware"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+    implementation(libs.kotlinx.serialization.json)
     ksp(project(":mathcat-serialization-ksp"))
 
     testImplementation(kotlin("test-junit"))
-    testImplementation("io.ktor:ktor-client-mock:3.4.1")
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.junit4)
 }
 
 ksp {

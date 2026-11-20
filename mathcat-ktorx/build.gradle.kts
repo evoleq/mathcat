@@ -1,7 +1,7 @@
 plugins {
     `maven-publish`
-    kotlin("multiplatform")
-    id("com.android.kotlin.multiplatform.library")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kmp.library)
 }
 
 kotlin {
@@ -27,21 +27,21 @@ kotlin {
             api(project(":mathcat-api"))
             api(project(":mathcat-result"))
             api(project(":mathcat-serialization"))
-            api("io.ktor:ktor-client-core:3.4.1")
-            api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+            api(libs.ktor.client.core)
+            api(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
-            implementation("io.ktor:ktor-client-mock:3.4.1")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+            implementation(libs.ktor.client.mock)
+            implementation(libs.kotlinx.coroutines.test)
         }
         jvmMain.dependencies {
-            api("io.ktor:ktor-server-core:3.4.1")
-            implementation("io.ktor:ktor-server-auth-jwt:3.4.1")
+            api(libs.ktor.server.core)
+            implementation(libs.ktor.server.auth.jwt)
             api(project(":mathcat-transform"))
         }
         jvmTest.dependencies {
-            implementation("io.ktor:ktor-server-test-host:3.4.1")
+            implementation(libs.ktor.server.test.host)
         }
     }
 }

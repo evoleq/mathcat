@@ -1,0 +1,30 @@
+# External build and library versions only. MathCat's release version is
+# managed by the repository-wide SemVer tool, not this catalog.
+[versions]
+kotlin = "2.3.20"
+ksp = "2.3.12"
+android-kmp = "9.0.0"
+ktor = "3.4.1"
+kotlinx-serialization = "1.11.0"
+kotlinx-coroutines = "1.10.2"
+junit = "4.13.2"
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-kmp" }
+
+[libraries]
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
+ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+ksp-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+junit4 = { module = "junit:junit", version.ref = "junit" }

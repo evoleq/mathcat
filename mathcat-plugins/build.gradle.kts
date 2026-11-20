@@ -1,7 +1,7 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
-    id("com.android.kotlin.multiplatform.library")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.android.kmp.library)
     `maven-publish`
 }
 
@@ -30,14 +30,14 @@ kotlin {
         commonMain.dependencies {
             api(project(":mathcat-type-algebra"))
             api(project(":mathcat-core"))
-            api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+            api(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+            implementation(libs.kotlinx.coroutines.test)
         }
         jsMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+            implementation(libs.kotlinx.coroutines.core)
         }
     }
 }
