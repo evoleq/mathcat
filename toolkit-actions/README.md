@@ -1,4 +1,4 @@
-# MathCat Actions — typed, composable descriptions (draft)
+# ToolKit Actions — typed, composable descriptions (draft)
 
 This Kotlin Multiplatform module provides a minimal transport-neutral Action
 abstraction and integrates it with the already-tested generic Store capability.
@@ -6,8 +6,8 @@ abstraction and integrates it with the already-tested generic Store capability.
 ## Public API sketch
 
 ```kotlin
-import org.evoleq.mathcat.actions.*
-import org.evoleq.mathcat.store.Store
+import evoleq.toolkit.actions.*
+import evoleq.toolkit.store.Store
 
 val root: Store<Application, ActionDispatcher<Application>> =
     Store(storage = applicationStorage, dispatcher = applicationDispatcher)
@@ -18,8 +18,8 @@ banking.write(newBankingState)
 banking.dispatch(readBankAccountsAction)
 ```
 
-The `Store * Lens` overload is intentionally located in **mathcat-actions**.
-The generic `mathcat-store` module still works with arbitrary dispatcher
+The `Store * Lens` overload is intentionally located in **toolkit-actions**.
+The generic `toolkit-store` module still works with arbitrary dispatcher
 capabilities and is not forced to know the semantics of typed Actions.
 
 ## Responsibilities and algebra
@@ -61,7 +61,7 @@ There is **no** HTTP backend, service resolver, `MutableSharedFlow`,
 CoroutineScope, Compose lifecycle, process registry, retry/transaction
 policy, stream observer, or automatic migration to Solyton.
 
-**Maturity policy:** Evoleq/MathCat is developed and tested first, the book
+**Maturity policy:** Evoleq/ToolKit is developed and tested first, the book
 is written in parallel, and Solyton only adopts reviewed, mature components.
 Nothing is merged into `master`, published or integrated by this draft.
 
@@ -69,7 +69,7 @@ See [Action and Storage architectural research](../docs/ACTION-DISPATCH-AND-STOR
 
 ## Profunctor shape of Action
 
-For fixed state `S`, MathCat's
+For fixed state `S`, ToolKit's
 `Action<S, I, O> = Reader<S, I> × Writer<S, O>` is **covariant in I** and
 **contravariant in O**. It is a profunctor in standard argument order
 `P_S<O, I> = Action<S, I, O>`, not `P_S<I, O>`.

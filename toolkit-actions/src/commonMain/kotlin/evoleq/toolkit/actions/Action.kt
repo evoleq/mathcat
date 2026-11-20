@@ -1,9 +1,9 @@
-package org.evoleq.mathcat.actions
+package evoleq.toolkit.actions
 
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.core.optics.times
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.writer.Writer
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.core.optics.times
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.writer.Writer
 
 /**
  * Typed, platform-independent description of an Action's state interaction.

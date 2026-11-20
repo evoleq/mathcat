@@ -1,12 +1,12 @@
-package org.evoleq.mathcat.actions
+package evoleq.toolkit.actions
 
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.core.optics.times
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.storage.Memory
-import org.evoleq.mathcat.core.storage.source
-import org.evoleq.mathcat.core.writer.Writer
-import org.evoleq.mathcat.store.Store
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.core.optics.times
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.storage.Memory
+import evoleq.toolkit.core.storage.source
+import evoleq.toolkit.core.writer.Writer
+import evoleq.toolkit.store.Store
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine

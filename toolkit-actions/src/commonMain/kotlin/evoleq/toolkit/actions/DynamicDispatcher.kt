@@ -1,7 +1,7 @@
-package org.evoleq.mathcat.actions
+package evoleq.toolkit.actions
 
-import org.evoleq.mathcat.core.reader.Source
-import org.evoleq.mathcat.core.reader.emit
+import evoleq.toolkit.core.reader.Source
+import evoleq.toolkit.core.reader.emit
 
 /**
  * Late-bound dispatcher selection from a Source<ActionDispatcher<S>>.

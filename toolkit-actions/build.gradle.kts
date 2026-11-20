@@ -9,7 +9,7 @@ kotlin {
     js(IR) { nodejs() }
     wasmJs { nodejs() }
     android {
-        namespace = "org.evoleq.mathcat.actions"
+        namespace = "evoleq.toolkit.actions"
         compileSdk = 36
         minSdk = 24
         withHostTestBuilder {}.configure {}
@@ -24,8 +24,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":mathcat-core"))
-            api(project(":mathcat-store"))
+            api(project(":toolkit-core"))
+            api(project(":toolkit-store"))
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

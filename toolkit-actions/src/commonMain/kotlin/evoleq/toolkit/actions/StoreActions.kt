@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.actions
+package evoleq.toolkit.actions
 
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.store.Store
-import org.evoleq.mathcat.store.focus
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.store.Store
+import evoleq.toolkit.store.focus
 
 /**
  * A ready-to-use, state-indexed Store specialization for ActionDispatchers.

@@ -1,7 +1,7 @@
-package org.evoleq.mathcat.actions
+package evoleq.toolkit.actions
 
-import org.evoleq.mathcat.core.reader.map
-import org.evoleq.mathcat.core.writer.contraMap
+import evoleq.toolkit.core.reader.map
+import evoleq.toolkit.core.writer.contraMap
 
 /**
  * Action<S, I, O> is covariant in I (Reader<S, I>) and contravariant in O

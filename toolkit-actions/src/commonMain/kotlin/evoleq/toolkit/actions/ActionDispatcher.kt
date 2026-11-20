@@ -1,6 +1,6 @@
-package org.evoleq.mathcat.actions
+package evoleq.toolkit.actions
 
-import org.evoleq.mathcat.core.optics.Lens
+import evoleq.toolkit.core.optics.Lens
 
 /**
  * An effect boundary that accepts typed Actions and Envelopes.
