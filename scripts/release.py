@@ -22,7 +22,7 @@ BUILD_TOOL_DEP = re.compile(
 )
 BREAKING = re.compile(r"(?m)^(?:[a-z][\w-]*(?:\([^)]+\))?!:|BREAKING[ -]CHANGE\s*:)")
 FEATURE = re.compile(r"(?m)^feat(?:\([^)]+\))?:")
-REPOSITORY = "evoleq/mathcat"
+REPOSITORY = "evoleq/toolkit"
 
 
 class ReleaseError(ValueError):

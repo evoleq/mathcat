@@ -1,7 +1,7 @@
 # Pure Router — executable lifecycle specification
 
 **2026-11-20. Experimental pure Kotlin Multiplatform slice.**
-Stacked on MathCat PR #26. This is not a browser adapter, a Compose
+Based on Evoleq ToolKit PR #26. This is not a browser adapter, a Compose
 renderer, a Ktor endpoint, or an application runtime.
 
 ## The Evoleq style: describe, compose, interpret

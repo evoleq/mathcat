@@ -8,7 +8,7 @@ No dependency on Ktor, Compose, browser DOM or a coroutine runner is added.
 
 ## A Flow is a transition, not a CoroutineScope
 
-A MathCat Flow is the pure function
+An Evoleq ToolKit Flow is the pure function
 
 \[
 \delta: S \times E \longrightarrow S \times C^*
