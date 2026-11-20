@@ -102,3 +102,10 @@ These repositories have **not** been archived or made private. Existing consumer
 - Keep experimental language/tooling research separate from the usable library.
 
 The public API, licensing and release policy for MathCat 2.0 are still under review.
+
+## External dependency versions
+
+The build uses [Gradle Version Catalog](gradle/libs.versions.toml) for external
+Kotlin, Android, KSP, Ktor, kotlinx and JUnit versions. See the
+[dependency versioning guide](docs/GRADLE-VERSION-CATALOG.md) for the
+separation from MathCat's shared release SemVer and compatibility manifest.
