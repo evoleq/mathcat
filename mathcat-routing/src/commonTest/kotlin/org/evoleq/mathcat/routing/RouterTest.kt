@@ -32,7 +32,7 @@ class RouterTest {
         val url = "/app/organisationen/sonnenhof/anteile?tab=history"
         val beginning = router.evolve(RouterState(), RouterEvent.Navigate(url))
         val checking = assertIs<RouterPhase.Checking>(beginning.state.phase)
-        assertEquals(1, checking.generation)
+        assertEquals(1L, checking.generation)
         assertEquals("sonnenhof", checking.navigation.match.parameters["organisation"])
         assertEquals(listOf("history"), checking.navigation.match.query["tab"])
         assertEquals(setOf("logged-in", "shares.read"), checking.navigation.match.requires)
