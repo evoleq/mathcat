@@ -14,3 +14,6 @@ fun contextualValue(value: org.evoleq.mathcat.context.Contextual<String>): Strin
     value.data
 fun serializationLookup(registry: org.evoleq.mathcat.serialization.Serializers): String =
     registry.toString()
+
+// Plugin manifest API is available independently of MathCat sources.
+fun pluginId(): String = org.evoleq.mathcat.plugins.PluginId("banking").value

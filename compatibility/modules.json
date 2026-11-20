@@ -80,6 +80,12 @@
         "mathcat-ktorx": "same-release"
       },
       "publication": "kmp"
+    },
+    "mathcat-plugins": {
+      "requires": {
+        "mathcat-type-algebra": "same-release"
+      },
+      "publication": "kmp"
     }
   }
 }
