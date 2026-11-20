@@ -208,3 +208,48 @@ jobs:
         run: python3 scripts/verify_published_jvm.py v0.0.0-smoke
       - name: Compile independent JVM consumer using Maven Local
         run: gradle --no-daemon -p publishing-smoke compileKotlin
+
+  central-publication:
+    name: Maven Central signed publications and external JVM consumer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.1'
+      - name: Prepare Android SDK
+        run: |
+          sdkmanager_path="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$sdkmanager_path"
+          yes | "$sdkmanager_path" --licenses > /dev/null || true
+          "$sdkmanager_path" "platforms;android-36" "build-tools;36.0.0"
+      - name: Create disposable signing key (NOT a production release key)
+        shell: bash
+        run: |
+          set -euo pipefail
+          gpg --batch --passphrase '' --quick-generate-key 'ToolKit CI Smoke <ci@example.invalid>' rsa2048 sign 1d
+          {
+            echo 'CENTRAL_SIGNING_KEY<<GPG_SMOKE_KEY'
+            gpg --armor --export-secret-keys 'ToolKit CI Smoke'
+            echo 'GPG_SMOKE_KEY'
+          } >> "$GITHUB_ENV"
+      - name: Publish all Linux platform variants with Central coordinates
+        env:
+          CENTRAL_PUBLISHING: 'true'
+          RELEASE_VERSION: '0.0.1'
+          CENTRAL_LICENSE_NAME: 'TEST ONLY - not for publication'
+          CENTRAL_LICENSE_URL: 'https://example.org/test-only'
+          CENTRAL_SIGNING_PASSWORD: ''
+        run: |
+          gradle --no-daemon $(python scripts/central_publication_tasks.py linux)
+      - name: Verify POM metadata, internal dependency versions and detached signatures
+        run: python scripts/central_bundle.py verify --version 0.0.1 --scope linux
+      - name: Compile independent Maven repository consumer (not Maven Local)
+        run: gradle --no-daemon -p central-publishing-smoke -PtoolkitVersion=0.0.1 compileKotlin

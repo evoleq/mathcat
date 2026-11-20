@@ -1,0 +1,170 @@
+name: Maven Central staging
+
+# Deliberate authorization: DNS verification, license and Portal credentials
+# are human-controlled prerequisites. No releases from PRs or tag pushes.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing CI-verified annotated release tag (vX.Y.Z)"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: central-staging-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify release evidence before using secrets
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.release.outputs.sha }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check tag, compatibility and master CI provenance
+        id: release
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+          CENTRAL_LICENSE_NAME: ${{ vars.CENTRAL_LICENSE_NAME }}
+          CENTRAL_LICENSE_URL: ${{ vars.CENTRAL_LICENSE_URL }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Expected stable annotated tag vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+          if [[ -z "$CENTRAL_LICENSE_NAME" || "$CENTRAL_LICENSE_URL" != https://* ]]; then
+            echo "Set actual distribution license via CENTRAL_LICENSE_NAME and CENTRAL_LICENSE_URL variables." >&2
+            exit 1
+          fi
+          git fetch origin master --tags
+          test "$(git cat-file -t "refs/tags/$TAG")" = "tag"
+          SHA="$(git rev-parse "refs/tags/$TAG^{commit}")"
+          export SHA
+          git merge-base --is-ancestor "$SHA" "refs/remotes/origin/master"
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?event=push&head_sha=$SHA&status=success&per_page=100" |
+            python -c 'import json, os, sys; runs=json.load(sys.stdin)["workflow_runs"]; assert any(r["head_sha"] == os.environ["SHA"] and r["head_branch"] == "master" and r["conclusion"] == "success" for r in runs), "No successful master push CI at this exact commit"'
+          git checkout --detach "$SHA"
+          python -m unittest discover -s scripts/tests -v
+          python scripts/release.py validate
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+  stage:
+    name: Build and sign ${{ matrix.host }} publications
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - host: linux
+            os: ubuntu-latest
+          - host: macos
+            os: macos-15
+          - host: windows
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    environment: maven-central
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.sha }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.1'
+      - name: Prepare Android SDK on Linux
+        if: matrix.host == 'linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager_path="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$sdkmanager_path"
+          yes | "$sdkmanager_path" --licenses > /dev/null || true
+          "$sdkmanager_path" "platforms;android-36" "build-tools;36.0.0"
+      - name: Stage exactly this host's publications with PGP signatures
+        shell: bash
+        env:
+          CENTRAL_PUBLISHING: 'true'
+          RELEASE_VERSION: ${{ needs.verify.outputs.version }}
+          CENTRAL_LICENSE_NAME: ${{ vars.CENTRAL_LICENSE_NAME }}
+          CENTRAL_LICENSE_URL: ${{ vars.CENTRAL_LICENSE_URL }}
+          CENTRAL_SIGNING_KEY: ${{ secrets.CENTRAL_SIGNING_KEY }}
+          CENTRAL_SIGNING_PASSWORD: ${{ secrets.CENTRAL_SIGNING_PASSWORD }}
+          HOST: ${{ matrix.host }}
+        run: |
+          set -euo pipefail
+          read -r -a TASKS <<< "$(python scripts/central_publication_tasks.py "$HOST")"
+          gradle --no-daemon "${TASKS[@]}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: central-${{ matrix.host }}
+          path: build/central-staging/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Validate complete bundle and upload for manual approval
+    needs: [verify, stage]
+    runs-on: ubuntu-latest
+    environment: maven-central
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: central-*
+          path: build/central-staging/
+          merge-multiple: true
+      - name: Verify manifest, POM coordinates, PGP signatures and platform completeness
+        env:
+          RELEASE_VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          python scripts/central_bundle.py bundle --version "$RELEASE_VERSION"
+          unzip -t build/release/central-bundle.zip > /dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: toolkit-central-bundle-${{ inputs.tag }}
+          path: build/release/central-bundle.zip
+          retention-days: 14
+      - name: Upload to Sonatype Central Portal (USER_MANAGED; do not auto-publish)
+        shell: bash
+        env:
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+          RELEASE_VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          set -euo pipefail
+          : "${CENTRAL_USERNAME:?Missing Sonatype Portal token username}"
+          : "${CENTRAL_PASSWORD:?Missing Sonatype Portal token password}"
+          AUTH="$(printf '%s:%s' "$CENTRAL_USERNAME" "$CENTRAL_PASSWORD" | base64 | tr -d '\r\n')"
+          DEPLOYMENT_ID="$(curl --fail-with-body --silent --show-error \
+            --header "Authorization: Bearer $AUTH" \
+            --form "bundle=@build/release/central-bundle.zip;type=application/octet-stream" \
+            "https://central.sonatype.com/api/v1/publisher/upload?publishingType=USER_MANAGED&name=toolkit-$RELEASE_VERSION")"
+          echo "Central Portal deployment ID: $DEPLOYMENT_ID"
+          echo "Validate deployment in Sonatype UI, then publish explicitly."

@@ -9,9 +9,18 @@
 
 Mathematically grounded, compositional software tools for Kotlin Multiplatform.
 
-> Formerly MathCat. The GitHub repository is still named `evoleq/mathcat` while the Gradle modules and Kotlin packages have moved to Evoleq ToolKit. See the [migration guide](docs/TOOLKIT-MIGRATION.md).
+> Formerly MathCat. The repository is now `evoleq/toolkit`; old JitPack coordinates remain a separate compatibility path. See the [migration guide](docs/TOOLKIT-MIGRATION.md).
 
 ToolKit is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
+
+## Maven Central release path
+
+A separate, signed Maven Central staging workflow is available under
+`org.evoleq.toolkit`. Until the `evoleq.org` namespace is verified,
+a real distribution license is chosen, and Sonatype validates a deployment,
+**no Maven Central artifact should be assumed to exist**.
+The existing GitHub/JitPack development workflow remains unchanged.
+See [Central publishing and release gates](docs/CENTRAL-PUBLISHING.md).
 
 ## Current module integration (draft)
 
