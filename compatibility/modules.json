@@ -103,7 +103,8 @@
     },
     "toolkit-routing": {
       "requires": {
-        "toolkit-type-algebra": "same-release"
+        "toolkit-type-algebra": "same-release",
+        "toolkit-evolution": "same-release"
       },
       "publication": "kmp"
     }
