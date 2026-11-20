@@ -65,18 +65,21 @@ subprojects {
             }
             check(licenseUrl.startsWith("https://")) { "Central license URL must use HTTPS" }
 
-            val docsJar = tasks.register<Jar>("centralJavadocJar") {
-                archiveClassifier.set("javadoc")
-                // ToolKit has no generated KDoc/Javadoc pipeline yet.
-                // A documented placeholder is explicitly allowed by Sonatype.
-                from(rootProject.file("ReadMe.md"))
-            }
             val publishing = extensions.getByType(PublishingExtension::class.java)
             publishing.repositories.maven {
                 name = "CentralStaging"
                 url = uri(rootProject.layout.buildDirectory.dir("central-staging").get().asFile)
             }
             publishing.publications.withType(MavenPublication::class.java).configureEach {
+                // Each KMP target has its own signing task. They MUST NOT sign
+                // the same physical Javadoc JAR (Gradle 9 task output collision).
+                val publicationId = name.replaceFirstChar { it.uppercaseChar() }
+                val docsJar = tasks.register<Jar>("centralJavadoc" + publicationId + "Jar") {
+                    archiveBaseName.set(project.name + "-" + publicationId)
+                    archiveClassifier.set("javadoc")
+                    // Placeholder API docs until a KDoc pipeline is introduced.
+                    from(rootProject.file("ReadMe.md"))
+                }
                 artifact(docsJar)
                 pom {
                     name.set("Evoleq ToolKit - " + project.name)
