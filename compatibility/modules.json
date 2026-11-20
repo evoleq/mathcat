@@ -96,6 +96,16 @@
         "mathcat-actions": "same-release"
       },
       "publication": "kmp"
+    },
+    "mathcat-evolution": {
+      "requires": {},
+      "publication": "kmp"
+    },
+    "mathcat-routing": {
+      "requires": {
+        "mathcat-type-algebra": "same-release"
+      },
+      "publication": "kmp"
     }
   }
 }
