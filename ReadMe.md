@@ -1,11 +1,15 @@
-# ToolKit
+# Evoleq ToolKit
 
 <p align="center">
   <img src="assets/toolkit-original-stokes.png" alt="ToolKit – Original Stokes: cat mascot, turquoise lambda and Stokes formula" width="360" />
 </p>
 
 
-**Mathematically flavored functional programming for Kotlin Multiplatform.**
+**The Art of Composition.**
+
+Mathematically grounded, compositional software tools for Kotlin Multiplatform.
+
+> Formerly MathCat. The GitHub repository is still named `evoleq/mathcat` while the Gradle modules and Kotlin packages have moved to Evoleq ToolKit. See the [migration guide](docs/TOOLKIT-MIGRATION.md).
 
 ToolKit is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
 
