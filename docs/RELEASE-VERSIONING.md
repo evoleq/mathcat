@@ -1,6 +1,6 @@
 # Versioning and compatibility — initial implementation
 
-MathCat currently uses **one repository SemVer version for all publishable MathCat modules**. The KSP test fixture is explicitly non-publishable. Runtime and build-time project dependencies are declared by Gradle and mirrored in [compatibility/modules.json](../compatibility/modules.json). Independent module versions, a cross-repository compatibility resolver, API/ABI checking and wire-compatibility claims are **not implemented** here.
+ToolKit currently uses **one repository SemVer version for all publishable ToolKit modules**. The KSP test fixture is explicitly non-publishable. Runtime and build-time project dependencies are declared by Gradle and mirrored in [compatibility/modules.json](../compatibility/modules.json). Independent module versions, a cross-repository compatibility resolver, API/ABI checking and wire-compatibility claims are **not implemented** here.
 
 ## Local use
 

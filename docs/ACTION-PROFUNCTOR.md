@@ -1,7 +1,7 @@
-# Action as a profunctor — MathCat and the frontend
+# Action as a profunctor — ToolKit and the frontend
 
 > Design and code reference for the compositional software architecture manuscript.
-> Implementation: `mathcat-actions`. The `mathcat-middleware` interpreter is a
+> Implementation: `toolkit-actions`. The `toolkit-middleware` interpreter is a
 > **separate effect layer**, not part of the following pure construction.
 
 ## 1. The two directions in one action
@@ -108,13 +108,13 @@ request and its writer accepts `O` from an HTTP response, a pure
 `map` / `contraMap` does not generate a request/response serializer,
 change the server protocol or update a declared endpoint key.
 
-In MathCat:
+In ToolKit:
 
-- `mathcat-actions` owns pure descriptors, their profunctor-style maps
+- `toolkit-actions` owns pure descriptors, their profunctor-style maps
   and lawful lens lifting over state.
-- `mathcat-ktorx` interprets an endpoint's declared method, types and
+- `toolkit-ktorx` interprets an endpoint's declared method, types and
   wire format, with manual or generated serializers.
-- `mathcat-middleware` supplies the standalone `Call(action)` and
+- `toolkit-middleware` supplies the standalone `Call(action)` and
   the typed sequence `Read * Call * OnError * Dispatch * React`.
 - Domain-specific permissions, UI error dialogs and process lifecycles
   stay in an application or a future optional process module.

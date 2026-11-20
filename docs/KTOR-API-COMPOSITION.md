@@ -1,4 +1,4 @@
-# `mathcat-ktorx`: thin Ktor adapter for the original Evoleq API DSL
+# `toolkit-ktorx`: thin Ktor adapter for the original Evoleq API DSL
 
 **Design note · corrected 18 November 2026 · not implemented.**
 
@@ -6,7 +6,7 @@
 
 The original `Api` DSL, its `group`/`module` composition and new minimal `include`/`group(name, Api)` overloads are **Ktor-independent**. The [actual first implementation](https://github.com/evoleq/mathcat/pull/8) preserves the author's `Api { ... }` and `EndPoint.Get/Post/Put/Patch/Delete/Head` API rather than inventing a new descriptor system.
 
-**All Ktor-specific abstractions belong in `mathcat-ktorx`** (planned Gradle module and package `org.evoleq.mathcat.ktorx`). The adapter consumes a declared `Api` and binds a Ktor Route to the same `KClass<*>` endpoint key used by existing clients. It also owns `Receive`, `Respond` and execution of the composed Action on a request-local `Base(call, environment)`.
+**All Ktor-specific abstractions belong in `toolkit-ktorx`** (planned Gradle module and package `evoleq.toolkit.ktorx`). The adapter consumes a declared `Api` and binds a Ktor Route to the same `KClass<*>` endpoint key used by existing clients. It also owns `Receive`, `Respond` and execution of the composed Action on a request-local `Base(call, environment)`.
 
 The original [application routes](https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-backend/src/main/kotlin/org/solyton/solawi/bid/module/bid/routing/routing.auction.kt) use `post("create") { ... runOn Base(call, environment) }`; their methods and paths can instead be read from the *existing* `EndPoint` metadata without changing the API DSL.
 
@@ -33,16 +33,16 @@ The adapter captures an application environment at installation, but constructs 
 ## Minimal coupling
 
 ```text
-mathcat-api (implemented on Draft PR #8; Ktor-free)
+toolkit-api (implemented on Draft PR #8; Ktor-free)
   Api / EndPoint / group / module / include / KClass lookup
           ↑
-mathcat-ktorx (planned; Ktor-only)
+toolkit-ktorx (planned; Ktor-only)
   route registration / Receive / Respond / per-request Base
           ↓
          Ktor
 ```
 
-The adapter may depend on the minimal existing Action execution contract. `mathcat-api`, `mathcat-core`, `mathcat-store` and `mathcat-actions` must not gain Ktor dependencies. No general Flow framework, JavaFX/Swing adapter or Solyton migration belongs to this work.
+The adapter may depend on the minimal existing Action execution contract. `toolkit-api`, `toolkit-core`, `toolkit-store` and `toolkit-actions` must not gain Ktor dependencies. No general Flow framework, JavaFX/Swing adapter or Solyton migration belongs to this work.
 
 ## Focused tests for the later adapter
 
@@ -52,4 +52,4 @@ The adapter may depend on the minimal existing Action execution contract. `mathc
 4. Compare authorization, failure, serialization and cancellation behavior with the existing routes.
 5. Verify API composition and route installation do not introduce dependencies in the wrong direction.
 
-**Status:** This design remains separate and unimplemented. The corrected `mathcat-api` PR #8 has green cross-platform CI but remains Draft. Do not merge/release without review.
+**Status:** This design remains separate and unimplemented. The corrected `toolkit-api` PR #8 has green cross-platform CI but remains Draft. Do not merge/release without review.

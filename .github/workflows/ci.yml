@@ -29,37 +29,37 @@ jobs:
       - name: Compile and test portable targets
         run: |
           gradle --no-daemon \
-            :mathcat-type-algebra:jvmTest :mathcat-type-algebra:jsNodeTest \
-            :mathcat-type-algebra:wasmJsNodeTest :mathcat-type-algebra:linuxX64Test \
-            :mathcat-core:jvmTest :mathcat-core:jsNodeTest \
-            :mathcat-core:wasmJsNodeTest :mathcat-core:linuxX64Test \
-            :mathcat-store:jvmTest :mathcat-store:jsNodeTest \
-            :mathcat-store:wasmJsNodeTest :mathcat-store:linuxX64Test \
-            :mathcat-actions:jvmTest :mathcat-actions:jsNodeTest \
-            :mathcat-actions:wasmJsNodeTest :mathcat-actions:linuxX64Test \
-            :mathcat-api:jvmTest \
-            :mathcat-api:jsNodeTest \
-            :mathcat-api:wasmJsNodeTest \
-            :mathcat-api:linuxX64Test \
-            :mathcat-result:jvmTest \
-            :mathcat-result:jsNodeTest \
-            :mathcat-result:wasmJsNodeTest \
-            :mathcat-result:linuxX64Test \
-            :mathcat-serialization:jvmTest \
-            :mathcat-serialization:jsNodeTest \
-            :mathcat-serialization:wasmJsNodeTest \
-            :mathcat-serialization:linuxX64Test \
-            :mathcat-ktorx:jvmTest \
-            :mathcat-ktorx:jsNodeTest \
-            :mathcat-ktorx:wasmJsNodeTest \
-            :mathcat-ktorx:linuxX64Test \
-            :mathcat-middleware:jvmTest :mathcat-middleware:jsNodeTest \
-            :mathcat-middleware:wasmJsNodeTest :mathcat-middleware:linuxX64Test \
-            :mathcat-plugins:jvmTest :mathcat-plugins:jsNodeTest \
-            :mathcat-plugins:wasmJsNodeTest :mathcat-plugins:linuxX64Test \
-            :mathcat-plugins-actions:jvmTest :mathcat-plugins-actions:jsNodeTest \
-            :mathcat-plugins-actions:wasmJsNodeTest :mathcat-plugins-actions:linuxX64Test \
-            :mathcat-serialization-ksp-fixture:test :mathcat-context:test :mathcat-transform:test
+            :toolkit-type-algebra:jvmTest :toolkit-type-algebra:jsNodeTest \
+            :toolkit-type-algebra:wasmJsNodeTest :toolkit-type-algebra:linuxX64Test \
+            :toolkit-core:jvmTest :toolkit-core:jsNodeTest \
+            :toolkit-core:wasmJsNodeTest :toolkit-core:linuxX64Test \
+            :toolkit-store:jvmTest :toolkit-store:jsNodeTest \
+            :toolkit-store:wasmJsNodeTest :toolkit-store:linuxX64Test \
+            :toolkit-actions:jvmTest :toolkit-actions:jsNodeTest \
+            :toolkit-actions:wasmJsNodeTest :toolkit-actions:linuxX64Test \
+            :toolkit-api:jvmTest \
+            :toolkit-api:jsNodeTest \
+            :toolkit-api:wasmJsNodeTest \
+            :toolkit-api:linuxX64Test \
+            :toolkit-result:jvmTest \
+            :toolkit-result:jsNodeTest \
+            :toolkit-result:wasmJsNodeTest \
+            :toolkit-result:linuxX64Test \
+            :toolkit-serialization:jvmTest \
+            :toolkit-serialization:jsNodeTest \
+            :toolkit-serialization:wasmJsNodeTest \
+            :toolkit-serialization:linuxX64Test \
+            :toolkit-ktorx:jvmTest \
+            :toolkit-ktorx:jsNodeTest \
+            :toolkit-ktorx:wasmJsNodeTest \
+            :toolkit-ktorx:linuxX64Test \
+            :toolkit-middleware:jvmTest :toolkit-middleware:jsNodeTest \
+            :toolkit-middleware:wasmJsNodeTest :toolkit-middleware:linuxX64Test \
+            :toolkit-plugins:jvmTest :toolkit-plugins:jsNodeTest \
+            :toolkit-plugins:wasmJsNodeTest :toolkit-plugins:linuxX64Test \
+            :toolkit-plugins-actions:jvmTest :toolkit-plugins-actions:jsNodeTest \
+            :toolkit-plugins-actions:wasmJsNodeTest :toolkit-plugins-actions:linuxX64Test \
+            :toolkit-serialization-ksp-fixture:test :toolkit-context:test :toolkit-transform:test
 
   android:
     name: Android library compilation
@@ -80,7 +80,7 @@ jobs:
         with:
           gradle-version: '9.2.1'
       - name: Compile Android KMP targets
-        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-api:compileAndroidMain :mathcat-result:compileAndroidMain :mathcat-serialization:compileAndroidMain :mathcat-ktorx:compileAndroidMain :mathcat-middleware:compileAndroidMain :mathcat-plugins:compileAndroidMain :mathcat-plugins-actions:compileAndroidMain
+        run: gradle --no-daemon :toolkit-type-algebra:compileAndroidMain :toolkit-core:compileAndroidMain :toolkit-store:compileAndroidMain :toolkit-actions:compileAndroidMain :toolkit-api:compileAndroidMain :toolkit-result:compileAndroidMain :toolkit-serialization:compileAndroidMain :toolkit-ktorx:compileAndroidMain :toolkit-middleware:compileAndroidMain :toolkit-plugins:compileAndroidMain :toolkit-plugins-actions:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
@@ -97,35 +97,35 @@ jobs:
       - name: Compile iOS targets and test macOS
         run: |
           gradle --no-daemon \
-            :mathcat-type-algebra:compileKotlinIosArm64 :mathcat-type-algebra:compileKotlinIosSimulatorArm64 \
-            :mathcat-type-algebra:macosX64Test \
-            :mathcat-core:compileKotlinIosArm64 :mathcat-core:compileKotlinIosSimulatorArm64 \
-            :mathcat-core:macosX64Test \
-            :mathcat-store:compileKotlinIosArm64 :mathcat-store:compileKotlinIosSimulatorArm64 \
-            :mathcat-store:macosX64Test \
-            :mathcat-actions:compileKotlinIosArm64 :mathcat-actions:compileKotlinIosSimulatorArm64 \
-            :mathcat-actions:macosX64Test \
-            :mathcat-api:compileKotlinIosArm64 \
-            :mathcat-api:compileKotlinIosSimulatorArm64 \
-            :mathcat-api:macosX64Test \
-            :mathcat-result:compileKotlinIosArm64 \
-            :mathcat-result:compileKotlinIosSimulatorArm64 \
-            :mathcat-result:macosX64Test \
-            :mathcat-serialization:compileKotlinIosArm64 \
-            :mathcat-serialization:compileKotlinIosSimulatorArm64 \
-            :mathcat-serialization:macosX64Test \
-            :mathcat-ktorx:compileKotlinIosArm64 \
-            :mathcat-ktorx:compileKotlinIosSimulatorArm64 \
-            :mathcat-ktorx:macosX64Test \
-            :mathcat-middleware:compileKotlinIosArm64 \
-            :mathcat-middleware:compileKotlinIosSimulatorArm64 \
-            :mathcat-middleware:macosX64Test \
-            :mathcat-plugins:compileKotlinIosArm64 \
-            :mathcat-plugins:compileKotlinIosSimulatorArm64 \
-            :mathcat-plugins:macosX64Test \
-            :mathcat-plugins-actions:compileKotlinIosArm64 \
-            :mathcat-plugins-actions:compileKotlinIosSimulatorArm64 \
-            :mathcat-plugins-actions:macosX64Test
+            :toolkit-type-algebra:compileKotlinIosArm64 :toolkit-type-algebra:compileKotlinIosSimulatorArm64 \
+            :toolkit-type-algebra:macosX64Test \
+            :toolkit-core:compileKotlinIosArm64 :toolkit-core:compileKotlinIosSimulatorArm64 \
+            :toolkit-core:macosX64Test \
+            :toolkit-store:compileKotlinIosArm64 :toolkit-store:compileKotlinIosSimulatorArm64 \
+            :toolkit-store:macosX64Test \
+            :toolkit-actions:compileKotlinIosArm64 :toolkit-actions:compileKotlinIosSimulatorArm64 \
+            :toolkit-actions:macosX64Test \
+            :toolkit-api:compileKotlinIosArm64 \
+            :toolkit-api:compileKotlinIosSimulatorArm64 \
+            :toolkit-api:macosX64Test \
+            :toolkit-result:compileKotlinIosArm64 \
+            :toolkit-result:compileKotlinIosSimulatorArm64 \
+            :toolkit-result:macosX64Test \
+            :toolkit-serialization:compileKotlinIosArm64 \
+            :toolkit-serialization:compileKotlinIosSimulatorArm64 \
+            :toolkit-serialization:macosX64Test \
+            :toolkit-ktorx:compileKotlinIosArm64 \
+            :toolkit-ktorx:compileKotlinIosSimulatorArm64 \
+            :toolkit-ktorx:macosX64Test \
+            :toolkit-middleware:compileKotlinIosArm64 \
+            :toolkit-middleware:compileKotlinIosSimulatorArm64 \
+            :toolkit-middleware:macosX64Test \
+            :toolkit-plugins:compileKotlinIosArm64 \
+            :toolkit-plugins:compileKotlinIosSimulatorArm64 \
+            :toolkit-plugins:macosX64Test \
+            :toolkit-plugins-actions:compileKotlinIosArm64 \
+            :toolkit-plugins-actions:compileKotlinIosSimulatorArm64 \
+            :toolkit-plugins-actions:macosX64Test
 
   windows:
     name: Windows Native
@@ -141,7 +141,7 @@ jobs:
           gradle-version: '9.2.1'
       - name: Test mingwX64
         shell: pwsh
-        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-api:mingwX64Test :mathcat-result:mingwX64Test :mathcat-serialization:mingwX64Test :mathcat-ktorx:mingwX64Test :mathcat-middleware:mingwX64Test :mathcat-plugins:mingwX64Test :mathcat-plugins-actions:mingwX64Test
+        run: gradle --no-daemon :toolkit-type-algebra:mingwX64Test :toolkit-core:mingwX64Test :toolkit-store:mingwX64Test :toolkit-actions:mingwX64Test :toolkit-api:mingwX64Test :toolkit-result:mingwX64Test :toolkit-serialization:mingwX64Test :toolkit-ktorx:mingwX64Test :toolkit-middleware:mingwX64Test :toolkit-plugins:mingwX64Test :toolkit-plugins-actions:mingwX64Test
   
   publication:
     name: Publish JVM variants and compile an external consumer
@@ -161,31 +161,31 @@ jobs:
           VERSION: 'v0.0.0-smoke'
         run: |
           gradle --no-daemon \
-            :mathcat-type-algebra:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-type-algebra:publishJvmPublicationToMavenLocal \
-            :mathcat-core:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-core:publishJvmPublicationToMavenLocal \
-            :mathcat-store:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-store:publishJvmPublicationToMavenLocal \
-            :mathcat-actions:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-actions:publishJvmPublicationToMavenLocal \
-            :mathcat-api:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-api:publishJvmPublicationToMavenLocal \
-            :mathcat-result:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-result:publishJvmPublicationToMavenLocal \
-            :mathcat-serialization:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-serialization:publishJvmPublicationToMavenLocal \
-            :mathcat-ktorx:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-ktorx:publishJvmPublicationToMavenLocal \
-            :mathcat-middleware:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-middleware:publishJvmPublicationToMavenLocal \
-            :mathcat-plugins:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-plugins:publishJvmPublicationToMavenLocal \
-            :mathcat-plugins-actions:publishKotlinMultiplatformPublicationToMavenLocal \
-            :mathcat-plugins-actions:publishJvmPublicationToMavenLocal \
-            :mathcat-context:publishToMavenLocal \
-            :mathcat-transform:publishToMavenLocal \
-            :mathcat-serialization-ksp:publishToMavenLocal
+            :toolkit-type-algebra:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-type-algebra:publishJvmPublicationToMavenLocal \
+            :toolkit-core:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-core:publishJvmPublicationToMavenLocal \
+            :toolkit-store:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-store:publishJvmPublicationToMavenLocal \
+            :toolkit-actions:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-actions:publishJvmPublicationToMavenLocal \
+            :toolkit-api:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-api:publishJvmPublicationToMavenLocal \
+            :toolkit-result:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-result:publishJvmPublicationToMavenLocal \
+            :toolkit-serialization:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-serialization:publishJvmPublicationToMavenLocal \
+            :toolkit-ktorx:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-ktorx:publishJvmPublicationToMavenLocal \
+            :toolkit-middleware:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-middleware:publishJvmPublicationToMavenLocal \
+            :toolkit-plugins:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-plugins:publishJvmPublicationToMavenLocal \
+            :toolkit-plugins-actions:publishKotlinMultiplatformPublicationToMavenLocal \
+            :toolkit-plugins-actions:publishJvmPublicationToMavenLocal \
+            :toolkit-context:publishToMavenLocal \
+            :toolkit-transform:publishToMavenLocal \
+            :toolkit-serialization-ksp:publishToMavenLocal
       - name: Verify Maven metadata and internal coordinates
         run: python3 scripts/verify_published_jvm.py v0.0.0-smoke
       - name: Compile independent JVM consumer using Maven Local

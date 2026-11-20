@@ -1,8 +1,8 @@
 # Trampoline: a small, stack-safe monad
 
-**MathCat Core · commonMain · Kotlin Multiplatform**
+**ToolKit Core · commonMain · Kotlin Multiplatform**
 
-The mathematical vocabulary deliberately matches the existing MathCat
+The mathematical vocabulary deliberately matches the existing ToolKit
 `State` and `Result` implementations:
 
 | Mathematical operation | Kotlin API | Type |
@@ -39,12 +39,12 @@ infix fun <A, B> Trampoline<A>.bind(
 No `flatMap` alias is needed: `multiply` is the primitive and `bind` is
 derived. This follows the same Evoleq naming as the existing State monad.
 `Return` is a **standalone capitalized constructor**, not a companion
-method. Import it from `org.evoleq.mathcat.core.trampoline`.
+method. Import it from `evoleq.toolkit.core.trampoline`.
 
 ## Example: recursion without JVM-stack recursion
 
 ```kotlin
-import org.evoleq.mathcat.core.trampoline.*
+import evoleq.toolkit.core.trampoline.*
 
 fun countdown(n: Int, sum: Int = 0): Trampoline<Int> =
     if (n == 0) Return(sum)
@@ -93,7 +93,7 @@ Thunk side effects can be observed and replayed; monad/functor laws are
 specified for **pure continuations**.
 
 See
-[`TrampolineTest`](../mathcat-core/src/commonTest/kotlin/org/evoleq/mathcat/core/trampoline/TrampolineTest.kt):
+[`TrampolineTest`](../toolkit-core/src/commonTest/kotlin/org/evoleq/mathcat/core/trampoline/TrampolineTest.kt):
 it is both executable documentation and a regression suite for the functor
 and monad laws, laziness, error propagation and **50,000-step** recursion,
 bind and multiply stress tests across supported commonTest platforms.

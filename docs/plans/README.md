@@ -1,4 +1,4 @@
-# MathCat Compose and routing — development plans
+# ToolKit Compose and routing — development plans
 
 **2026-11-20 · Plans only; no new API implemented by these documents.**
 
@@ -19,10 +19,10 @@ Five complementary plans:
                    |
      uses  Store<S,D> + effect interpreter ports
                    |
-       mathcat-compose + browser renderer
+       toolkit-compose + browser renderer
 ```
 
-**Principle:** mathematical transitions are visible and testable. State and resource ownership may live in a closure, but the closure never hides an unstructured coroutine. Write concrete transition tests **before** extracting a new `mathcat-evolution` public library.
+**Principle:** mathematical transitions are visible and testable. State and resource ownership may live in a closure, but the closure never hides an unstructured coroutine. Write concrete transition tests **before** extracting a new `toolkit-evolution` public library.
 
 For browser persistence, begin with a typed in-memory port and actual Solyton preference/context use cases; treat its current localStorage token handling as a separate security-review item. Do **not** introduce IndexedDB or a new generic storage framework before there is a real offline use case.
 

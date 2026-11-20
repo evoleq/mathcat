@@ -2,9 +2,9 @@
 
 **2026-11-20 · Plan, not an implementation.**
 
-**Recommended artifacts:** `mathcat-routing` (pure MPP declarations and matching),
-`mathcat-routing-browser` (JS browser adapter) and optionally
-`mathcat-routing-compose` (Compose renderer).
+**Recommended artifacts:** `toolkit-routing` (pure MPP declarations and matching),
+`toolkit-routing-browser` (JS browser adapter) and optionally
+`toolkit-routing-compose` (Compose renderer).
 
 **Architectural decision:** the **router is a subautomaton of the outer Application Flow**. Its state is not automatically Application domain data; the enclosing Flow may project an observable routing state into a Store-backed view.
 
@@ -67,7 +67,7 @@ val result = compiled.match("/app/shares/42?tab=history")
 - Static segments outrank params; two competing param patterns or duplicate route IDs yield an explicit failure, never an arbitrary last-writer-wins.
 - Route fragments from independent modules combine through a **validated** operation with an empty identity; associativity is expected only under well-defined disjointness/normalization preconditions.
 - Guard metadata must not substitute for actual host-/server-side authorization.
-- No Compose, DOM, Ktor, or plugin library dependency in pure `mathcat-routing`.
+- No Compose, DOM, Ktor, or plugin library dependency in pure `toolkit-routing`.
 
 ## Router as an internal subautomaton
 
@@ -95,7 +95,7 @@ Current route/location can be rendered through a projection of the Flow's observ
 - Navigation effects must not be fired in a Composable body. Compose observes the Flow/Store projection and renders it; the Flow/Browser interpreter performs navigation.
 - Distinguish legacy Compose HTML (Solyton) from Compose UI; compile/test adapters for concrete targets rather than assuming one renderer works everywhere.
 - Plugin-backed routes should reference host-validated plugin IDs and a plain JS module ABI, never pass an independently compiled Kotlin `@Composable` function over the JS boundary.
-- `mathcat-plugins-actions` currently implements fixed host routes and action grants, **not** dynamic route registration. Add glue only when required by a real end-to-end slice.
+- `toolkit-plugins-actions` currently implements fixed host routes and action grants, **not** dynamic route registration. Add glue only when required by a real end-to-end slice.
 
 ## Delivery sequence with regression tests
 

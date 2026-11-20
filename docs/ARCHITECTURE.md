@@ -1,13 +1,13 @@
-# MathCat 2.0 — Architecture and type-operations research
+# ToolKit 2.0 — Architecture and type-operations research
 
 **Status:** research draft, 2026-11-18. No language, library, licensing, or publishing decision is implied by this PR.
 
 ## Scope
 
-MathCat aims for a small, mathematically explicit Kotlin Multiplatform foundation, rather than another collection of framework helpers. Distinguish:
+ToolKit aims for a small, mathematically explicit Kotlin Multiplatform foundation, rather than another collection of framework helpers. Distinguish:
 
 1. **Ordinary Kotlin library:** pure `Reader`, `Writer`/`Updater`, `Selection`, lawful `Lens`, and pure `State`. Proposed, **not implemented here**.
-2. **Type-operation semantics:** algebraic sums, products, unary type constructors, identity, composition and explicit conversion between isomorphic types. The initial `mathcat-type-algebra` module implements a **value-level syntax tree** (AST) only.
+2. **Type-operation semantics:** algebraic sums, products, unary type constructors, identity, composition and explicit conversion between isomorphic types. The initial `toolkit-type-algebra` module implements a **value-level syntax tree** (AST) only.
 3. **Tooling:** code generators and optional compiler diagnostics, to be developed separately from the runtime library.
 4. **Effects:** storage, suspend operations and platform-specific adapters, also separate from the pure core.
 
@@ -76,7 +76,7 @@ for each `f: A -> B`. Identity, vertical composition and whiskering/horizontal c
 
 ## Relationship to fp-axioms
 
-`evoleq/fp-axioms` already contains a **KSP** symbol processor, a Gradle plugin that wires KSP, and multiplatform annotation definitions. It is a valuable predecessor, not a dependency of the current MathCat core.
+`evoleq/fp-axioms` already contains a **KSP** symbol processor, a Gradle plugin that wires KSP, and multiplatform annotation definitions. It is a valuable predecessor, not a dependency of the current ToolKit core.
 
 Read-only code findings (2026-11-18):
 
@@ -104,7 +104,7 @@ val writer =
 - `contraMap` maps the API result *into the writer's input*.
 - The enclosing Action ties the operation to the IO boundary.
 
-This pattern should survive into MathCat; it does **not** require copying every helper into the algebraic core. A principled future design is **pure list transformation / Writer** lifted through a lawful Lens.
+This pattern should survive into ToolKit; it does **not** require copying every helper into the algebraic core. A principled future design is **pure list transformation / Writer** lifted through a lawful Lens.
 
 Known review topics in the legacy code:
 - `update` has implicit no-match semantics (unchanged list), which should be documented or chosen explicitly.

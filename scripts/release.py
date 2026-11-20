@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MathCat repository-version planner and compatibility manifest validator.
+"""ToolKit repository-version planner and compatibility manifest validator.
 
 Standard-library only. No Git operations here modify the repository.
 """

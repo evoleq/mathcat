@@ -1,9 +1,9 @@
-# MathCat 2.0 — Core v0 (implementation proposal)
+# ToolKit 2.0 — Core v0 (implementation proposal)
 
 **Date:** 2026-11-18  
 **Status:** draft implementation / review, NOT released or merged  
-**Scope:** `mathcat-core` Kotlin Multiplatform; see [target matrix](MULTIPLATFORM.md) for JVM, JS, Android, Native and Wasm  
-**Parent research PR:** [MathCat PR #1](https://github.com/evoleq/mathcat/pull/1)  
+**Scope:** `toolkit-core` Kotlin Multiplatform; see [target matrix](MULTIPLATFORM.md) for JVM, JS, Android, Native and Wasm  
+**Parent research PR:** [ToolKit PR #1](https://github.com/evoleq/mathcat/pull/1)  
 **Related:** [Evoleq 2.0 exploration](https://github.com/doctor-smith/ai-command/issues/44), [legacy bugfix draft #394](https://github.com/doctor-smith/solawi-bid/pull/394)
 
 ## Objective
@@ -24,7 +24,7 @@ The Lens selects **where**; the keyed Writer chooses **how**; `contraMap` transl
 Each independent algebraic structure has its own namespace. This is deliberate **developer-experience and name-safety architecture**, not an additional Gradle module per structure.
 
 ```text
-org.evoleq.mathcat.core
+evoleq.toolkit.core
 ├── state           State, KlState, Return, Update, Get, map, multiply, bind, *
 ├── reader          Reader, IdReader, map, *
 │   └── maps        Get(key), GetForSure(key)
@@ -38,11 +38,11 @@ org.evoleq.mathcat.core
 Thus `core.state.Return` can coexist with a hypothetical future `core.result.Return`, and `core.optics.Get` with `core.state.Get` and `core.reader.maps.Get`. Consumers explicitly import or alias the desired constructor; nobody has to carry a companion qualifier through a Kleisli chain. The public `Reader`/`Writer` types stay nominal for signature safety; they are still lambda-friendly.
 
 ```kotlin
-import org.evoleq.mathcat.core.state.Return
-import org.evoleq.mathcat.core.state.Update
-import org.evoleq.mathcat.core.state.times
-import org.evoleq.mathcat.core.optics.Get as LensGet
-import org.evoleq.mathcat.core.state.Get as StateGet
+import evoleq.toolkit.core.state.Return
+import evoleq.toolkit.core.state.Update
+import evoleq.toolkit.core.state.times
+import evoleq.toolkit.core.optics.Get as LensGet
+import evoleq.toolkit.core.state.Get as StateGet
 ```
 
 ## Public primitives and guarantees
@@ -131,7 +131,7 @@ The important distinction is between **changing the state** and **discarding the
 
 ### Construction, composition and import aliases
 
-MathCat follows Evoleq's deliberate developer-experience convention: **standalone constructors** read as mathematical names (for example `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`), while **operations on existing objects** are named `map`, `multiply`, `bind`, `get`, `set`, `contraMap` and composed using `*`. Natural type constructors such as `Reader { ... }`, `Writer { ... }` and `Lens(...)` keep their existing type names; no redundant factories.
+ToolKit follows Evoleq's deliberate developer-experience convention: **standalone constructors** read as mathematical names (for example `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`), while **operations on existing objects** are named `map`, `multiply`, `bind`, `get`, `set`, `contraMap` and composed using `*`. Natural type constructors such as `Reader { ... }`, `Writer { ... }` and `Lens(...)` keep their existing type names; no redundant factories.
 
 Receiver-based convenience functions such as `entriesLens.upsertAllBy(key)` remain lowercase, because the receiver carries the context. Do not force capitalization where it makes the DSL less fluid.
 
@@ -152,22 +152,22 @@ Get<S>()        // State<S,S>: returns the current state without changing it
 
 The Optics' `get` and `set` remain lowercase properties. `Get(lens)` constructs a Reader that can be composed independently; `Get<S>()` constructs a State computation. This is deliberate overload by **argument shape**, not return type.
 
-The older Evoleq also defines `Get(key)` and `GetForSure(key)` for maps. MathCat preserves these in `org.evoleq.mathcat.core.reader.maps`, separate from the optics package:
+The older Evoleq also defines `Get(key)` and `GetForSure(key)` for maps. ToolKit preserves these in `evoleq.toolkit.core.reader.maps`, separate from the optics package:
 
 ```kotlin
-import org.evoleq.mathcat.core.optics.Get
-import org.evoleq.mathcat.core.reader.maps.Get as MapGet
-import org.evoleq.mathcat.core.reader.maps.GetForSure
+import evoleq.toolkit.core.optics.Get
+import evoleq.toolkit.core.reader.maps.Get as MapGet
+import evoleq.toolkit.core.reader.maps.GetForSure
 ```
 
 `MapGet(key)` returns a nullable map value; `GetForSure(key)` is **partial** and fails when there is no non-null value. The `Get(key)` compatibility constructor treats a null key as no selection, matching Evoleq's existing helper.
 
-**Future monad modules** may each export their own `Return` (e.g., a hypothetical `org.evoleq.mathcat.result.Return`). Kotlin consumers can use import aliases:
+**Future monad modules** may each export their own `Return` (e.g., a hypothetical `evoleq.toolkit.result.Return`). Kotlin consumers can use import aliases:
 
 ```kotlin
-import org.evoleq.mathcat.core.state.Return as StateReturn
+import evoleq.toolkit.core.state.Return as StateReturn
 // hypothetical future module, NOT currently implemented:
-// import org.evoleq.mathcat.result.Return as ResultReturn
+// import evoleq.toolkit.result.Return as ResultReturn
 ```
 
 Import aliases disambiguate **separate importable declarations**; they cannot resolve same-package conflicting signatures or two functions distinguishable only by return type. Therefore constructors for different structures should live in distinct packages/modules with deliberate signatures. We do not invent wrapper names such as `pure` merely to avoid imports.
@@ -205,13 +205,13 @@ Memory<T> : Storage<T>  // plain in-memory implementation
 
 The `Storage` notation expresses a product of read/write **capabilities**, not an algebraic coproduct type. In the API, `Storage` is an interface with **read()/write() as its essential operations**. A derived `storage.source()` yields a first-class `Source<T> = Reader<Unit,T>`; `Memory` is one plain, non-reactive implementation. Several Memories can sit behind a single composite Storage, as demonstrated by a common test. With `storage * lens` and `storage * selection`, a focused Storage reads live values and reconstructs the underlying record on writes. With `storage * reader`, it yields a live Source.
 
-Compose snapshot observation depends on the *backend*, not the `Storage` interface. A `@Composable` function can return plain Memory without triggering recompositions for content writes; a future dedicated Compose adapter can instead back Storage with `MutableState<T>`. Both fit the same algebra. **No Compose runtime is linked into MathCat's commonMain.**
+Compose snapshot observation depends on the *backend*, not the `Storage` interface. A `@Composable` function can return plain Memory without triggering recompositions for content writes; a future dedicated Compose adapter can instead back Storage with `MutableState<T>`. Both fit the same algebra. **No Compose runtime is linked into ToolKit's commonMain.**
 
 ## Suspend and platform policy
 
-All operations here are *pure value transformations* and hence not `suspend`. An effects layer may later define `SuspendState<S,A>`, `Storage<A>`, `SuspendStorage<A>`, atomic update abstractions, Ktor adapters and platform-dependent operations. Construction of a suspend-capable computation need not itself be suspend. Storage and IO are intentionally **not** in `mathcat-core`.
+All operations here are *pure value transformations* and hence not `suspend`. An effects layer may later define `SuspendState<S,A>`, `Storage<A>`, `SuspendStorage<A>`, atomic update abstractions, Ktor adapters and platform-dependent operations. Construction of a suspend-capable computation need not itself be suspend. Storage and IO are intentionally **not** in `toolkit-core`.
 
-`mathcat-core` uses only Kotlin's standard library. It shares JVM, JS, Wasm, Android, Linux, Windows and Apple Native targets with the type-algebra spike. See [Multiplatform status](MULTIPLATFORM.md) for the difference between configured targets, verified compilation and executed tests. Neither module depends on KSP or `fp-axioms`; generator plugins are separate JVM-hosted build tools.
+`toolkit-core` uses only Kotlin's standard library. It shares JVM, JS, Wasm, Android, Linux, Windows and Apple Native targets with the type-algebra spike. See [Multiplatform status](MULTIPLATFORM.md) for the difference between configured targets, verified compilation and executed tests. Neither module depends on KSP or `fp-axioms`; generator plugins are separate JVM-hosted build tools.
 
 ## Validation plan (implemented commonTest suite)
 
@@ -238,8 +238,8 @@ All operations here are *pure value transformations* and hence not `suspend`. An
 
 | Date | Work | Status |
 | --- | --- | --- |
-| 2026-11-18 | MathCat type-algebra research and green JVM+JS baseline | [Parent draft PR #1](https://github.com/evoleq/mathcat/pull/1), not merged |
-| 2026-11-18 | Dedicated `mathcat-core` module using nominal Reader/Writer | Draft implementation |
+| 2026-11-18 | ToolKit type-algebra research and green JVM+JS baseline | [Parent draft PR #1](https://github.com/evoleq/mathcat/pull/1), not merged |
+| 2026-11-18 | Dedicated `toolkit-core` module using nominal Reader/Writer | Draft implementation |
 | 2026-11-18 | Selection and Lens laws separated; FilterBy represented honestly | Draft implementation + tests |
 | 2026-11-18 | Pure State and keyed list Writer examples added | Draft implementation + tests |
 | 2026-11-18 | CI expanded for two modules × two platforms | [Run #44265321148: SUCCESS](https://github.com/evoleq/mathcat/actions/runs/44265321148) |

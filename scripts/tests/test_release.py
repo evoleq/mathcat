@@ -11,9 +11,9 @@ from release import ReleaseError, make_record, next_version, plan, release_impac
 
 MANIFEST = {
     "schema": 1, "versionPolicy": "repository", "modules": {
-        "mathcat-core": {"requires": {}},
-        "mathcat-store": {"requires": {"mathcat-core": "same-release"}},
-        "mathcat-actions": {"requires": {"mathcat-core": "same-release", "mathcat-store": "same-release"}},
+        "toolkit-core": {"requires": {}},
+        "toolkit-store": {"requires": {"toolkit-core": "same-release"}},
+        "toolkit-actions": {"requires": {"toolkit-core": "same-release", "toolkit-store": "same-release"}},
     },
 }
 
@@ -38,9 +38,9 @@ class ReleaseTests(unittest.TestCase):
                 self.assertEqual(next_version(prev, message), expected)
 
     def test_scope_and_reverse_dependencies(self):
-        self.assertEqual(release_impact(["mathcat-core/src/commonMain/kotlin/A.kt"], MANIFEST),
-                         (["mathcat-core"], ["mathcat-actions", "mathcat-core", "mathcat-store"]))
-        self.assertEqual(release_impact(["docs/example.md", "mathcat-core/src/commonTest/kotlin/A.kt"], MANIFEST),
+        self.assertEqual(release_impact(["toolkit-core/src/commonMain/kotlin/A.kt"], MANIFEST),
+                         (["toolkit-core"], ["toolkit-actions", "toolkit-core", "toolkit-store"]))
+        self.assertEqual(release_impact(["docs/example.md", "toolkit-core/src/commonTest/kotlin/A.kt"], MANIFEST),
                          ([], []))
         self.assertEqual(release_impact(["gradle.properties"], MANIFEST),
                          (sorted(MANIFEST["modules"]), sorted(MANIFEST["modules"])))
@@ -57,37 +57,37 @@ class ReleaseTests(unittest.TestCase):
             path = root / "compatibility/modules.json"
             path.write_text(json.dumps(MANIFEST))
             validate(root)
-            (root / "mathcat-store/build.gradle.kts").write_text("")
+            (root / "toolkit-store/build.gradle.kts").write_text("")
             with self.assertRaisesRegex(ReleaseError, "Gradle requires"):
                 validate(root)
-            (root / "mathcat-store/build.gradle.kts").write_text('api(project(":mathcat-core"))')
+            (root / "toolkit-store/build.gradle.kts").write_text('api(project(":toolkit-core"))')
             cyclic = json.loads(path.read_text())
-            cyclic["modules"]["mathcat-core"]["requires"] = {"mathcat-store": "same-release"}
-            (root / "mathcat-core/build.gradle.kts").write_text('api(project(":mathcat-store"))')
+            cyclic["modules"]["toolkit-core"]["requires"] = {"toolkit-store": "same-release"}
+            (root / "toolkit-core/build.gradle.kts").write_text('api(project(":toolkit-store"))')
             path.write_text(json.dumps(cyclic))
             with self.assertRaisesRegex(ReleaseError, "cycle"):
                 validate(root)
 
     def test_jvm_changes_and_test_only_fixtures(self):
         manifest = json.loads(json.dumps(MANIFEST))
-        manifest["modules"]["mathcat-transform"] = {
-            "requires": {"mathcat-core": "same-release"}, "publication": "jvm",
+        manifest["modules"]["toolkit-transform"] = {
+            "requires": {"toolkit-core": "same-release"}, "publication": "jvm",
         }
-        manifest["modules"]["mathcat-build-fixture"] = {
-            "requires": {"mathcat-transform": "same-release"}, "publication": "none",
+        manifest["modules"]["toolkit-build-fixture"] = {
+            "requires": {"toolkit-transform": "same-release"}, "publication": "none",
         }
         self.assertEqual(
-            release_impact(["mathcat-transform/src/main/kotlin/Transform.kt"], manifest),
-            (["mathcat-transform"], ["mathcat-transform"]),
+            release_impact(["toolkit-transform/src/main/kotlin/Transform.kt"], manifest),
+            (["toolkit-transform"], ["toolkit-transform"]),
         )
         self.assertEqual(
-            release_impact(["mathcat-build-fixture/src/main/kotlin/Fixture.kt"], manifest),
+            release_impact(["toolkit-build-fixture/src/main/kotlin/Fixture.kt"], manifest),
             ([], []),
         )
         self.assertEqual(
-            release_impact(["mathcat-core/src/commonMain/kotlin/A.kt"], manifest),
-            (["mathcat-core"],
-             ["mathcat-actions", "mathcat-core", "mathcat-store", "mathcat-transform"]),
+            release_impact(["toolkit-core/src/commonMain/kotlin/A.kt"], manifest),
+            (["toolkit-core"],
+             ["toolkit-actions", "toolkit-core", "toolkit-store", "toolkit-transform"]),
         )
 
     def test_build_tool_dependency_and_publication_policy(self):
@@ -95,11 +95,11 @@ class ReleaseTests(unittest.TestCase):
             root = Path(tmp)
             (root / "compatibility").mkdir()
             manifest = json.loads(json.dumps(MANIFEST))
-            manifest["modules"]["mathcat-ksp"] = {
+            manifest["modules"]["toolkit-ksp"] = {
                 "requires": {}, "publication": "jvm",
             }
-            manifest["modules"]["mathcat-fixture"] = {
-                "requires": {}, "buildRequires": {"mathcat-ksp": "same-release"},
+            manifest["modules"]["toolkit-fixture"] = {
+                "requires": {}, "buildRequires": {"toolkit-ksp": "same-release"},
                 "publication": "none",
             }
             (root / "settings.gradle.kts").write_text(
@@ -116,7 +116,7 @@ class ReleaseTests(unittest.TestCase):
             path = root / "compatibility/modules.json"
             path.write_text(json.dumps(manifest))
             validate(root)
-            (root / "mathcat-fixture/build.gradle.kts").write_text("")
+            (root / "toolkit-fixture/build.gradle.kts").write_text("")
             with self.assertRaisesRegex(ReleaseError, "buildRequires"):
                 validate(root)
 
@@ -143,14 +143,14 @@ class ReleaseTests(unittest.TestCase):
             git(root, "add", ".")
             git(root, "commit", "-qm", "docs: add README")
             self.assertFalse(plan(root)["release"])
-            (root / "mathcat-core/src/commonMain/kotlin/Hello.kt").write_text("class Hello")
+            (root / "toolkit-core/src/commonMain/kotlin/Hello.kt").write_text("class Hello")
             git(root, "add", ".")
             git(root, "commit", "-qm", "feat(core): new API")
             proposal = plan(root)
             self.assertEqual(proposal["nextTag"], "v0.2.0")
-            self.assertEqual(proposal["affectedModules"], ["mathcat-actions", "mathcat-core", "mathcat-store"])
+            self.assertEqual(proposal["affectedModules"], ["toolkit-actions", "toolkit-core", "toolkit-store"])
             record = make_record(proposal, MANIFEST, "123")
-            self.assertEqual(record["modules"]["mathcat-store"]["requires"], {"mathcat-core": "0.2.0"})
+            self.assertEqual(record["modules"]["toolkit-store"]["requires"], {"toolkit-core": "0.2.0"})
             self.assertEqual(record["verification"]["status"], "ci-success")
             self.assertEqual(record["commit"], proposal["commit"])
             with self.assertRaisesRegex(ReleaseError, "numeric"):

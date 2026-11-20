@@ -35,15 +35,15 @@ independently declared Api fragments
                │
       Api.group / module / include
                │
-   mathcat-api (Ktor-independent)
+   toolkit-api (Ktor-independent)
                ▲
                │ consumed by
-   mathcat-ktorx (future Ktor route binder)
+   toolkit-ktorx (future Ktor route binder)
                │
              Ktor
 ```
 
-`mathcat-api` has no Ktor dependency. MathCat Core `Reader` is used to adapt the original `EndPoint(key)` reader to the new core type. A portable `Parameters` data contract retains GET's input bound while old client codecs and serialization remain outside the new module; this is documented as a *portability seam*, not complete source/binary compatibility.
+`toolkit-api` has no Ktor dependency. ToolKit Core `Reader` is used to adapt the original `EndPoint(key)` reader to the new core type. A portable `Parameters` data contract retains GET's input bound while old client codecs and serialization remain outside the new module; this is documented as a *portability seam*, not complete source/binary compatibility.
 
 ## What tests actually establish
 
@@ -58,4 +58,4 @@ The corrected first slice passed all four jobs of [CI run 44377915481](https://g
 
 ## Later work, only when separately undertaken
 
-The Ktor-specific route binder belongs to **`mathcat-ktorx`**. It should map a route to a declared `KClass` endpoint, use the existing `method`/`url`/`group` fields and supply `Base(call, environment)` per request. If distinguishing the precise source module requires extra provenance, investigate how to add it **without redesigning `Api`**. See [Ktor adapter research](KTOR-API-COMPOSITION.md). No Solyton change.
+The Ktor-specific route binder belongs to **`toolkit-ktorx`**. It should map a route to a declared `KClass` endpoint, use the existing `method`/`url`/`group` fields and supply `Base(call, environment)` per request. If distinguishing the precise source module requires extra provenance, investigate how to add it **without redesigning `Api`**. See [Ktor adapter research](KTOR-API-COMPOSITION.md). No Solyton change.

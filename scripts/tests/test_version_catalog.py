@@ -37,7 +37,7 @@ class VersionCatalogTests(unittest.TestCase):
         plugins = {name.replace("-", ".") for name in catalog["plugins"]}
         used_libraries, used_plugins = set(), set()
 
-        for build in [ROOT / "build.gradle.kts", *ROOT.glob("mathcat-*/build.gradle.kts")]:
+        for build in [ROOT / "build.gradle.kts", *ROOT.glob("toolkit-*/build.gradle.kts")]:
             content = build.read_text()
             with self.subTest(file=build.relative_to(ROOT).as_posix()):
                 self.assertNotRegex(

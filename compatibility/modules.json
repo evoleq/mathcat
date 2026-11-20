@@ -2,98 +2,98 @@
   "schema": 1,
   "versionPolicy": "repository",
   "modules": {
-    "mathcat-type-algebra": {
+    "toolkit-type-algebra": {
       "requires": {},
       "publication": "kmp"
     },
-    "mathcat-core": {
+    "toolkit-core": {
       "requires": {
-        "mathcat-type-algebra": "same-release"
+        "toolkit-type-algebra": "same-release"
       },
       "publication": "kmp"
     },
-    "mathcat-store": {
+    "toolkit-store": {
       "requires": {
-        "mathcat-core": "same-release"
+        "toolkit-core": "same-release"
       },
       "publication": "kmp"
     },
-    "mathcat-actions": {
+    "toolkit-actions": {
       "requires": {
-        "mathcat-core": "same-release",
-        "mathcat-store": "same-release"
+        "toolkit-core": "same-release",
+        "toolkit-store": "same-release"
       },
       "publication": "kmp"
     },
-    "mathcat-api": {
+    "toolkit-api": {
       "requires": {
-        "mathcat-core": "same-release"
+        "toolkit-core": "same-release"
       },
       "publication": "kmp"
     },
-    "mathcat-result": {
+    "toolkit-result": {
       "requires": {},
       "publication": "kmp"
     },
-    "mathcat-serialization": {
+    "toolkit-serialization": {
       "requires": {
-        "mathcat-result": "same-release"
+        "toolkit-result": "same-release"
       },
       "publication": "kmp"
     },
-    "mathcat-context": {
-      "requires": {},
-      "publication": "jvm"
-    },
-    "mathcat-transform": {
-      "requires": {
-        "mathcat-result": "same-release",
-        "mathcat-context": "same-release"
-      },
-      "publication": "jvm"
-    },
-    "mathcat-ktorx": {
-      "requires": {
-        "mathcat-api": "same-release",
-        "mathcat-result": "same-release",
-        "mathcat-serialization": "same-release",
-        "mathcat-transform": "same-release"
-      },
-      "publication": "kmp"
-    },
-    "mathcat-serialization-ksp": {
+    "toolkit-context": {
       "requires": {},
       "publication": "jvm"
     },
-    "mathcat-serialization-ksp-fixture": {
+    "toolkit-transform": {
       "requires": {
-        "mathcat-serialization": "same-release",
-        "mathcat-ktorx": "same-release",
-        "mathcat-middleware": "same-release"
+        "toolkit-result": "same-release",
+        "toolkit-context": "same-release"
+      },
+      "publication": "jvm"
+    },
+    "toolkit-ktorx": {
+      "requires": {
+        "toolkit-api": "same-release",
+        "toolkit-result": "same-release",
+        "toolkit-serialization": "same-release",
+        "toolkit-transform": "same-release"
+      },
+      "publication": "kmp"
+    },
+    "toolkit-serialization-ksp": {
+      "requires": {},
+      "publication": "jvm"
+    },
+    "toolkit-serialization-ksp-fixture": {
+      "requires": {
+        "toolkit-serialization": "same-release",
+        "toolkit-ktorx": "same-release",
+        "toolkit-middleware": "same-release"
       },
       "publication": "none",
       "buildRequires": {
-        "mathcat-serialization-ksp": "same-release"
+        "toolkit-serialization-ksp": "same-release"
       }
     },
-    "mathcat-middleware": {
+    "toolkit-middleware": {
       "requires": {
-        "mathcat-actions": "same-release",
-        "mathcat-ktorx": "same-release"
+        "toolkit-actions": "same-release",
+        "toolkit-ktorx": "same-release"
       },
       "publication": "kmp"
     },
-    "mathcat-plugins": {
+    "toolkit-plugins": {
       "requires": {
-        "mathcat-type-algebra": "same-release",
-        "mathcat-core": "same-release"
+        "toolkit-type-algebra": "same-release",
+        "toolkit-core": "same-release"
       },
       "publication": "kmp"
     },
-    "mathcat-plugins-actions": {
+    "toolkit-plugins-actions": {
       "requires": {
-        "mathcat-plugins": "same-release",
-        "mathcat-actions": "same-release"
+        "toolkit-plugins": "same-release",
+        "toolkit-actions": "same-release"
       },
       "publication": "kmp"
     }

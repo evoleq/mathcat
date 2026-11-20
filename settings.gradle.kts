@@ -30,20 +30,20 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "mathcat"
+rootProject.name = "toolkit"
 
-include(":mathcat-type-algebra")
-include(":mathcat-core")
-include(":mathcat-store")
-include(":mathcat-actions")
-include(":mathcat-api")
-include(":mathcat-result")
-include(":mathcat-serialization")
-include(":mathcat-ktorx")
-include(":mathcat-middleware")
-include(":mathcat-plugins")
-include(":mathcat-plugins-actions")
-include(":mathcat-context")
-include(":mathcat-transform")
-include(":mathcat-serialization-ksp")
-include(":mathcat-serialization-ksp-fixture")
+include(":toolkit-type-algebra")
+include(":toolkit-core")
+include(":toolkit-store")
+include(":toolkit-actions")
+include(":toolkit-api")
+include(":toolkit-result")
+include(":toolkit-serialization")
+include(":toolkit-ktorx")
+include(":toolkit-middleware")
+include(":toolkit-plugins")
+include(":toolkit-plugins-actions")
+include(":toolkit-context")
+include(":toolkit-transform")
+include(":toolkit-serialization-ksp")
+include(":toolkit-serialization-ksp-fixture")

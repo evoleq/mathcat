@@ -1,8 +1,8 @@
-# MathCat — Mathematical foundations
+# ToolKit — Mathematical foundations
 
 **Status:** design and implementation reference · 18 November 2026 · **Draft PR #2**  
 **Audience:** Kotlin developers first; categorical structure made explicit for those who want to follow it.  
-**Scope:** the **implemented** `mathcat-core`. The separate `mathcat-type-algebra` module models type expressions as data and does **not** extend Kotlin's kind system.
+**Scope:** the **implemented** `toolkit-core`. The separate `toolkit-type-algebra` module models type expressions as data and does **not** extend Kotlin's kind system.
 
 > **Principle:** Every mathematical name should correspond to an operation, a type signature, a law, or an explicit limitation. The goal is not mathematical decoration; it is to make compositions predictable.
 
@@ -35,7 +35,7 @@ val nameLength: Reader<Person, Int> = name * size
 
 ## 2. Writer = a command-indexed endomorphism, not the Writer monad
 
-MathCat retains the Evoleq name **`Writer`** intentionally:
+ToolKit retains the Evoleq name **`Writer`** intentionally:
 
 ```text
 End(S)        = Hom(S,S)
@@ -162,7 +162,7 @@ Fix a state type `S`. The state type constructor is:
 T_S(A) = S → (A × S)
 ```
 
-This is a functor in `A`. MathCat's names deliberately expose the **unit** and **multiplication**, rather than hiding the latter behind a single conventional `flatMap` name.
+This is a functor in `A`. ToolKit's names deliberately expose the **unit** and **multiplication**, rather than hiding the latter behind a single conventional `flatMap` name.
 
 ### Unit: `Return`
 
@@ -211,7 +211,7 @@ m.bind(f) = μ_B(T_S(f)(m))
           = m.map(f).multiply()
 ```
 
-That identity is implemented directly in MathCat rather than merely documented.
+That identity is implemented directly in ToolKit rather than merely documented.
 
 A Kleisli arrow is named according to existing Evoleq vocabulary:
 
@@ -270,7 +270,7 @@ Id(A)                = A
 (F ⊗ G)(A)           = F(A) × G(A)
 ```
 
-A genuine `Functor<F>` should abstract over a constructor `F : Type → Type`, and `Nat<F,G>` over a natural family `F(A) → G(A)`. Kotlin today does not have general native higher-kinded parameters. The sibling `mathcat-type-algebra` module therefore models syntax trees for these expressions; **it does not compute Kotlin types or prove naturality**.
+A genuine `Functor<F>` should abstract over a constructor `F : Type → Type`, and `Nat<F,G>` over a natural family `F(A) → G(A)`. Kotlin today does not have general native higher-kinded parameters. The sibling `toolkit-type-algebra` module therefore models syntax trees for these expressions; **it does not compute Kotlin types or prove naturality**.
 
 Functor composition is automatic given suitable functors; Monad composition is **not** generally automatic and may require a distributive law. This distinction is fundamental to the later language/plugin research.
 
@@ -289,7 +289,7 @@ Functor composition is automatic given suitable functors; Monad composition is *
 | Kleisli arrow | `KlState` | Input value + stateful computation |
 | Value-preserving Kleisli constructor | `Update` | Change state without discarding the incoming value |
 | State read constructor | `Get<S>()` | Return current state without changing it |
-| Functor / kind operators | `mathcat-type-algebra` experiment | Explicit research, not native Kotlin HKT |
+| Functor / kind operators | `toolkit-type-algebra` experiment | Explicit research, not native Kotlin HKT |
 
 **Vocabulary policy:** Preserve the author's standalone capitalized constructors `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy`, `UpsertAllBy`, alongside lowercase operations `multiply`, `map`, `bind`, `get`, `set`, `contraMap`. Do not add redundant `pure`/`flatMap`/`modify` public aliases. The Kotlin API should stay short and readable while its laws and mathematical origins remain explicit. Mathematical symbols live in explanations and equations; Kotlin code keeps a conflict-aware vocabulary.
 
@@ -313,9 +313,9 @@ These are **ordinary Kotlin constructs**, not a claim that Kotlin supports nativ
 When different future monads supply a `Return`, the constructors should live in **their corresponding packages**. A caller can use Kotlin import aliases:
 
 ```kotlin
-import org.evoleq.mathcat.core.state.Return as StateReturn
+import evoleq.toolkit.core.state.Return as StateReturn
 // illustrative only; a result monad is not implemented yet:
-// import org.evoleq.mathcat.result.Return as ResultReturn
+// import evoleq.toolkit.result.Return as ResultReturn
 ```
 
 The alias changes the local name, **not** the mathematical meaning. It cannot solve an actual package-level signature collision; Kotlin also does not overload a function by return type alone. The project should prefer clear package boundaries and import aliases over renaming `Return` to unrelated words.
@@ -323,11 +323,11 @@ The alias changes the local name, **not** the mathematical meaning. It cannot so
 
 ### Map readers and name scopes
 
-The old Evoleq also offers `Get(key): Reader<Map<K,V>,V?>` and the partial `GetForSure(key): Reader<Map<K,V>,V>`. The MathCat port preserves them in `org.evoleq.mathcat.core.reader.maps`:
+The old Evoleq also offers `Get(key): Reader<Map<K,V>,V?>` and the partial `GetForSure(key): Reader<Map<K,V>,V>`. The ToolKit port preserves them in `evoleq.toolkit.core.reader.maps`:
 
 ```kotlin
-import org.evoleq.mathcat.core.optics.Get
-import org.evoleq.mathcat.core.reader.maps.Get as MapGet
+import evoleq.toolkit.core.optics.Get
+import evoleq.toolkit.core.reader.maps.Get as MapGet
 ```
 
 This is an intentional use of **separate namespaces**, not a demand to rename mathematical constructors. See the test `GetSetImportsTest` for concrete interoperability.
