@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.types
+package evoleq.toolkit.types
 
 /**
  * Ordinary Kotlin representations of a tagged coproduct and a product.

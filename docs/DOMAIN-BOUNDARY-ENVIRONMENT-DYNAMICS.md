@@ -1,6 +1,6 @@
 # Domain, Boundary, Environment and multilevel dynamics
 
-**Research slice · 2026-11-18 · not a frozen public API.** This is part of the architectural foundation of MathCat/Evoleq, rather than a decorative topology analogy. Companion to the book *Compositional Software Architecture*, chapters 2, 4 and 5.
+**Research slice · 2026-11-18 · not a frozen public API.** This is part of the architectural foundation of ToolKit/Evoleq, rather than a decorative topology analogy. Companion to the book *Compositional Software Architecture*, chapters 2, 4 and 5.
 
 ## 1. Three roles, not three mutually exclusive classes
 
@@ -84,7 +84,7 @@ Re-evaluate `Gap` against current `Lens` laws and state/suspend boundaries. An a
 
 The existing [ApiTest](https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/commonTest/kotlin/org/evoleq/ktorx/api/ApiTest.kt) covers basic configuration but does **not** verify duplicate-key policy, nested `module` composition, path normalization, codec interoperability or the safety of the typed lookup. Current `module` overwrites keys and concatenates strings for paths. These are **potential** defects or ambiguity, not reproduced failures.
 
-A better **future** boundary DSL should preserve fluent typed declaration while making typed keys, ownership, duplicate conflicts, prefix normalization, request/response codecs, error contracts, transport-specific interpretation and module composition explicit. Do not move Ktor serializers or endpoint maps into `mathcat-core`.
+A better **future** boundary DSL should preserve fluent typed declaration while making typed keys, ownership, duplicate conflicts, prefix normalization, request/response codecs, error contracts, transport-specific interpretation and module composition explicit. Do not move Ktor serializers or endpoint maps into `toolkit-core`.
 
 In the existing backend, [`Environment`](https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-backend/src/main/kotlin/org/solyton/solawi/bid/application/environment/environment.kt) combines `KTorEnv`, `DbEnv`, `JwtEnv`, configuration and external resources. This is a concrete adapter/environment assembly, not the abstract domain model. Dependency injection through a Boundary should let tests replace functions without constructing a real HTTP server or database.
 
@@ -111,7 +111,7 @@ In the short term retain `Reader`, `Writer`, `Lens`, `Storage`, `Store` and `Act
 6. Boundary decoding and encoding have a precise roundtrip/observation law, including failure and version skew.
 7. Multiple levels of timing (domain tick vs workflow completion vs architectural change) are not silently conflated.
 
-No Solyton changes, no stable API claim, no automatic MathCat release from this documentation/testing slice.
+No Solyton changes, no stable API claim, no automatic ToolKit release from this documentation/testing slice.
 
 ## 7. Flow as an analogy and a local tool — not an application framework
 
@@ -121,7 +121,7 @@ The author experimented with **JavaFX and Swing**. Integrating Flows there was c
 
 The conceptual relationship to dynamical systems remains important independently of any integration effort. At the value level, a transition `D × I -> D × O` is an instructive model of an open component. At the workflow level, actions compose along explicit dependencies. At the system level, a domain may be embedded into an environment with feedback and observation. These are different levels and timescales. No single global Flow runtime is required to explain them.
 
-Open/coupled dynamics remain an interesting **research question**, not a pending framework implementation or a promised replacement for Ktor, Compose, Swing or JavaFX. Focus upcoming implementation on the concrete composition problems we already have in MathCat, such as Storage/Store/Action and the Ktor API DSL. Preserve Flow/Gap as design predecessors and as mathematical analogies for the book.
+Open/coupled dynamics remain an interesting **research question**, not a pending framework implementation or a promised replacement for Ktor, Compose, Swing or JavaFX. Focus upcoming implementation on the concrete composition problems we already have in ToolKit, such as Storage/Store/Action and the Ktor API DSL. Preserve Flow/Gap as design predecessors and as mathematical analogies for the book.
 
 ## 8. Ktor API DSL is a concrete transport-boundary composition
 
@@ -131,4 +131,4 @@ The author's specific request is to extend the **existing Evoleq API description
 2. In the Ktor adapter only, associate a route explicitly with the endpoint declaration it implements; retain originating module and endpoint metadata.
 3. In the Ktor adapter only, centralize repeated `runOn Base(call, environment)` assembly while preserving **per-request** `call` semantics.
 
-See [framework-independent API module composition](API-MODULE-COMPOSITION.md) and the [dedicated `mathcat-ktorx` adapter module](KTOR-API-COMPOSITION.md). **`group` and `module` do not depend on Ktor**; only the route binder and request execution do. The general `Domain`, `Boundary`, `Environment` and coupled-dynamics reasoning can inform both layers, but neither layer belongs to a global Flow runtime. The design is not implemented by this research draft. No changes to Solyton.
+See [framework-independent API module composition](API-MODULE-COMPOSITION.md) and the [dedicated `toolkit-ktorx` adapter module](KTOR-API-COMPOSITION.md). **`group` and `module` do not depend on Ktor**; only the route binder and request execution do. The general `Domain`, `Boundary`, `Environment` and coupled-dynamics reasoning can inform both layers, but neither layer belongs to a global Flow runtime. The design is not implemented by this research draft. No changes to Solyton.

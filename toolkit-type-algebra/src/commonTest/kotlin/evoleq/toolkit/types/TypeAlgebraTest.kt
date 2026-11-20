@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.types
+package evoleq.toolkit.types
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

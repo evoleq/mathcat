@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.types
+package evoleq.toolkit.types
 
 /**
  * A small, first-order *model* of type expressions. This is an AST of values;

@@ -16,7 +16,7 @@ kotlin {
     }
 
     android {
-        namespace = "org.evoleq.mathcat.types"
+        namespace = "evoleq.toolkit.types"
         compileSdk = 36
         minSdk = 24
 

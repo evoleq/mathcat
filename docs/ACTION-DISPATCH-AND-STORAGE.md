@@ -1,13 +1,13 @@
 # Action dispatchers and compositional Storage
 
-**MathCat 2.0 — architecture exploration, 2026-11-18.**  
-**Status: research and incremental implementation.** The original text below distinguishes design candidates from verified code. The separate [Store draft PR #4](https://github.com/evoleq/mathcat/pull/4) has implemented `Store<S,D>` in `mathcat-store`; the [typed Actions draft PR #5](https://github.com/evoleq/mathcat/pull/5) now adds the small `mathcat-actions` module, with standalone `Action`, `ActionEnvelope`, `ActionDispatcher`, their typed Lens transports and `Store * Lens`. Neither PR adds a running processor, coroutine scope, HTTP integration, Compose adapter or a Solyton migration. Both remain drafts.
+**ToolKit 2.0 — architecture exploration, 2026-11-18.**  
+**Status: research and incremental implementation.** The original text below distinguishes design candidates from verified code. The separate [Store draft PR #4](https://github.com/evoleq/mathcat/pull/4) has implemented `Store<S,D>` in `toolkit-store`; the [typed Actions draft PR #5](https://github.com/evoleq/mathcat/pull/5) now adds the small `toolkit-actions` module, with standalone `Action`, `ActionEnvelope`, `ActionDispatcher`, their typed Lens transports and `Store * Lens`. Neither PR adds a running processor, coroutine scope, HTTP integration, Compose adapter or a Solyton migration. Both remain drafts.
 
 ## The problem
 
 The existing Solyton frontend has a public `Storage<Application>` whose `read()` assembles several independent (some Compose-observable, some plain) Memories and whose `write()` routes updates. An application-level `MutableSharedFlowActionDispatcher<Application>` currently lives **inside the Application data class**. A `@Composable Storage()` factory registers a collector via `onDispatch`, which launches `ProcessAction(envelope) runOn storage`. Sub-application representations (e.g., `NavBar`, `BankingApplication`) each receive a specially lifted dispatcher when projected from `Application`.
 
-What we want: preserve this practical composability, but separate **data**, **the capability to dispatch commands**, and **the lifecycle/runner that executes them**. Do not make MathCat core depend on Ktor, Compose, coroutines or serializers.
+What we want: preserve this practical composability, but separate **data**, **the capability to dispatch commands**, and **the lifecycle/runner that executes them**. Do not make ToolKit core depend on Ktor, Compose, coroutines or serializers.
 
 ## 1. Three separate capabilities
 
@@ -44,7 +44,7 @@ Unlike embedding a dispatcher in a model `data class Application`, `Store<S>` ex
 
 `Store<S>` is an **effectful product of capabilities**, not `Storage<S>` for one mutable cell and not a categorical product in a category with unspecified effects. Its name may collide with the legacy `@Composable Store` function in other packages; import aliases or a more specific name can be chosen after usage tests.
 
-The pure `mathcat-core` retains only `Storage<S>`, `Reader`, `Writer`, `Lens`, `Selection`, `State`, etc. The action model and combined capability would belong to a separate module such as **`mathcat-actions`**. External executors, API calls, Compose scopes, persistence, queue backpressure and process registry belong in application/runtime adapters.
+The pure `toolkit-core` retains only `Storage<S>`, `Reader`, `Writer`, `Lens`, `Selection`, `State`, etc. The action model and combined capability would belong to a separate module such as **`toolkit-actions`**. External executors, API calls, Compose scopes, persistence, queue backpressure and process registry belong in application/runtime adapters.
 
 ## 2. The same Lens can transport both capabilities
 
@@ -185,9 +185,9 @@ Do not start a `CoroutineScope(Job()).launch` implicitly inside a composed Stora
 
 ## References
 
-- [MathCat Storage composition design](STORAGE-COMPOSITION.md)
-- [MathCat Storage and Memory review](STORAGE-AND-MEMORY.md)
-- [MathCat mathematical foundations](MATHEMATICAL-FOUNDATIONS.md)
+- [ToolKit Storage composition design](STORAGE-COMPOSITION.md)
+- [ToolKit Storage and Memory review](STORAGE-AND-MEMORY.md)
+- [ToolKit mathematical foundations](MATHEMATICAL-FOUNDATIONS.md)
 - Existing dispatcher & envelope: https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/commonMain/kotlin/org/evoleq/optics/storage/flow.kt
 - Existing Action lens lift: https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/commonMain/kotlin/org/evoleq/optics/storage/action.kt
 - Existing frontend action processor: https://github.com/doctor-smith/solawi-bid/blob/main/solawi-bid-frontend/src/jsMain/kotlin/org/solyton/solawi/bid/application/storage/middleware/action-processor.kt
@@ -195,7 +195,7 @@ Do not start a `CoroutineScope(Job()).launch` implicitly inside a composed Stora
 
 ## 7. First implementation slice (PR #5)
 
-The experimental `mathcat-actions` module now implements a **transport-neutral subset** of the Evoleq architecture:
+The experimental `toolkit-actions` module now implements a **transport-neutral subset** of the Evoleq architecture:
 
 ```text
 Action<S,I,O>                     name, Reader<S,I>, Writer<S,O>, onSuccess?

@@ -1,6 +1,6 @@
 # Gradle Version Catalog
 
-MathCat keeps **external** Gradle plugin and library versions in
+ToolKit keeps **external** Gradle plugin and library versions in
 `gradle/libs.versions.toml`. Gradle automatically exposes the `libs` aliases
 in the main multi-module build.
 
@@ -27,8 +27,8 @@ kotlin {
 
 ## Separation from repository releases
 
-**Do not place MathCat's own artifact version in the catalog.**
-Internal module dependencies remain explicit `project(":mathcat-core")`
+**Do not place ToolKit's own artifact version in the catalog.**
+Internal module dependencies remain explicit `project(":toolkit-core")`
 references, cross-checked against `compatibility/modules.json` by
 `scripts/release.py validate`. The repository-wide SemVer release planner
 still controls source tags and compatibility records after successful CI.
