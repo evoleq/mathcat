@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.writer
+package evoleq.toolkit.writer
 
-import org.evoleq.mathcat.core.writer.Dispatcher
-import org.evoleq.mathcat.core.writer.Writer
-import org.evoleq.mathcat.core.writer.dispatch
+import evoleq.toolkit.core.writer.Dispatcher
+import evoleq.toolkit.core.writer.Writer
+import evoleq.toolkit.core.writer.dispatch
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

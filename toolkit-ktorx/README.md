@@ -1,6 +1,6 @@
-# mathcat-ktorx — thin Ktor bindings for the *existing* Evoleq Api
+# toolkit-ktorx — thin Ktor bindings for the *existing* Evoleq Api
 
-**Stacked Draft PR based on MathCat API [PR #8](https://github.com/evoleq/mathcat/pull/8).** The API module is the source of truth: `Api { ... }`, its `KClass` keys, `EndPoint.Get/Post/Put/Patch/Delete/Head`, paths and groups remain unchanged.
+**Stacked Draft PR based on ToolKit API [PR #8](https://github.com/evoleq/mathcat/pull/8).** The API module is the source of truth: `Api { ... }`, its `KClass` keys, `EndPoint.Get/Post/Put/Patch/Delete/Head`, paths and groups remain unchanged.
 
 ## Ktor client (Multiplatform)
 
@@ -15,7 +15,7 @@ val user = client.requestEndpoint(
 )
 ```
 
-The client reads the **existing method and URL** from `api[key]`, substitutes named path parameters (encoding each segment), passes query parameters to Ktor, and decodes with the given `KSerializer<T>`. The overload `sendEndpoint` also encodes a request body with `KSerializer<S>`. No runtime dependency on KSP, MathCat Actions or a global registry. The caller can use a manually assembled or KSP-generated registry to provide the codecs once those modules are integrated.
+The client reads the **existing method and URL** from `api[key]`, substitutes named path parameters (encoding each segment), passes query parameters to Ktor, and decodes with the given `KSerializer<T>`. The overload `sendEndpoint` also encodes a request body with `KSerializer<S>`. No runtime dependency on KSP, ToolKit Actions or a global registry. The caller can use a manually assembled or KSP-generated registry to provide the codecs once those modules are integrated.
 
 ## Ktor server (JVM only)
 
@@ -32,14 +32,14 @@ The adapter reads the method/path from the same `EndPoint` declaration and const
 
 ## Scope and evidence
 
-A portable MockEngine client test and a JVM `testApplication` route test verify endpoint method/path binding, named parameters, request body serialization, and two distinct request-local contexts. CI covers the same KMP targets as MathCat API.
+A portable MockEngine client test and a JVM `testApplication` route test verify endpoint method/path binding, named parameters, request body serialization, and two distinct request-local contexts. CI covers the same KMP targets as ToolKit API.
 
-**This is an initial adapter, not a migration**: it has not yet wired `mathcat-result`'s JSON envelope, authentication/authorization, serializers registry composition at the application boundary, or Solyton's full `ReceiveContextual` and `Respond` flow. Those are follow-ups after PRs #8, #9 and #10 are accepted and merged; no Solyton changes are made.
+**This is an initial adapter, not a migration**: it has not yet wired `toolkit-result`'s JSON envelope, authentication/authorization, serializers registry composition at the application boundary, or Solyton's full `ReceiveContextual` and `Respond` flow. Those are follow-ups after PRs #8, #9 and #10 are accepted and merged; no Solyton changes are made.
 
 
 ## Contextual + IO: the Solyton composition vocabulary
 
-The server JVM adapter now retains the Solyton-shaped Contextual(userId: UUID, context: String, data: T) with its map operation, and a Ktor-only suspendable Action/ KlAction composition. The pure MathCat Core State remains non-suspend.
+The server JVM adapter now retains the Solyton-shaped Contextual(userId: UUID, context: String, data: T) with its map operation, and a Ktor-only suspendable Action/ KlAction composition. The pure ToolKit Core State remains non-suspend.
 
 The KtorIO<Base> interpreter takes a getter for the application's actual Base.call, a composed Serializers registry, a Result JSON codec, optional authenticated-user resolver (defaults to Ktor JWTPrincipal subject) and independent ExceptionTransforms.
 
@@ -95,7 +95,7 @@ can still use the explicit overloads.
 
 ### Frontend: State Reader / Action interpreter
 
-The transport-independent `mathcat-actions.Action` deliberately has no HTTP
+The transport-independent `toolkit-actions.Action` deliberately has no HTTP
 method, KClass endpoint or serializer. Its pure `reader` can be interpreted
 at a frontend boundary without changing its structure:
 
@@ -121,7 +121,7 @@ and base URL remain application environment concerns; a configured HttpClient
 provides authentication headers and custom client plugins.
 
 For login-aware applications that hold the current state in `Storage`, use the
-standalone `mathcat-middleware` module. It resolves the client at runtime:
+standalone `toolkit-middleware` module. It resolves the client at runtime:
 
 ```kotlin
 val resolver = ApiClientResolver<Application> { app ->
@@ -149,7 +149,7 @@ by a server-provided class name or automatic Action.writer mutation is added.
 ### Standalone middleware publication
 
 For the shortest frontend expression, use the separately published
-[`mathcat-middleware`](../mathcat-middleware) module. Bind the endpoint key
+[`toolkit-middleware`](../toolkit-middleware) module. Bind the endpoint key
 **once** at Action declaration with `action.at(LoginKey::class)` and then
 write only `Call(action) runOn runtime`. The standalone `Call` is not an
 `ApiClient`/gateway member; its client and serializers are injected by the

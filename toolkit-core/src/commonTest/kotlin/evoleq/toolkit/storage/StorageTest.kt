@@ -1,10 +1,10 @@
-package org.evoleq.mathcat.core.storage
+package evoleq.toolkit.core.storage
 
-import org.evoleq.mathcat.core.collections.FilterBy
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.reader.emit
-import org.evoleq.mathcat.core.writer.Writer
+import evoleq.toolkit.core.collections.FilterBy
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.reader.emit
+import evoleq.toolkit.core.writer.Writer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -42,7 +42,7 @@ class StorageTest {
     fun sourceAndCallbackCanBackAStorageWithoutMemory() {
         var raw = 5
         val storage = Storage(
-            source = org.evoleq.mathcat.core.reader.Source { raw },
+            source = evoleq.toolkit.core.reader.Source { raw },
             write = { raw = it }
         )
         val source = storage.source()

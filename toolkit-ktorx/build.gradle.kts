@@ -9,7 +9,7 @@ kotlin {
     js(IR) { nodejs() }
     wasmJs { nodejs() }
     android {
-        namespace = "org.evoleq.mathcat.ktorx"
+        namespace = "evoleq.toolkit.ktorx"
         compileSdk = 36
         minSdk = 24
         withHostTestBuilder {}.configure {}
@@ -24,9 +24,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":mathcat-api"))
-            api(project(":mathcat-result"))
-            api(project(":mathcat-serialization"))
+            api(project(":toolkit-api"))
+            api(project(":toolkit-result"))
+            api(project(":toolkit-serialization"))
             api(libs.ktor.client.core)
             api(libs.kotlinx.serialization.json)
         }
@@ -38,7 +38,7 @@ kotlin {
         jvmMain.dependencies {
             api(libs.ktor.server.core)
             implementation(libs.ktor.server.auth.jwt)
-            api(project(":mathcat-transform"))
+            api(project(":toolkit-transform"))
         }
         jvmTest.dependencies {
             implementation(libs.ktor.server.test.host)
