@@ -1,4 +1,4 @@
-# mathcat-context — pure authenticated Contextual (JVM)
+# toolkit-context — pure authenticated Contextual (JVM)
 
 The original Solyton backend declares:
 

@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.core.collections
+package evoleq.toolkit.core.collections
 
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.core.optics.times
-import org.evoleq.mathcat.core.writer.Writer
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.core.optics.times
+import evoleq.toolkit.core.writer.Writer
 
 /**
  * Reusable pure list writers, with the same contravariant API as any Writer.

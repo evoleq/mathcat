@@ -16,7 +16,7 @@ kotlin {
     }
 
     android {
-        namespace = "org.evoleq.mathcat.core"
+        namespace = "evoleq.toolkit.core"
         compileSdk = 36
         minSdk = 24
 
@@ -36,7 +36,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":mathcat-type-algebra"))
+            api(project(":toolkit-type-algebra"))
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

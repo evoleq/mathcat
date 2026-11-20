@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.core.collections
+package evoleq.toolkit.core.collections
 
-import org.evoleq.mathcat.core.optics.Selection
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.writer.Writer
+import evoleq.toolkit.core.optics.Selection
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.writer.Writer
 
 /** 
  * Filter/replace selection, deliberately NOT a lawful Lens:

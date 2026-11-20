@@ -1,6 +1,6 @@
-package org.evoleq.mathcat.core.optics
+package evoleq.toolkit.core.optics
 
-import org.evoleq.mathcat.types.Sum2
+import evoleq.toolkit.types.Sum2
 
 /**
  * A monomorphic Prism selects one case of a sum.

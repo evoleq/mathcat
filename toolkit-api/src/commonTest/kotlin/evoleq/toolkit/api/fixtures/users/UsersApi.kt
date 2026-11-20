@@ -1,7 +1,7 @@
-package org.evoleq.mathcat.api.fixtures.users
+package evoleq.toolkit.api.fixtures.users
 
-import org.evoleq.mathcat.api.Api
-import org.evoleq.mathcat.api.EmptyParams
+import evoleq.toolkit.api.Api
+import evoleq.toolkit.api.EmptyParams
 
 class ReadUser : EmptyParams()
 class User
