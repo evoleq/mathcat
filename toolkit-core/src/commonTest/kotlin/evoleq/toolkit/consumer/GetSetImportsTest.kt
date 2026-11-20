@@ -1,17 +1,17 @@
-package org.evoleq.mathcat.consumer
+package evoleq.toolkit.consumer
 
-import org.evoleq.mathcat.core.optics.Get
-import org.evoleq.mathcat.core.state.Get as StateGet
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.optics.Selection
-import org.evoleq.mathcat.core.optics.Set
-import org.evoleq.mathcat.core.writer.Writer
-import org.evoleq.mathcat.core.collections.FilterBy
-import org.evoleq.mathcat.core.reader.times
-import org.evoleq.mathcat.core.writer.contraMap
-import org.evoleq.mathcat.core.reader.maps.Get as MapGet
-import org.evoleq.mathcat.core.reader.maps.GetForSure
+import evoleq.toolkit.core.optics.Get
+import evoleq.toolkit.core.state.Get as StateGet
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.optics.Selection
+import evoleq.toolkit.core.optics.Set
+import evoleq.toolkit.core.writer.Writer
+import evoleq.toolkit.core.collections.FilterBy
+import evoleq.toolkit.core.reader.times
+import evoleq.toolkit.core.writer.contraMap
+import evoleq.toolkit.core.reader.maps.Get as MapGet
+import evoleq.toolkit.core.reader.maps.GetForSure
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails

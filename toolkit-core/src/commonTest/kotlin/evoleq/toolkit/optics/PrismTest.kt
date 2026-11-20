@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.optics
+package evoleq.toolkit.optics
 
-import org.evoleq.mathcat.core.optics.Prism
-import org.evoleq.mathcat.core.optics.times
-import org.evoleq.mathcat.types.Sum2
+import evoleq.toolkit.core.optics.Prism
+import evoleq.toolkit.core.optics.times
+import evoleq.toolkit.types.Sum2
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

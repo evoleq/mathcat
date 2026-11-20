@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.dynamics
+package evoleq.toolkit.dynamics
 
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.writer.Writer
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.writer.Writer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

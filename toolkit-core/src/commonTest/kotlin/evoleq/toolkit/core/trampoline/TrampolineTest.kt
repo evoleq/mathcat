@@ -1,11 +1,11 @@
-package org.evoleq.mathcat.core.trampoline
+package evoleq.toolkit.core.trampoline
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 /**
- * Executable documentation: the same vocabulary as State/Result in MathCat:
+ * Executable documentation: the same vocabulary as State/Result in Toolkit:
  * Return, map, multiply and bind = map(f).multiply().
  */
 class TrampolineTest {

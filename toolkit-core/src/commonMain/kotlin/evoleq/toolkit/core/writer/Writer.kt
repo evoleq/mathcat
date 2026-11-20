@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.writer
+package evoleq.toolkit.core.writer
 
 /**
  * A pure, curried state updater. The first argument is an update command, and the

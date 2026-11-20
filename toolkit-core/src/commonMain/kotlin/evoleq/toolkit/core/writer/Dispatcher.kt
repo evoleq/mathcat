@@ -1,10 +1,10 @@
-package org.evoleq.mathcat.core.writer
+package evoleq.toolkit.core.writer
 
 /**
  * A synchronous command-indexed Writer over the Unit state.
  *
  * Dispatcher<A> = Writer<Unit, A>. This is neither a coroutine dispatcher
- * nor the suspend-capable ActionDispatcher<S> from mathcat-actions.
+ * nor the suspend-capable ActionDispatcher<S> from toolkit-actions.
  * Its Writer may perform effects when evaluated, not when constructed.
  */
 typealias Dispatcher<A> = Writer<Unit, A>

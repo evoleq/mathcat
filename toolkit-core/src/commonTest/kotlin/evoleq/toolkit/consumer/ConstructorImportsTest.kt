@@ -1,9 +1,9 @@
-package org.evoleq.mathcat.consumer
+package evoleq.toolkit.consumer
 
-import org.evoleq.mathcat.core.state.KlState
-import org.evoleq.mathcat.core.state.Return as StateReturn
-import org.evoleq.mathcat.core.state.Update
-import org.evoleq.mathcat.core.state.times
+import evoleq.toolkit.core.state.KlState
+import evoleq.toolkit.core.state.Return as StateReturn
+import evoleq.toolkit.core.state.Update
+import evoleq.toolkit.core.state.times
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

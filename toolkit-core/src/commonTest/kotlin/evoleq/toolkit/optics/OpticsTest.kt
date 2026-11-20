@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.core.optics
+package evoleq.toolkit.core.optics
 
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.writer.Writer
-import org.evoleq.mathcat.core.collections.FilterBy
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.writer.Writer
+import evoleq.toolkit.core.collections.FilterBy
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

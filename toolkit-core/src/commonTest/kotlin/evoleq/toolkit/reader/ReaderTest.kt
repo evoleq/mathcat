@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.reader
+package evoleq.toolkit.core.reader
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

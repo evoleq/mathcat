@@ -1,9 +1,9 @@
-package org.evoleq.mathcat.reader
+package evoleq.toolkit.reader
 
-import org.evoleq.mathcat.core.reader.Source
-import org.evoleq.mathcat.core.reader.emit
-import org.evoleq.mathcat.core.reader.read
-import org.evoleq.mathcat.core.reader.x
+import evoleq.toolkit.core.reader.Source
+import evoleq.toolkit.core.reader.emit
+import evoleq.toolkit.core.reader.read
+import evoleq.toolkit.core.reader.x
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
