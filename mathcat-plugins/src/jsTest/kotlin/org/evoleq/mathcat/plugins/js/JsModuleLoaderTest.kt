@@ -1,6 +1,7 @@
 package org.evoleq.mathcat.plugins.js
 
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.await
 import org.evoleq.mathcat.plugins.*
 import org.evoleq.mathcat.types.Sum2
 import kotlin.test.Test
@@ -56,6 +57,7 @@ class JsModuleLoaderTest {
             export const version = "1.0.0";
             export async function activate(host) {
                 if (!host.actions || !host.navigation) throw Error("missing capabilities");
+                globalThis.__mathcatActionsForTest = host.actions;
                 const accepted = await host.actions.dispatch("shares.refresh");
                 const moved = await host.navigation.navigate("shares.home");
                 const denied = await host.actions.dispatch("admin.delete");
@@ -94,6 +96,13 @@ class JsModuleLoaderTest {
             events
         )
         assertEquals(Sum2.Right(Unit), deployment.stop())
+        // A module can retain old JS function references; after stop they
+        // must no longer provide access to host actions.
+        val oldCommand = js("globalThis.__mathcatActionsForTest.dispatch('shares.refresh')")
+            .unsafeCast<kotlin.js.Promise<Boolean>>()
+        assertEquals(false, oldCommand.await())
+        js("delete globalThis.__mathcatActionsForTest")
+        assertEquals(3, events.size, "Revoked callbacks must not reach host effects")
     }
 
 }

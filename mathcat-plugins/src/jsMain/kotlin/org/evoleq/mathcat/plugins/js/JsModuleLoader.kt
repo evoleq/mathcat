@@ -49,19 +49,31 @@ class JsModuleLoader(
         }
 
         return object : PluginHandle {
+            private var active = false
+
             override suspend fun activate(host: PluginHostContext): PluginSession {
-                val hostData = plainHost(host, plugin, callbacks, callbackScope)
-                val session = awaitValue(module.activate(hostData))
-                require(session != null && jsTypeOf(session.dispose) == "function") {
-                    "JS plugin activate(host) must return an object with dispose()"
-                }
-                return PluginSession {
-                    awaitValue(session.dispose())
-                    Unit
+                check(!active) { "The same JS plugin handle cannot be activated twice" }
+                active = true
+                try {
+                    val hostData = plainHost(host, plugin, callbacks, callbackScope) { active }
+                    val session = awaitValue(module.activate(hostData))
+                    require(session != null && jsTypeOf(session.dispose) == "function") {
+                        "JS plugin activate(host) must return an object with dispose()"
+                    }
+                    return PluginSession {
+                        // Revoke the host command bridge BEFORE running cleanup.
+                        active = false
+                        awaitValue(session.dispose())
+                        Unit
+                    }
+                } catch (error: Throwable) {
+                    active = false
+                    throw error
                 }
             }
 
             override suspend fun unload() {
+                active = false
                 // Browser/Node ES module namespaces cannot be unloaded reliably.
                 // Dispose must release DOM, listeners, subscriptions and resources.
             }
@@ -83,7 +95,8 @@ private fun plainHost(
     host: PluginHostContext,
     plugin: PluginDescriptor,
     callbacks: PluginCallbacks?,
-    scope: CoroutineScope?
+    scope: CoroutineScope?,
+    isActive: () -> Boolean
 ): dynamic {
     val payload = js("({})")
     payload.hostApi = host.hostApi
@@ -103,7 +116,7 @@ private fun plainHost(
         ) {
             val actions = js("({})")
             val dispatch: (String) -> Promise<Boolean> = { key ->
-                scope.promise { callbacks.dispatchAction(plugin.id, key) }
+                scope.promise { isActive() && callbacks.dispatchAction(plugin.id, key) }
             }
             actions.dispatch = dispatch
             payload.actions = actions
@@ -114,7 +127,7 @@ private fun plainHost(
         ) {
             val navigation = js("({})")
             val navigate: (String) -> Promise<Boolean> = { key ->
-                scope.promise { callbacks.navigate(plugin.id, key) }
+                scope.promise { isActive() && callbacks.navigate(plugin.id, key) }
             }
             navigation.navigate = navigate
             payload.navigation = navigation

@@ -163,6 +163,9 @@ export async function activate(host) {
 }
 ```
 
+Commands are revoked once the plugin session is disposed or its handle is unloaded:
+retaining a stale JavaScript callback must not keep host capabilities live.
+
 The **host** must bind `shares.refresh` to an actual typed `Action` and
 `shares.home` to an internal route; unrecognized or ungranted names are
 rejected. Dispatch acknowledgement is not action completion.
