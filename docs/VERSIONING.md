@@ -1,6 +1,6 @@
-# Versioning of MathCat
+# Versioning of ToolKit
 
-MathCat uses SemVer-shaped **annotated Git tags** `vX.Y.Z` on `master`. A Git tag is a version checkpoint, **not** a Maven publication or a claim of stable API compatibility.
+ToolKit uses SemVer-shaped **annotated Git tags** `vX.Y.Z` on `master`. A Git tag is a version checkpoint, **not** a Maven publication or a claim of stable API compatibility.
 
 ## Preconditions
 

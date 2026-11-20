@@ -1,6 +1,6 @@
 # Storage, Memory and Compose boundaries
 
-**MathCat 2.0 · 2026-11-18 · Draft PR #2.** An implementation and architectural note, not an automatic migration of existing Solyton code.
+**ToolKit 2.0 · 2026-11-18 · Draft PR #2.** An implementation and architectural note, not an automatic migration of existing Solyton code.
 
 For the algebra of **products, tagged sums and embedding existing Storages**, see [Storage composition research](STORAGE-COMPOSITION.md). The product and sum operators are research proposals, not public APIs yet.
 
@@ -27,7 +27,7 @@ class Memory<S>(initial: S) : Storage<S>
 fun <S> Storage<S>.source(): Source<S> = Source { read() }
 ```
 
-`Source<T>` is **already present in legacy Evoleq**, and is now restored to MathCat as exactly `typealias Source<T> = Reader<Unit,T>`. It is a typealias rather than a wrapper, so `Source * Reader` is ordinary Reader composition. **`read()` and `write()` are the required Storage operations.** The optional `storage.source()` projection constructs a live, deferred Source, not a property or an extra obligation on backend implementers. Previously obtained Sources observe later reads of the same Storage, not frozen snapshots.
+`Source<T>` is **already present in legacy Evoleq**, and is now restored to ToolKit as exactly `typealias Source<T> = Reader<Unit,T>`. It is a typealias rather than a wrapper, so `Source * Reader` is ordinary Reader composition. **`read()` and `write()` are the required Storage operations.** The optional `storage.source()` projection constructs a live, deferred Source, not a property or an extra obligation on backend implementers. Previously obtained Sources observe later reads of the same Storage, not frozen snapshots.
 
 The named `Storage(source, write)` and `Storage(read, write)` factory functions make adapters easy without subclassing.
 
@@ -82,10 +82,10 @@ Compose-observable memory versus plain memory affects **which writes invalidate 
 The **same `Storage<T>` interface** may be backed by:
 
 1. **Plain memory** (`Memory(initial)`): stores a Kotlin value in a field; does not participate in Compose snapshot observation. Useful for tests, process registries, non-UI context and state that should not trigger UI invalidation.
-2. **Compose `MutableState<T>`**: reads/writes `state.value`; Compose can record reads and invalidate scopes which read that state when its value changes, subject to the snapshot mutation policy. This needs Compose runtime and must **not** be added to MathCat's platform-independent core.
+2. **Compose `MutableState<T>`**: reads/writes `state.value`; Compose can record reads and invalidate scopes which read that state when its value changes, subject to the snapshot mutation policy. This needs Compose runtime and must **not** be added to ToolKit's platform-independent core.
 3. **Other stores**: browser/session storage, databases, key/value stores, application services, etc. Synchronous callbacks fit this interface only when their operation really is synchronous; asynchronous persistence needs a distinct `suspend`-capable abstraction.
 
-### Future Compose adapter (illustration only, NOT implemented in MathCat core)
+### Future Compose adapter (illustration only, NOT implemented in ToolKit core)
 
 ```kotlin
 @Composable
@@ -126,7 +126,7 @@ For a large application, observing one monolithic `mutableStateOf<Application>` 
 
 **Potential lifecycle/effects issue:** the frontend's `onDispatch` starts `CoroutineScope(Job()).launch` each time it is called. If the `@Composable Storage()` factory is re-entered during recomposition, multiple collectors could be started without a composition-tied cancellation owner. The code was inspected, but duplicate collectors in a running application have not been reproduced. Future Compose integration should test lifecycle and cancellation explicitly.
 
-Neither issue is changed by this MathCat PR; they are observations and a follow-up suggestion, **not a claim that production behavior has already been reproduced**.
+Neither issue is changed by this ToolKit PR; they are observations and a follow-up suggestion, **not a claim that production behavior has already been reproduced**.
 
 ## What to test later in the Compose module
 
@@ -139,9 +139,9 @@ Neither issue is changed by this MathCat PR; they are observations and a follow-
 
 ## Implementation status
 
-- `Source<T> = Reader<Unit,T>`: implemented in `mathcat-core/src/commonMain/.../reader/Source.kt`.
-- `Storage<T>` interface with primary `read()/write()`, derived `source()`, and standalone factories: implemented in `mathcat-core/src/commonMain/.../storage/Storage.kt`.
-- `Memory<T>`: implemented as a plain, non-observable backend in `mathcat-core/src/commonMain/.../storage/Memory.kt`.
+- `Source<T> = Reader<Unit,T>`: implemented in `toolkit-core/src/commonMain/.../reader/Source.kt`.
+- `Storage<T>` interface with primary `read()/write()`, derived `source()`, and standalone factories: implemented in `toolkit-core/src/commonMain/.../storage/Storage.kt`.
+- `Memory<T>`: implemented as a plain, non-observable backend in `toolkit-core/src/commonMain/.../storage/Memory.kt`.
 - Common tests cover live Source reads, memory writes, independent Memories behind one Storage, and Lens/Selection/Reader lifting; CI must establish which platform tasks have passed.
 - Compose adapter: **not implemented**. Putting Compose runtime into commonMain would compromise the minimal math core.
 - Recomposition and persistence are **not** contractual properties of plain `Storage<T>`.

@@ -1,12 +1,12 @@
 # Storage composition: products, sums, and embedding existing stores
 
-**MathCat 2.0 · research design · 18 November 2026 · Draft PR #2**  
+**ToolKit 2.0 · research design · 18 November 2026 · Draft PR #2**  
 **Status:** mathematical/API proposal only. No `x`, sum router, `Absorb`, `Mount`, or generalized composite class is implemented by this document.  
 **Existing code:** `core.storage.Storage<T>` with **`read()` and `write()`**, `Memory<T>`, `Storage * Reader/Lens/Selection`, `Storage.source()`.
 
 ## Why this matters
 
-Solyton's frontend already exposes a single `Storage<Application>` while actually keeping some state in Compose-observable memory and other state in ordinary, deliberately non-observable memory. It therefore assembles a **view of several existing independent stores**. MathCat should understand the mathematics without simply turning this particular frontend implementation into the generalized API.
+Solyton's frontend already exposes a single `Storage<Application>` while actually keeping some state in Compose-observable memory and other state in ordinary, deliberately non-observable memory. It therefore assembles a **view of several existing independent stores**. ToolKit should understand the mathematics without simply turning this particular frontend implementation into the generalized API.
 
 The design goal: **a composite keeps the identity of its constituent Storage handles**. No implicit copying, reinitializing or taking ownership of existing Memories. Reads consult them live; writes have an explicit routing policy. `Memory` is a single backend, not the definition of `Storage`.
 
@@ -143,7 +143,7 @@ To implement a switchable `Storage<Either<A,B>>` using both existing storages, w
 
 A sum of commands may be the practical first implementation. The generic `Storage<A+B>` algebra is deliberately **not implemented** until the operational semantics are agreed.
 
-The sibling `mathcat-type-algebra` module already treats sum and product as different type expressions; that AST is **not a runtime implementation** of the Storage sum/product operators.
+The sibling `toolkit-type-algebra` module already treats sum and product as different type expressions; that AST is **not a runtime implementation** of the Storage sum/product operators.
 
 ## 5. Compose: combine observation policies, not storage algebras
 
@@ -178,7 +178,7 @@ Two existing Storage handles admit a product-valued read/write composition, but 
 ## Decision log / migration boundary
 
 - **Confirmed:** keep `Storage<T>.read()` and `write(T)`. `source()` is a derived read projection. Keep existing handles alive and independently usable.
-- **Confirmed:** MathCat core stays Kotlin Multiplatform and Compose-free.
+- **Confirmed:** ToolKit core stays Kotlin Multiplatform and Compose-free.
 - **Candidate:** `Storage<A> x Storage<B> : Storage<Pair<A,B>>`, using existing Evoleq `x` vocabulary.
 - **Candidate:** product backing followed by `Storage * Lens` or `Storage * Selection` for a domain-specific view; explicit algebraic laws.
 - **Open:** whether the return type should use `Pair` or a later `Product2` type, how to support n-ary products ergonomically without huge tuples, and whether a general `Iso` can eliminate tedious wrapping.

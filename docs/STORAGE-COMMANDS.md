@@ -1,6 +1,6 @@
-# Reconciling the legacy Storage PR with MathCat's current core
+# Reconciling the legacy Storage PR with ToolKit's current core
 
-**2026-11-18.** Resolves the original, conflicted [PR #3](https://github.com/evoleq/mathcat/pull/3) against the linear MathCat master. The historical head was preserved on `archive/mathcat-pr3-before-reconcile-2026-11-18` before rewriting the PR branch.
+**2026-11-18.** Resolves the original, conflicted [PR #3](https://github.com/evoleq/mathcat/pull/3) against the linear ToolKit master. The historical head was preserved on `archive/toolkit-pr3-before-reconcile-2026-11-18` before rewriting the PR branch.
 
 ## Kept
 
@@ -14,7 +14,7 @@ Source<A> x Source<B> -> Source<Pair<A,B>>
 List<Source<A>>.emit() -> List<A>
 ```
 
-A `Dispatcher<A>` is a Writer over Unit, not a coroutine dispatcher. The `dispatch(command)` extension evaluates the Writer once. The separate `ActionDispatcher<S>` in `mathcat-actions` is suspending and may only **accept** an Action; it does not imply execution. They are intentionally distinct.
+A `Dispatcher<A>` is a Writer over Unit, not a coroutine dispatcher. The `dispatch(command)` extension evaluates the Writer once. The separate `ActionDispatcher<S>` in `toolkit-actions` is suspending and may only **accept** an Action; it does not imply execution. They are intentionally distinct.
 
 The `Storage * Writer` interpretation samples the **current** `Storage.read()` at dispatch time and writes the resulting value using `Storage.write()`. Constructing the Dispatcher does not evaluate the Writer or read Storage. It is a synchronous read–modify–write, **not atomic**, and offers no concurrency, rollback or thread-safety guarantee.
 
@@ -22,7 +22,7 @@ The `Storage * Writer` interpretation samples the **current** `Storage.read()` a
 
 ## Deliberately not kept
 
-The legacy `org.evoleq.mathcat.storage.Storage` data class and `mathcat-storage` module duplicate and conflict with the already integrated, more general `org.evoleq.mathcat.core.storage.Storage` **interface**. The interface remains the only Storage contract; an implementation may assemble multiple independently owned Memories.
+The legacy `evoleq.toolkit.storage.Storage` data class and `toolkit-storage` module duplicate and conflict with the already integrated, more general `evoleq.toolkit.core.storage.Storage` **interface**. The interface remains the only Storage contract; an implementation may assemble multiple independently owned Memories.
 
 No Ktor, Compose or coroutine dependency is introduced, and no Solyton code changes. Existing Source, Lens, Selection, Reader and Storage APIs are retained. Tests cover deferred and live execution, `Writer.contraMap`, product evaluation order, failures and existing Storage identity.
 

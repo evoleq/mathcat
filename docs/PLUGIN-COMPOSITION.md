@@ -1,4 +1,4 @@
-# Dynamically composed applications — a small MathCat plugin algebra
+# Dynamically composed applications — a small ToolKit plugin algebra
 
 **Research implementation, November 2026.** No general plugin framework
 or universal security system is claimed.
@@ -55,7 +55,7 @@ turned into a domain failure.
 
 ## 3. A real Prism at the runtime boundary
 
-The pure `Prism<S,A>` in `mathcat-core` exposes
+The pure `Prism<S,A>` in `toolkit-core` exposes
 
 ```text
 match : S -> A + S       (Left = matched)
@@ -125,7 +125,7 @@ A feature such as Shares or Banking can be built independently and expose
 the small exported JS contract. The host can discover and mount it without
 a host rebuild, using `containerId` as a first DOM integration seam.
 The host's full `Storage<Application>` and privileged action dispatcher
-are **not** exposed. An opt-in `mathcat-plugins-actions` adapter binds
+are **not** exposed. An opt-in `toolkit-plugins-actions` adapter binds
 typed `Action<S,I,O>` values and fixed internal route paths to allowlisted
 command keys, with a **separate grant set per plugin**.
 `JsModuleLoader` can expose these through a plain JavaScript callback ABI
