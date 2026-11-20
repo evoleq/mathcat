@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     id("com.android.kotlin.multiplatform.library")
     `maven-publish`
 }
@@ -28,6 +29,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":mathcat-type-algebra"))
+            api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

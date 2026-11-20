@@ -34,6 +34,26 @@ class PluginAlgebraTest {
     )
 
     @Test
+    fun manifestJsonRoundTripsAcrossAllKmpTargets() {
+        val original = PluginManifest(listOf(feature, base))
+        assertEquals(original, ParseManifest(original.toJson()))
+    }
+
+    @Test
+    fun discoverUsesFreshManifestAndComposesWithKleisliResolution() = runTest {
+        var catalog = PluginManifest(listOf(base))
+        val live = PluginCatalog { catalog }
+        val discovery = Discover(live, PluginTarget.JS, host)
+        assertEquals(listOf(base.id),
+            assertIs<Sum2.Right<PluginPlan>>(discovery.run(setOf(base.id))).value.ordered.map { it.id }
+        )
+        catalog = PluginManifest(listOf(feature, base))
+        assertEquals(listOf(base.id, feature.id),
+            assertIs<Sum2.Right<PluginPlan>>(discovery.run(setOf(feature.id))).value.ordered.map { it.id }
+        )
+    }
+
+    @Test
     fun dependencyPlanningIsPureStableAndPlacesDependenciesBeforeDependents() {
         val catalog = PluginManifest(listOf(feature, base))
         val result = Plan(catalog, setOf(feature.id), PluginTarget.JS, host)
