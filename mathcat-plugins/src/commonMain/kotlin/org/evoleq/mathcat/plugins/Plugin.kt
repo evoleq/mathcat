@@ -98,6 +98,7 @@ sealed interface PluginFailure {
     data class MissingCapabilities(val id: PluginId, val missing: Set<String>) : PluginFailure
     data class MissingArtifact(val id: PluginId, val target: PluginTarget) : PluginFailure
     data class CatalogFailed(val message: String) : PluginFailure
+    data class SlotSelectionMismatch(val current: Set<PluginId>, val requested: Set<PluginId>) : PluginFailure
     data class LoadingFailed(val id: PluginId, val message: String) : PluginFailure
     data class ActivationFailed(val id: PluginId, val message: String) : PluginFailure
     data class CleanupFailed(val id: PluginId, val message: String) : PluginFailure
