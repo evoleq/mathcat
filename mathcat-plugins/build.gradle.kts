@@ -29,6 +29,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":mathcat-type-algebra"))
+            api(project(":mathcat-core"))
             api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
         }
         commonTest.dependencies {

@@ -85,7 +85,8 @@
     },
     "mathcat-plugins": {
       "requires": {
-        "mathcat-type-algebra": "same-release"
+        "mathcat-type-algebra": "same-release",
+        "mathcat-core": "same-release"
       },
       "publication": "kmp"
     },
