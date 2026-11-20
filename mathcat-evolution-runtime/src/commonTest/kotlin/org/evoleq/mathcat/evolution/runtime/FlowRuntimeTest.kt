@@ -1,6 +1,7 @@
 package org.evoleq.mathcat.evolution.runtime
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
@@ -18,6 +19,7 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFailsWith
 
 /** Every test is an example of a lifecycle invariant, not a timing benchmark. */
+@OptIn(ExperimentalCoroutinesApi::class)
 class FlowRuntimeTest {
     private sealed interface Event {
         data object Start : Event
