@@ -2,6 +2,7 @@ package org.evoleq.mathcat.plugins
 
 import org.evoleq.mathcat.types.Sum2
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 /**
  * A portable description of a runtime plugin. The manifest is data, not

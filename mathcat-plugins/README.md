@@ -50,7 +50,7 @@ not transactional rollback, atomic update or security isolation.
       "requiredCapabilities": ["navigation"],
       "dependencies": [],
       "artifacts": {
-        "JS": {"uri": "/plugins/shares.a3b1c2d3.mjs", "sha256": null}
+        "JS": {"uri": "/plugins/shares.a3b1c2d3.js", "sha256": null}
       }
     }
   ]
@@ -60,7 +60,7 @@ not transactional rollback, atomic update or security isolation.
 The schema is round-tripped on all supported targets using Kotlin
 serialization (`ParseManifest(json)` and `manifest.toJson()`).
 `HttpPluginCatalog` revalidates the manifest using `fetch(...,
-{cache:'no-cache'})`; the module filename itself should be content-hashed
+{cache:'no-cache'})`; the module filename itself should be content-hashed (the existing Solyton Nginx immutable-cache rule covers hashed *.js and *.css, not *.mjs)
 and served with `Cache-Control: public, max-age=31536000, immutable`.
 Keep the old hashed file available for existing browser sessions until a
 controlled reload/upgrade.
