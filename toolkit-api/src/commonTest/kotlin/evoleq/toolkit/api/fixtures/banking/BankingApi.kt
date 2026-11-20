@@ -1,7 +1,7 @@
-package org.evoleq.mathcat.api.fixtures.banking
+package evoleq.toolkit.api.fixtures.banking
 
-import org.evoleq.mathcat.api.Api
-import org.evoleq.mathcat.api.EmptyParams
+import evoleq.toolkit.api.Api
+import evoleq.toolkit.api.EmptyParams
 
 class ReadAccount
 class Account

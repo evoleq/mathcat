@@ -1,6 +1,6 @@
-package org.evoleq.mathcat.api
+package evoleq.toolkit.api
 
-import org.evoleq.mathcat.core.reader.Reader
+import evoleq.toolkit.core.reader.Reader
 import kotlin.reflect.KClass
 
 

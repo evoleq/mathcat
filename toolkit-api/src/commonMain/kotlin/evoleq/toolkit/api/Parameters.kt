@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.api
+package evoleq.toolkit.api
 
 /**
  * The pure query-parameter value contract used by the original Api.get DSL.

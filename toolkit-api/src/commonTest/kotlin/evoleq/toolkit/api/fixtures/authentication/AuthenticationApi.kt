@@ -1,6 +1,6 @@
-package org.evoleq.mathcat.api.fixtures.authentication
+package evoleq.toolkit.api.fixtures.authentication
 
-import org.evoleq.mathcat.api.Api
+import evoleq.toolkit.api.Api
 
 class Login
 class LoggedIn
