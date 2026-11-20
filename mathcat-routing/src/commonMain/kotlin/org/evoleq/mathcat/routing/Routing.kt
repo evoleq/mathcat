@@ -44,13 +44,13 @@ sealed interface RouteError {
  */
 @RoutingDsl
 class RoutesConfiguration internal constructor(
-    private val path: List<Segment> = emptyList(),
-    private val inheritedGrants: Set<String> = emptySet(),
-    private val inheritedLayouts: List<String> = emptyList(),
-    private val definitions: MutableList<RouteDefinition> = mutableListOf()
+    private val path: List<Segment> = emptyList()
 ) {
+    private var routeName: String? = null
     private val grants = mutableSetOf<String>()
     private val layouts = mutableListOf<String>()
+    private val children = mutableListOf<RoutesConfiguration>()
+    private val fragments = mutableListOf<Routes>()
 
     fun requires(vararg permissions: String) {
         require(permissions.all { it.isNotBlank() }) { "Permissions must be nonempty" }
@@ -65,26 +65,19 @@ class RoutesConfiguration internal constructor(
 
     fun name(name: String) {
         require(name.isNotBlank()) { "Route name must not be empty" }
-        definitions.add(RouteDefinition(name, path,
-            inheritedGrants + grants, inheritedLayouts + layouts))
+        require(routeName == null) { "A route may have only one name" }
+        routeName = name
     }
 
     fun route(pattern: String, configure: RoutesConfiguration.() -> Unit) {
-        val pieces = parsePattern(pattern)
-        val child = RoutesConfiguration(path + pieces, inheritedGrants + grants,
-            inheritedLayouts + layouts, definitions)
+        val child = RoutesConfiguration(path + parsePattern(pattern))
         child.configure()
+        children.add(child)
     }
 
     /** Module fragments can be composed beneath the current prefix. */
     fun include(fragment: Routes) {
-        for (definition in fragment.definitions) {
-            definitions.add(definition.copy(
-                segments = path + definition.segments,
-                requires = inheritedGrants + grants + definition.requires,
-                layouts = inheritedLayouts + layouts + definition.layouts
-            ))
-        }
+        fragments.add(fragment)
     }
 
     /** Configuration-time condition; never a substitute for an auth guard. */
@@ -92,7 +85,24 @@ class RoutesConfiguration internal constructor(
         if (environment.lowercase() !in setOf("p", "prod", "production")) route(pattern, configure)
     }
 
-    internal fun done(): Routes = Routes(definitions.toList())
+    private fun collect(grantsFromParent: Set<String>, layoutsFromParent: List<String>): List<RouteDefinition> {
+        val allGrants = grantsFromParent + grants
+        val allLayouts = layoutsFromParent + layouts
+        val own = routeName?.let { listOf(RouteDefinition(it, path, allGrants, allLayouts)) }
+            ?: emptyList()
+        val included = fragments.flatMap { fragment ->
+            fragment.definitions.map { definition ->
+                definition.copy(
+                    segments = path + definition.segments,
+                    requires = allGrants + definition.requires,
+                    layouts = allLayouts + definition.layouts
+                )
+            }
+        }
+        return own + included + children.flatMap { it.collect(allGrants, allLayouts) }
+    }
+
+    internal fun done(): Routes = Routes(collect(emptySet(), emptyList()))
 }
 
 /** Strictly validate patterns; support both {name} and legacy :name. */
