@@ -67,6 +67,18 @@ For the JS tests, Kotlin/Gradle downloads the required Node.js environment when 
 
 **Platform targets:** Both modules declare JVM, JavaScript/Node.js, WebAssembly/Node.js, Android, Linux, Windows, iOS and macOS. The [platform matrix](docs/MULTIPLATFORM.md) specifies exact architectures, host requirements and what CI really verifies. **CI validates all integrated modules and publishes no artifacts to Maven Central.** Experimental JitPack publication of tagged source is available on demand, but remote JitPack and cross-platform artifact verification are still pending. The final license remains open.
 
+## Runtime-composable plugins (new research slice)
+
+The independently published [`mathcat-plugins`](mathcat-plugins) MPP module
+offers **pure deterministic dependency planning** followed by a Kleisli
+composition of effectful discovery, loading and activation. Platform adapters
+are located in `jvmMain` (local JAR + SHA-256 + ServiceLoader) and `jsMain`
+(ES-module `import()` + fresh HTTP manifest). Other targets can plan/validate
+but do not claim a dynamic executable loader. No security sandbox or automatic
+version-skew compatibility is implied.
+
+See [Runtime Plugin Architecture](docs/PLUGIN-COMPOSITION.md).
+
 ## Earlier MathCat experiments
 
 The earlier MathCat libraries remain separate and are **not** implied dependencies of the new module. They are useful historical references; their API quality and contracts are being reassessed before any potential migration.
