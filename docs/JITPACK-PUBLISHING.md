@@ -1,6 +1,6 @@
 # Experimental modular publishing through JitPack
 
-MathCat 2.0 remains experimental (0.x). GitHub CI/annotated SemVer tags
+ToolKit 2.0 remains experimental (0.x). GitHub CI/annotated SemVer tags
 are the **source-release gate**. JitPack builds tagged sources **on demand**;
 creating a GitHub release does not prove any Maven artifact was built.
 
@@ -20,15 +20,15 @@ dependencyResolutionManagement {
 Then use a **real tag with a successful JitPack build** (illustrative):
 
 ```kotlin
-implementation("com.github.evoleq.mathcat:mathcat-core:v0.2.0")
-implementation("com.github.evoleq.mathcat:mathcat-actions:v0.2.0")
+implementation("com.github.evoleq.mathcat:toolkit-core:v0.2.0")
+implementation("com.github.evoleq.mathcat:toolkit-actions:v0.2.0")
 ```
 
-The publishable modules are `mathcat-type-algebra`, `mathcat-core`, `mathcat-store`, `mathcat-actions`, `mathcat-api`, `mathcat-result`, `mathcat-serialization`, `mathcat-ktorx`, `mathcat-context`, `mathcat-transform` and `mathcat-serialization-ksp`. The `mathcat-serialization-ksp-fixture` is test-only and is **not** published.
+The publishable modules are `toolkit-type-algebra`, `toolkit-core`, `toolkit-store`, `toolkit-actions`, `toolkit-api`, `toolkit-result`, `toolkit-serialization`, `toolkit-ktorx`, `toolkit-context`, `toolkit-transform` and `toolkit-serialization-ksp`. The `toolkit-serialization-ksp-fixture` is test-only and is **not** published.
 Kotlin Multiplatform publishes root and target-specific Maven modules;
 the root publication selects a suitable platform variant. Gradle
-transitively resolves internal dependencies, including `mathcat-actions`
-to `mathcat-store` and `mathcat-core`.
+transitively resolves internal dependencies, including `toolkit-actions`
+to `toolkit-store` and `toolkit-core`.
 
 ## Release coordinates and environment
 

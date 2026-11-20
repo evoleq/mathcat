@@ -56,7 +56,7 @@ A router may be a subautomaton with its own **pure phase transition function** w
 A small host-owned closure may retain current automaton state, one serialized event inlet, operation generation IDs and effect handles. The transition function remains externally testable:
 
 ```kotlin
-// Illustrative architecture — NOT existing MathCat API.
+// Illustrative architecture — NOT existing ToolKit API.
 val runtime = ApplicationFlow(
     initial = AppPhase.Initial,
     store = existingStore,
@@ -86,11 +86,11 @@ The closure is **stateful**, not pure; only `transition` is pure. Avoid naming t
 
 **F2 — closure-owned event loop.** Implement the smallest runner that can execute the same reducer type, with host-owned scope and explicit stop. Tests: serialization, cancellation, backpressure, failure, no second load for same active plugin, stale completion protection, and no post-stop commands.
 
-**F3 — integrate routing as subautomaton.** Route navigation events through the Application Flow; let the router return commands for browser history, permission checks and optional MathCat `AccessPlugin`. Do not silently promote the route registry into Application domain data.
+**F3 — integrate routing as subautomaton.** Route navigation events through the Application Flow; let the router return commands for browser history, permission checks and optional ToolKit `AccessPlugin`. Do not silently promote the route registry into Application domain data.
 
 **F4 — integrate Compose Store.** Bind Compose observation and a single application-owned processor to the Flow, not to the `Store` constructor. Demonstrate recomposition, teardown, owner-key changes and cancellation.
 
-**Extraction gate:** Name and publish a small `mathcat-evolution` module only after both examples demonstrate that sharing the reducer/runner saves complexity. Otherwise keep the reducers local to adapters.
+**Extraction gate:** Name and publish a small `toolkit-evolution` module only after both examples demonstrate that sharing the reducer/runner saves complexity. Otherwise keep the reducers local to adapters.
 
 ## Executable specification
 

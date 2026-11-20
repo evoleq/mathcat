@@ -1,8 +1,8 @@
-# MathCat — Multiplatform architecture and verification
+# ToolKit — Multiplatform architecture and verification
 
 **Date:** 2026-11-18 · **Status:** Draft (platform verification underway) · **PR:** [#2](https://github.com/evoleq/mathcat/pull/2)
 
-MathCat's `mathcat-core` and `mathcat-type-algebra` modules deliberately share one supported-target declaration. All mathematical primitives are in `commonMain`; neither module includes Android, Apple, web browser, platform IO, Compose, or JVM-only runtime code.
+ToolKit's `toolkit-core` and `toolkit-type-algebra` modules deliberately share one supported-target declaration. All mathematical primitives are in `commonMain`; neither module includes Android, Apple, web browser, platform IO, Compose, or JVM-only runtime code.
 
 ## Target and CI matrix
 

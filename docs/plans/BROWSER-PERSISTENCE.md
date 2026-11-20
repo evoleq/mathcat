@@ -14,7 +14,7 @@ Ziel ist **eine kleine funktionale Schnittstelle für Browser-Persistenz**, kein
 | `HttpOnly`-Session-Cookie | Vom **Server** verwaltete Authentifizierung | Für Browser-JS absichtlich **unsichtbar**, daher **kein** KeyValuePort |
 | IndexedDB | Größere strukturierte Daten, Offline-Entwürfe | Asynchrone Transaktionen/Migrationen; eigene Schnittstelle statt Web-Storage-Wrapper |
 
-Wichtig: MathCats synchrones `Storage<S>` ist **nicht** die identische Abstraktion wie persistente Browser-Speicherung. Die erste hat `read/write`, die zweite kann fehlschlagen und besitzt einen externen Lebenszyklus.
+Wichtig: ToolKits synchrones `Storage<S>` ist **nicht** die identische Abstraktion wie persistente Browser-Speicherung. Die erste hat `read/write`, die zweite kann fehlschlagen und besitzt einen externen Lebenszyklus.
 
 ## 2. Konkrete Beobachtungen in Solyton
 
@@ -28,10 +28,10 @@ Diese Beobachtungen sind **kein Nachweis eines konkreten Vorfalls**, aber gute R
 
 ## 3. Kleiner gemeinsamer Vertrag
 
-Ein Vorschlag für eine **optionale** `mathcat-browser-storage`-Bibliothek (nicht Bestandteil von `mathcat-core`):
+Ein Vorschlag für eine **optionale** `toolkit-browser-storage`-Bibliothek (nicht Bestandteil von `toolkit-core`):
 
 ```kotlin
-// Beispielentwurf; noch keine öffentliche MathCat-API.
+// Beispielentwurf; noch keine öffentliche ToolKit-API.
 sealed interface PersistenceError {
     data object Unavailable : PersistenceError
     data object Denied : PersistenceError
@@ -83,7 +83,7 @@ Für **Client-Preferences** einen expliziten Cookie-Port mit `Path`, `SameSite`,
 
 **Authentifizierung:** `HttpOnly`-Cookies dürfen durch JS weder gelesen noch gesetzt werden. Deshalb erfolgt Session-Management über HTTP/Backend-Verträge, inklusive CSRF-Schutz, Cookie-Lifetime, Session-Rotation und Logout. Das Umstellen von Solytons Token-Speicherung darf **keine Nebenwirkung** des generischen Speicher-Refactors sein. OWASP rät ausdrücklich davon ab, Session-IDs/Secrets in JavaScript-zugänglichen Web-Storage-Objekten abzulegen.
 
-**Consent** ist eine Anwendungspolitik, keine Eigenschaft einer FP-Struktur. MathCat darf keine globale Einwilligungsentscheidung vorgeben.
+**Consent** ist eine Anwendungspolitik, keine Eigenschaft einer FP-Struktur. ToolKit darf keine globale Einwilligungsentscheidung vorgeben.
 
 ## 5. Zuständigkeit: außen der Application-Flow
 

@@ -6,7 +6,7 @@ Die Browser-Datenbank ist kein großer `localStorage`-Wrapper. IndexedDB besitzt
 
 ## 1. Ein schmaler, semantisch korrekter Port
 
-Ein möglicher zweiter, optionaler Adapter `mathcat-indexeddb` verwendet ein MPP-Daten-/Query-Modell und einen JS-Interpreter. Andere Targets können reine Query-Planer und Tests verwenden, ohne einen Native-IndexedDB-Treiber vorzutäuschen.
+Ein möglicher zweiter, optionaler Adapter `toolkit-indexeddb` verwendet ein MPP-Daten-/Query-Modell und einen JS-Interpreter. Andere Targets können reine Query-Planer und Tests verwenden, ohne einen Native-IndexedDB-Treiber vorzutäuschen.
 
 ```kotlin
 // Skizze, keine vorhandene API.

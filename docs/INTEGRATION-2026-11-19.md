@@ -1,4 +1,4 @@
-# Consolidation of MathCat API, Result, serialization, Ktor and publishing
+# Consolidation of ToolKit API, Result, serialization, Ktor and publishing
 
 This branch integrates original, stacked feature PRs #8–#14, on top of the already
 merged SemVer/compatibility work #15, with JitPack setup from #16.
@@ -6,17 +6,17 @@ Research designs from #7 are included as **research**, not as frozen APIs.
 
 ## Canonical module ownership
 
-- `mathcat-api` — original `Api` / `EndPoint` DSL, modular API composition (#8).
-- `mathcat-result` — portable Result algebra and exception policies (#10).
-- `mathcat-serialization` — feature-composable registry + legacy Result JSON (#9/#12).
-- `mathcat-serialization-ksp` — optional KSP registration generator (#9).
-- `mathcat-serialization-ksp-fixture` — test-only consumer (not published).
-- `mathcat-ktorx` — Ktor client/server binding (#11), Solyton-style KtorIO
+- `toolkit-api` — original `Api` / `EndPoint` DSL, modular API composition (#8).
+- `toolkit-result` — portable Result algebra and exception policies (#10).
+- `toolkit-serialization` — feature-composable registry + legacy Result JSON (#9/#12).
+- `toolkit-serialization-ksp` — optional KSP registration generator (#9).
+- `toolkit-serialization-ksp-fixture` — test-only consumer (not published).
+- `toolkit-ktorx` — Ktor client/server binding (#11), Solyton-style KtorIO
   and typed Result client (#14).
-- `mathcat-context` — canonical server Contextual (JVM-only, Ktor-free, #13).
-- `mathcat-transform` — pure Result and Contextual transformations
+- `toolkit-context` — canonical server Contextual (JVM-only, Ktor-free, #13).
+- `toolkit-transform` — pure Result and Contextual transformations
   (JVM-only, Ktor-free, #13). KtorIO delegates its pure steps to this module.
-- `mathcat-ktorx.Contextual` stays a source alias to `mathcat-context.Contextual`.
+- `toolkit-ktorx.Contextual` stays a source alias to `toolkit-context.Contextual`.
   Client Contextual is intentionally distinct (no authenticated user UUID).
 
 ## Architecture and deferred design

@@ -1,14 +1,14 @@
 # Stable @Composable Store — implementation plan
 
 **2026-11-20 · Plan, not an implementation.**  
-**Proposed artifact:** optional `mathcat-compose` MPP module.  
+**Proposed artifact:** optional `toolkit-compose` MPP module.  
 **Fundamental decision:** the **automaton surrounds the Store**; the Store does not start, own or manage it.
 
-## What MathCat already has
+## What ToolKit already has
 
-- `mathcat-core`: `Storage<S>` with synchronous `read/write`, `Storage * Lens`.
-- `mathcat-store`: `Store<S,D>` as a pairing of existing storage and dispatcher capabilities, without new Memory allocation or coroutines.
-- `mathcat-actions`: `Store<S, ActionDispatcher<S>> * Lens<S,A>` for consistent state and action projection.
+- `toolkit-core`: `Storage<S>` with synchronous `read/write`, `Storage * Lens`.
+- `toolkit-store`: `Store<S,D>` as a pairing of existing storage and dispatcher capabilities, without new Memory allocation or coroutines.
+- `toolkit-actions`: `Store<S, ActionDispatcher<S>> * Lens<S,A>` for consistent state and action projection.
 
 The [legacy Evoleq `@Composable Store`](https://github.com/doctor-smith/solawi-bid/blob/main/evoleq/src/jsMain/kotlin/org/evoleq/compose/storage/store.kt) is already a concise receiver DSL. Keep that ergonomic surface. Its implementation must **not** grow an implicit action-processor/automaton.
 
@@ -25,7 +25,7 @@ In [Solyton's existing `Storage<Application>`](https://github.com/doctor-smith/s
                     |
                     | optional adapter
                     v
-            mathcat-compose         <- snapshot observation, receiver UI
+            toolkit-compose         <- snapshot observation, receiver UI
                     |
                     v
                Compose UI
@@ -69,7 +69,7 @@ These names/types are **illustrative only**. Finalize after a working Compose HT
 - **Coroutine ownership:** the outer Application Flow's structured interpreter maintains at most one owned processor, cancels it on owner disposal, and doesn't duplicate subscriptions on recomposition.
 - **Effects:** dispatch acknowledgement vs completion, failures, retries and process lifetime must be documented. Cancellation remains cancellation.
 - **UI lifecycle:** test subtree mount/unmount, login/logout, changed owner keys and nested Lens-based page views.
-- **Isolation:** common MathCat code remains Compose-free; new compiler/runtime dependencies are pinned in `gradle/libs.versions.toml` only after compatibility with the current Kotlin version has been verified.
+- **Isolation:** common ToolKit code remains Compose-free; new compiler/runtime dependencies are pinned in `gradle/libs.versions.toml` only after compatibility with the current Kotlin version has been verified.
 
 ## Delivery sequence
 
