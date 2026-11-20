@@ -57,6 +57,8 @@ jobs:
             :mathcat-middleware:wasmJsNodeTest :mathcat-middleware:linuxX64Test \
             :mathcat-plugins:jvmTest :mathcat-plugins:jsNodeTest \
             :mathcat-plugins:wasmJsNodeTest :mathcat-plugins:linuxX64Test \
+            :mathcat-plugins-actions:jvmTest :mathcat-plugins-actions:jsNodeTest \
+            :mathcat-plugins-actions:wasmJsNodeTest :mathcat-plugins-actions:linuxX64Test \
             :mathcat-serialization-ksp-fixture:test :mathcat-context:test :mathcat-transform:test
 
   android:
@@ -78,7 +80,7 @@ jobs:
         with:
           gradle-version: '9.2.1'
       - name: Compile Android KMP targets
-        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-api:compileAndroidMain :mathcat-result:compileAndroidMain :mathcat-serialization:compileAndroidMain :mathcat-ktorx:compileAndroidMain :mathcat-middleware:compileAndroidMain :mathcat-plugins:compileAndroidMain
+        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-api:compileAndroidMain :mathcat-result:compileAndroidMain :mathcat-serialization:compileAndroidMain :mathcat-ktorx:compileAndroidMain :mathcat-middleware:compileAndroidMain :mathcat-plugins:compileAndroidMain :mathcat-plugins-actions:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
@@ -120,7 +122,10 @@ jobs:
             :mathcat-middleware:macosX64Test \
             :mathcat-plugins:compileKotlinIosArm64 \
             :mathcat-plugins:compileKotlinIosSimulatorArm64 \
-            :mathcat-plugins:macosX64Test
+            :mathcat-plugins:macosX64Test \
+            :mathcat-plugins-actions:compileKotlinIosArm64 \
+            :mathcat-plugins-actions:compileKotlinIosSimulatorArm64 \
+            :mathcat-plugins-actions:macosX64Test
 
   windows:
     name: Windows Native
@@ -136,7 +141,7 @@ jobs:
           gradle-version: '9.2.1'
       - name: Test mingwX64
         shell: pwsh
-        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-api:mingwX64Test :mathcat-result:mingwX64Test :mathcat-serialization:mingwX64Test :mathcat-ktorx:mingwX64Test :mathcat-middleware:mingwX64Test :mathcat-plugins:mingwX64Test
+        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-api:mingwX64Test :mathcat-result:mingwX64Test :mathcat-serialization:mingwX64Test :mathcat-ktorx:mingwX64Test :mathcat-middleware:mingwX64Test :mathcat-plugins:mingwX64Test :mathcat-plugins-actions:mingwX64Test
   
   publication:
     name: Publish JVM variants and compile an external consumer
@@ -176,6 +181,8 @@ jobs:
             :mathcat-middleware:publishJvmPublicationToMavenLocal \
             :mathcat-plugins:publishKotlinMultiplatformPublicationToMavenLocal \
             :mathcat-plugins:publishJvmPublicationToMavenLocal \
+            :mathcat-plugins-actions:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-plugins-actions:publishJvmPublicationToMavenLocal \
             :mathcat-context:publishToMavenLocal \
             :mathcat-transform:publishToMavenLocal \
             :mathcat-serialization-ksp:publishToMavenLocal

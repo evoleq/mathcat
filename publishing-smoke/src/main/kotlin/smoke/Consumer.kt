@@ -17,3 +17,6 @@ fun serializationLookup(registry: org.evoleq.mathcat.serialization.Serializers):
 
 // Plugin manifest API is available independently of MathCat sources.
 fun pluginId(): String = org.evoleq.mathcat.plugins.PluginId("banking").value
+
+// Independent publication of the optional host capability adapter.
+fun routeName(): String = org.evoleq.mathcat.plugins.actions.PluginRoute("shares.home", "/app/shares").key

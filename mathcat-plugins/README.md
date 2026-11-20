@@ -38,6 +38,38 @@ sessions then unloads handles, both in reverse dependency order. If an
 activation fails it attempts reverse-order cleanup. This is *best effort*,
 not transactional rollback, atomic update or security isolation.
 
+## On-demand access: Prism match/build + Kleisli loading
+
+The common `mathcat-core` Prism provides **pure** `match` and `build`.
+`LoadedPlugin: Prism<PluginSlot, PluginSlot.Loaded>` selects the loaded
+case of the sum `Missing + Loaded`. On a miss, we interpret a new effect:
+
+```kotlin
+var slot: PluginSlot = PluginSlot.Missing
+val access = MatchPlugin() * LoadIfMissing(
+    selection = setOf(PluginId("shares")),
+    catalog = catalog,
+    loader = loader,
+    target = PluginTarget.JS,
+    host = host
+)
+
+// run only when the feature is requested:
+when (val result = access.run(slot)) {
+    is Sum2.Left -> report(result.value)
+    is Sum2.Right -> slot = result.value
+}
+```
+
+On a hit, the stored deployment is returned **without reloading or
+fetching the manifest**. On a miss, the Kleisli stage performs
+`Discover * Activate` and then injects the activated result through
+`LoadedPlugin.build(...)`. The slot represents **one explicit selection
+set**: a different selection yields `SlotSelectionMismatch` rather than
+silently discarding live resources. The host owns and serializes slot updates,
+must dispose the deployment on shutdown, and must not assume atomic
+multi-plugin upgrades or concurrent access.
+
 ## Manifest schema
 
 ```json
@@ -87,10 +119,22 @@ export async function activate(host) {
 ```
 
 The host passes a plain object `{hostApi,capabilities,properties}`.
-Only declared capability **names** are exposed in v1; callable dispatch,
-routing, storage and auth bridges need an explicit, typed, permissioned
-host-to-plugin protocol in a later slice. A plugin can still mount a
-self-contained UI on an agreed DOM element today.
+Optional **host-owned, scoped** callbacks are now available: construct
+`JsModuleLoader(callbacks = bridge, callbackScope = scope)` with a
+`CoroutineScope` belonging to the host. If the manifest requests and the
+host supports `actions` or `navigation`, the plugin receives a plain JS
+`host.actions.dispatch(key): Promise<boolean>` and/or
+`host.navigation.navigate(key): Promise<boolean>`. Each invocation is
+checked against host-side, plugin-specific grants, not merely the manifest.
+
+The independent `mathcat-plugins-actions` MPP module provides
+`ActionNavigationBridge`, `BindAction`, `BindEnvelope`,
+`PluginRoute` and `PluginGrant`. The adapter holds the typed MathCat
+Actions and maps pre-approved navigation keys to host-controlled paths.
+The plugin never receives `Storage<Application>` or raw
+`ActionDispatcher<Application>`. Runtime action permissions and route
+permissions are enforced at the host adapter; this is not a replacement for
+authentication or server-side authorization.
 
 Kotlin/JS can compile plugin implementations to JavaScript, but use an
 explicit exported JS ABI. Do not assume arbitrary separately built Kotlin
@@ -102,6 +146,26 @@ Dynamic ES modules cannot be unloaded from the browser's module registry:
 than implying authenticity. Content hashes in filenames are for cache
 invalidation, not cryptographic verification. Use trusted origins and
 normal CSP/SRI policies where feasible.
+
+### Plugin-side JavaScript commands
+
+```js
+export const id = "shares";
+export const version = "1.0.0";
+
+export async function activate(host) {
+  if (host.actions) {
+    const dispatched = await host.actions.dispatch("shares.refresh");
+    if (!dispatched) throw Error("Host denied the action");
+  }
+  if (host.navigation) await host.navigation.navigate("shares.home");
+  return { dispose() {} };
+}
+```
+
+The **host** must bind `shares.refresh` to an actual typed `Action` and
+`shares.home` to an internal route; unrecognized or ungranted names are
+rejected. Dispatch acknowledgement is not action completion.
 
 ## JVM JAR ABI
 
@@ -144,4 +208,5 @@ ordered activation, reverse disposal and failed-activation cleanup.
 record, SHA-256 acceptance/rejection and successful service activation.
 
 `JsModuleLoaderTest`: actual Node ES-module `import()` from a data URL
-with JS identity/version handshake and activation/disposal.
+with JS identity/version handshake and activation/disposal, including
+optional asynchronously authorized Action and navigation calls.

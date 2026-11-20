@@ -88,6 +88,13 @@
         "mathcat-type-algebra": "same-release"
       },
       "publication": "kmp"
+    },
+    "mathcat-plugins-actions": {
+      "requires": {
+        "mathcat-plugins": "same-release",
+        "mathcat-actions": "same-release"
+      },
+      "publication": "kmp"
     }
   }
 }
