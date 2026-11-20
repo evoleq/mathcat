@@ -1,4 +1,4 @@
-# External build and library versions only. MathCat's release version is
+# External build and library versions only. ToolKit's release version is
 # managed by the repository-wide SemVer tool, not this catalog.
 [versions]
 kotlin = "2.3.20"

@@ -1,4 +1,4 @@
-// Completely separate consumer build: no project() references to MathCat.
+// Completely separate consumer build: no project() references to ToolKit.
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -13,4 +13,4 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "mathcat-publishing-smoke"
+rootProject.name = "toolkit-publishing-smoke"

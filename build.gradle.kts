@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.android.kmp.library) apply false
 }
 
-// All MathCat modules currently share one verified repository release version.
+// All ToolKit modules currently share one verified repository release version.
 // Passing a release version is explicit; ordinary local builds are snapshots.
 // JitPack exposes individual modules under com.github.<owner>.<repository>.
 // Match the group on every publication so internal dependencies resolve.

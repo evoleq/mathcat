@@ -56,13 +56,13 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$next" "$TESTED_SHA" -m "MathCat $next (CI verified)"
+          git tag -a "$next" "$TESTED_SHA" -m "ToolKit $next (CI verified)"
           git push origin "refs/tags/$next"
 
           python3 scripts/release.py record \
             --plan build/release-plan.json --ci-run "$CI_RUN" \
             --output "build/$next-compatibility.json"
           gh release create "$next" "build/$next-compatibility.json" \
-            --title "MathCat $next" \
+            --title "ToolKit $next" \
             --notes "CI-verified source release. See the attached compatibility record for exact module versions and evidence. This workflow does not publish Maven artifacts."
           echo "Tagged $next at $TESTED_SHA and attached compatibility record."
