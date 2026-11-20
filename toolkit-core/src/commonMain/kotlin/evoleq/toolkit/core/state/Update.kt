@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.state
+package evoleq.toolkit.core.state
 
 /**
  * Construct a state-changing Kleisli arrow that preserves the value it receives.

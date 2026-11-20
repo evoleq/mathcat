@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.state
+package evoleq.toolkit.core.state
 
 /**
  * Monad unit / return for the state type constructor T_S(A) = S -> (A, S).

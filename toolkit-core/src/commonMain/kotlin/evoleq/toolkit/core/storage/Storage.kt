@@ -1,11 +1,11 @@
-package org.evoleq.mathcat.core.storage
+package evoleq.toolkit.core.storage
 
-import org.evoleq.mathcat.core.optics.Lens
-import org.evoleq.mathcat.core.optics.Selection
-import org.evoleq.mathcat.core.reader.Reader
-import org.evoleq.mathcat.core.reader.Source
-import org.evoleq.mathcat.core.reader.emit
-import org.evoleq.mathcat.core.writer.Writer
+import evoleq.toolkit.core.optics.Lens
+import evoleq.toolkit.core.optics.Selection
+import evoleq.toolkit.core.reader.Reader
+import evoleq.toolkit.core.reader.Source
+import evoleq.toolkit.core.reader.emit
+import evoleq.toolkit.core.writer.Writer
 
 /**
  * Synchronous read/write boundary for a value S.

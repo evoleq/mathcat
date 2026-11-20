@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.state
+package evoleq.toolkit.core.state
 
 /**
  * Construct a pure State that returns the current state without changing it:

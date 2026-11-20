@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.reader
+package evoleq.toolkit.core.reader
 
 /**
  * A Reader with no meaningful external input: Source<A> = Reader<Unit,A>.

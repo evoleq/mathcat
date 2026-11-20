@@ -1,8 +1,8 @@
-package org.evoleq.mathcat.core.storage
+package evoleq.toolkit.core.storage
 
-import org.evoleq.mathcat.core.reader.Source
-import org.evoleq.mathcat.core.writer.Dispatcher
-import org.evoleq.mathcat.core.writer.Writer
+import evoleq.toolkit.core.reader.Source
+import evoleq.toolkit.core.writer.Dispatcher
+import evoleq.toolkit.core.writer.Writer
 
 /**
  * Interpret an S-state Writer through a live Storage as a synchronous

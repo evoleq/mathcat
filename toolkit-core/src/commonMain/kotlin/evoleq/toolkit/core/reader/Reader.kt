@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.reader
+package evoleq.toolkit.core.reader
 
 /**
  * A pure, nominal reader from [S] to [A].

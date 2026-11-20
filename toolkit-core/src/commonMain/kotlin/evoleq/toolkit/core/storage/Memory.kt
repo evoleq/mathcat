@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.storage
+package evoleq.toolkit.core.storage
 
 /**
  * A plain mutable, non-observable in-memory Storage implementation.

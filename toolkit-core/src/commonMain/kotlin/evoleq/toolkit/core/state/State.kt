@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.state
+package evoleq.toolkit.core.state
 
 /**
  * A stateful Kleisli arrow: given an input [A], produce a pure state computation

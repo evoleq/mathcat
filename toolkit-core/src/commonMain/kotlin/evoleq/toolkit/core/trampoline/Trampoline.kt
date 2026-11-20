@@ -1,4 +1,4 @@
-package org.evoleq.mathcat.core.trampoline
+package evoleq.toolkit.core.trampoline
 
 /**
  * A deferred, stack-safe computation. The mathematical presentation is
@@ -19,7 +19,7 @@ internal data class Binding<X, out A>(
     val next: (X) -> Trampoline<A>
 ) : Trampoline<A>
 
-/** Monad unit eta: A -> T(A). Matches MathCat's standalone State.Return. */
+/** Monad unit eta: A -> T(A). Matches Toolkit's standalone State.Return. */
 @Suppress("FunctionName")
 fun <A> Return(value: A): Trampoline<A> = Trampoline.Done(value)
 
