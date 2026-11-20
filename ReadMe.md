@@ -5,23 +5,23 @@
 </p>
 
 
-**The Art of Composition.**
+**The Art of Dynamic Composition.**
 
 Mathematically grounded, compositional software tools for Kotlin Multiplatform.
 
-> Formerly MathCat. The GitHub repository is still named `evoleq/mathcat` while the Gradle modules and Kotlin packages have moved to Evoleq ToolKit. See the [migration guide](docs/TOOLKIT-MIGRATION.md).
+> Formerly MathCat. The main repository is now [`evoleq/toolkit`](https://github.com/evoleq/toolkit). Gradle modules use `toolkit-*` and Kotlin packages use `evoleq.toolkit.*`. See the [migration guide](docs/TOOLKIT-MIGRATION.md).
 
 ToolKit is being reworked as a **small, law-aware foundation** for compositional software. The first step is a research prototype for **algebraic type operations**, not a claim that the Kotlin language already supports higher-kinded type parameters.
 
 ## Current module integration (draft)
 
-The [integration branch](https://github.com/evoleq/mathcat/pull/18) combines
+The [integration branch](https://github.com/evoleq/toolkit/pull/18) combines
 the original Ktor-independent API DSL, portable Result, composable serializer
 registry and optional KSP, Ktor client/server adapters, JVM Contextual and pure
 transforms. Compatibility tracking and JitPack smoke testing cover the
 expanded module graph. This remains a **draft until CI has passed**.
 The deliberately deferred API/Boundary/Environment DX work is tracked in
-[issue #17](https://github.com/evoleq/mathcat/issues/17).
+[issue #17](https://github.com/evoleq/toolkit/issues/17).
 See [integration decisions](docs/INTEGRATION-2026-11-19.md).
 
 ## ToolKit Core (new draft module)
@@ -32,7 +32,7 @@ The central composition patterns are `Lens * Lens`, `Lens * Selection`, `Lens * 
 
 The **mathematical origins are part of the API design**: [Mathematical foundations](docs/MATHEMATICAL-FOUNDATIONS.md) explains function composition, Writer contravariance, Lens/Selection laws, State's monad multiplication and Kleisli arrows. In particular, the capitalized top-level `Update` constructor produces a `KlState` that changes state while preserving the carried value.
 
-The public DSL now follows a simple rule: **constructors** `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy` and `UpsertAllBy` are capitalized and can be used directly; **operations** `map`, `multiply`, `bind`, `get`, `set` and `contraMap` stay lowercase. Future monads may reuse the name `Return` in their own packages; Kotlin's `import ... as ...` syntax disambiguates call sites without changing mathematical vocabulary. A [commonTest import-alias smoke test](toolkit-core/src/commonTest/kotlin/org/evoleq/mathcat/consumer/ConstructorImportsTest.kt) verifies the public core's alias ergonomics.
+The public DSL now follows a simple rule: **constructors** `Return`, `Update`, `IdReader`, `IdLens`, `FilterBy`, `Append`, `AppendAll`, `UpdateAllBy` and `UpsertAllBy` are capitalized and can be used directly; **operations** `map`, `multiply`, `bind`, `get`, `set` and `contraMap` stay lowercase. Future monads may reuse the name `Return` in their own packages; Kotlin's `import ... as ...` syntax disambiguates call sites without changing mathematical vocabulary. A [commonTest import-alias smoke test](toolkit-core/src/commonTest/kotlin/evoleq/toolkit/consumer/ConstructorImportsTest.kt) verifies the public core's alias ergonomics.
 
 In particular, **`Get(lens)` and `Set(lens)`** turn an optic into the corresponding `Reader` and `Writer`; `Get<S>()` constructs a pure state-read computation. Map readers use `evoleq.toolkit.core.reader.maps.Get(key)` / `GetForSure(key)`; explicit imports or import aliases keep these meanings clear. A `State` is directly callable (`state(s)`) without importing a separate invocation extension. Packages now keep the standalone constructors unambiguous: `core.state`, `core.reader`, `core.writer`, `core.optics`, `core.collections` and `core.reader.maps`.
 
@@ -90,10 +90,10 @@ selects already-loaded plugin slots; only misses trigger loading.
 
 The earlier MathCat libraries remain separate and are **not** implied dependencies of the new module. They are useful historical references; their API quality and contracts are being reassessed before any potential migration.
 
-- [toolkit-core](https://github.com/evoleq/mathcat-core), [toolkit-morphism](https://github.com/evoleq/mathcat-morphism), [toolkit-continuation](https://github.com/evoleq/mathcat-continuation)
-- [toolkit-reader](https://github.com/evoleq/mathcat-reader), [toolkit-state](https://github.com/evoleq/mathcat-state), [toolkit-store](https://github.com/evoleq/mathcat-store)
-- [toolkit-lens](https://github.com/evoleq/mathcat-lens), [toolkit-prism](https://github.com/evoleq/mathcat-prism), [toolkit-profunctor-optics](https://github.com/evoleq/mathcat-profunctor-optics)
-- [toolkit-result](https://github.com/evoleq/mathcat-result), [toolkit-structure](https://github.com/evoleq/mathcat-structure), [toolkit-yoneda](https://github.com/evoleq/mathcat-yoneda)
+- [mathcat-core](https://github.com/evoleq/mathcat-core), [mathcat-morphism](https://github.com/evoleq/mathcat-morphism), [mathcat-continuation](https://github.com/evoleq/mathcat-continuation)
+- [mathcat-reader](https://github.com/evoleq/mathcat-reader), [mathcat-state](https://github.com/evoleq/mathcat-state), [mathcat-store](https://github.com/evoleq/mathcat-store)
+- [mathcat-lens](https://github.com/evoleq/mathcat-lens), [mathcat-prism](https://github.com/evoleq/mathcat-prism), [mathcat-profunctor-optics](https://github.com/evoleq/mathcat-profunctor-optics)
+- [mathcat-result](https://github.com/evoleq/mathcat-result), [mathcat-structure](https://github.com/evoleq/mathcat-structure), [mathcat-yoneda](https://github.com/evoleq/mathcat-yoneda)
 
 These repositories have **not** been archived or made private. Existing consumers and references should be evaluated before changing their visibility.
 
