@@ -250,6 +250,6 @@ jobs:
         run: |
           gradle --no-daemon $(python scripts/central_publication_tasks.py linux)
       - name: Verify POM metadata, internal dependency versions and detached signatures
-        run: python scripts/central_bundle.py verify --version 0.0.1 --scope linux
+        run: python scripts/central_bundle.py verify --version 0.0.1 --scope linux --verify-pgp
       - name: Compile independent Maven repository consumer (not Maven Local)
         run: gradle --no-daemon -p central-publishing-smoke -PtoolkitVersion=0.0.1 compileKotlin
