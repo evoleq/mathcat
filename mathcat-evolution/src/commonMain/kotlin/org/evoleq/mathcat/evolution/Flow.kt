@@ -74,3 +74,22 @@ class FlowConfiguration<S, E : Any, C> {
 @Suppress("FunctionName")
 fun <S, E : Any, C> Flow(configure: FlowConfiguration<S, E, C>.() -> Unit): Flow<S, E, C> =
     FlowConfiguration<S, E, C>().apply(configure).configure()
+
+/** The identity transition. */
+@Suppress("FunctionName")
+fun <S, E, C> IdTransition(): Transition<S, E, C> = { state, _ ->
+    Evolution(state, emptyList())
+}
+
+/**
+ * Sequential composition in the State × Writer algebra.
+ * Both stages see the same event; the second sees the first stage's state.
+ * Commands concatenate in execution-description order. No commands execute here.
+ */
+operator fun <S, E, C> Transition<S, E, C>.times(
+    next: Transition<S, E, C>
+): Transition<S, E, C> = { state, event ->
+    val first = this(state, event)
+    val second = next(first.state, event)
+    Evolution(second.state, first.commands + second.commands)
+}
