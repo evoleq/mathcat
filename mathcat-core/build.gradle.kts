@@ -35,6 +35,9 @@ kotlin {
     macosArm64()
 
     sourceSets {
+        commonMain.dependencies {
+            api(project(":mathcat-type-algebra"))
+        }
         commonTest.dependencies {
             implementation(kotlin("test"))
         }

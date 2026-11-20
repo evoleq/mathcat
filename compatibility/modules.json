@@ -7,7 +7,9 @@
       "publication": "kmp"
     },
     "mathcat-core": {
-      "requires": {},
+      "requires": {
+        "mathcat-type-algebra": "same-release"
+      },
       "publication": "kmp"
     },
     "mathcat-store": {
