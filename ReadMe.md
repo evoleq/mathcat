@@ -77,7 +77,10 @@ are located in `jvmMain` (local JAR + SHA-256 + ServiceLoader) and `jsMain`
 but do not claim a dynamic executable loader. No security sandbox or automatic
 version-skew compatibility is implied.
 
-See [Runtime Plugin Architecture](docs/PLUGIN-COMPOSITION.md).
+See [Runtime Plugin Architecture](docs/PLUGIN-COMPOSITION.md). The new
+[optional Action and Navigation bridge](mathcat-plugins-actions) binds
+host-owned typed Actions to allowlisted plugin commands. A pure **Prism**
+selects already-loaded plugin slots; only misses trigger loading.
 
 ## Earlier MathCat experiments
 

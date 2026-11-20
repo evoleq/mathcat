@@ -53,7 +53,35 @@ deterministic function. `Activate` runs sequentially in dependency order
 and attempts reverse-order compensation after errors. Cancellation is not
 turned into a domain failure.
 
-## 3. JVM and JS interpretations
+## 3. A real Prism at the runtime boundary
+
+The pure `Prism<S,A>` in `mathcat-core` exposes
+
+```text
+match : S -> A + S       (Left = matched)
+build : A -> S
+```
+
+For a lawful sum-case Prism `match(build(a)) = Left(a)` and, when
+`match(s) = Left(a)`, `build(a) = s`. These are tested in
+`PrismTest` and `PluginAlgebraTest`.
+
+`LoadedPlugin` selects `Loaded` from
+`PluginSlot = Missing + Loaded`. The composition
+
+```kotlin
+MatchPlugin() * LoadIfMissing(selection, catalog, loader, target, host)
+```
+
+first **matches** a running deployment. Only on a miss does the
+**effectful** second stage run `Discover * Activate`. It then uses
+the **pure** `Prism.build` to re-embed the loaded value.
+
+This prevents the category mistake of claiming the optic performs IO:
+`match/build` are ordinary pure functions, while plugin downloading,
+importing and activation are interpreted Kleisli arrows.
+
+## 4. JVM and JS interpretations
 
 - **JVM:** `JarPluginLoader` reads a local JAR, checks its SHA-256 and
   activates its `ServiceLoader`-registered `JvmPluginEntrypoint`.
@@ -67,7 +95,7 @@ turned into a domain failure.
   manifests and planning are KMP. No JAR/classloader or JS dynamic-loader
   support is promised for these targets yet.
 
-## 4. Cache-busting and deployment
+## 5. Cache-busting and deployment
 
 Solyton already serves Webpack's `[contenthash]` JavaScript chunks with
 long-lived immutable caching, while revalidating the SPA HTML. Keep that.
@@ -91,22 +119,28 @@ The current JS adapter checks ID/version exports and uses normal trusted
 origin/TLS policy, but does **not** verify signatures or SHA-256. It refuses
 declared `sha256` fields instead of silently claiming integrity.
 
-## 5. What it is useful for in Solyton
+## 6. What it is useful for in Solyton
 
 A feature such as Shares or Banking can be built independently and expose
 the small exported JS contract. The host can discover and mount it without
 a host rebuild, using `containerId` as a first DOM integration seam.
 The host's full `Storage<Application>` and privileged action dispatcher
-should *not* be handed to arbitrary plugins. A future typed capability
-bridge should use the same boundaries as `mathcat-actions`.
+are **not** exposed. An opt-in `mathcat-plugins-actions` adapter binds
+typed `Action<S,I,O>` values and fixed internal route paths to allowlisted
+command keys, with a **separate grant set per plugin**.
+`JsModuleLoader` can expose these through a plain JavaScript callback ABI
+using a host-owned coroutine scope. Permissions are rechecked on each call,
+independently of plugin manifest contents. This remains an explicit
+plugin-to-host boundary and NOT an authorization sandbox.
 
-What is deliberately deferred: plugin-to-host action API, routing mounts,
-authz and isolation model, remote JAR downloads, hot swapping without a
+What is deliberately deferred: plugin route registration and rendering,
+dynamic action parameters/codecs, a complete authentication/authorization
+policy and isolation model, remote JAR downloads, hot swapping without a
 reload, version ranges and lockfiles, signed manifests, atomic upgrades,
 cross-compiled Kotlin runtime ABI version negotiation, independent
 JitPack releases and process orchestration.
 
-## 6. Law and documentation tests
+## 7. Law and documentation tests
 
 The plugin module tests the sum short-circuit law, deterministic
 dependency-first ordering, dependency cycle/version/capability rejection,

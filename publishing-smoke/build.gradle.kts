@@ -8,6 +8,7 @@ dependencies {
     implementation("com.github.evoleq.mathcat:mathcat-ktorx:v0.0.0-smoke")
     implementation("com.github.evoleq.mathcat:mathcat-middleware:v0.0.0-smoke")
     implementation("com.github.evoleq.mathcat:mathcat-plugins:v0.0.0-smoke")
+    implementation("com.github.evoleq.mathcat:mathcat-plugins-actions:v0.0.0-smoke")
     implementation("com.github.evoleq.mathcat:mathcat-context:v0.0.0-smoke")
     implementation("com.github.evoleq.mathcat:mathcat-transform:v0.0.0-smoke")
     implementation("com.github.evoleq.mathcat:mathcat-serialization-ksp:v0.0.0-smoke")
