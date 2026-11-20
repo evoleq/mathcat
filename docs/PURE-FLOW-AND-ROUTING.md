@@ -54,6 +54,12 @@ registration. Rules are tried in declaration order; the first matching rule
 wins. `otherwise` is an explicit fallback. The implicit unmatched behavior
 is identity with no commands.
 
+Two pure `Transition<S,E,C>` values also compose with `*`: the second
+receives the state returned by the first, and their command lists are
+concatenated in order. `IdTransition()` is the identity; tests document
+both identity and associativity. This composition **does not execute**
+commands and is not a replacement for the later effectful interpreter.
+
 These semantics are intentionally **not** a claim that the Flow is an
 autonomous Evoleq `Flow<D,T>` loop, a coroutine `Flow` or a structured
 application runtime. The historic evolution equations and conditions
