@@ -151,3 +151,11 @@ runtime guarantees from an attractive algebraic notation.
 This is a good book example precisely because the **same pure
 mathematical structures** connect a static architecture description to
 an executable application that can change composition at runtime.
+
+## Manuscript connection
+
+The book-facing explanation, with a running host-and-shares example and a
+clear separation of Prism matching from effectful loading, is in
+[`book/RUNTIME-COMPOSITION.md`](book/RUNTIME-COMPOSITION.md).
+This implementation document remains the technical reference; the book draft
+does not claim that the host integration has already shipped in Solyton.

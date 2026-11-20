@@ -336,3 +336,15 @@ This is an intentional use of **separate namespaces**, not a demand to rename ma
 ## 8. Portability
 
 These formulas are part of `commonMain`. The semantics of a pure Reader, Writer, Selection, Lens and State do not depend on JVM, Android, JS, Wasm or Native execution. The **platforms actually verified by CI** are explicitly listed in [MULTIPLATFORM.md](MULTIPLATFORM.md), not inferred from the presence of a Gradle target. Neither `suspend` nor platform-specific storage APIs are hidden inside the mathematical core.
+
+## Book chapter: Runtime Composition
+
+The book's next architectural scale—from composable Actions to independently
+loaded application modules—is developed as a **manuscript-ready draft** in
+[`docs/book/RUNTIME-COMPOSITION.md`](book/RUNTIME-COMPOSITION.md).
+It connects the now implemented Prism `match/build`, checked Kleisli
+composition via `*`, dependency planning, JavaScript/JVM interpreters,
+host capability boundaries and runtime architectural evolution. This chapter
+draft is deliberately separate from the technical implementation reference
+[`PLUGIN-COMPOSITION.md`](PLUGIN-COMPOSITION.md) and from the latest full
+book manuscript, which is not part of this repository.
