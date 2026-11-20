@@ -49,7 +49,7 @@ class ToolkitBrandingTests(unittest.TestCase):
         root_build = (ROOT / "build.gradle.kts").read_text()
         self.assertIn('"com.github.evoleq.mathcat"', root_build)
         self.assertIn("toolkit-api", (ROOT / "publishing-smoke/build.gradle.kts").read_text())
-        self.assertIn('REPOSITORY = "evoleq/mathcat"', (ROOT / "scripts/release.py").read_text())
+        self.assertIn('REPOSITORY = "evoleq/toolkit"', (ROOT / "scripts/release.py").read_text())
 
     def test_branding_asset_present(self):
         self.assertTrue((ROOT / "assets/toolkit-original-stokes.png").is_file())
