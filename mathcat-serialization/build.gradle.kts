@@ -1,8 +1,8 @@
 plugins {
     `maven-publish`
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
-    id("com.android.kotlin.multiplatform.library")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.android.kmp.library)
 }
 
 kotlin {
@@ -25,12 +25,12 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
+            api(libs.kotlinx.serialization.core)
             api(project(":mathcat-result"))
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }

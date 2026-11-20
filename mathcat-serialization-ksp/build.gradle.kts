@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     `maven-publish`
 }
 
 dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:2.3.12")
+    implementation(libs.ksp.processing.api)
 }
 
 publishing {
