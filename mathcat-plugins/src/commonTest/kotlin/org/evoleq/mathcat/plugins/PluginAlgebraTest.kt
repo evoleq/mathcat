@@ -54,6 +54,78 @@ class PluginAlgebraTest {
     }
 
     @Test
+    fun loadedSlotPrismSatisfiesReviewAndPreviewLaws() = runTest {
+        val empty = PluginSlot.Missing
+        assertEquals(Sum2.Right(empty), LoadedPlugin.match(empty))
+        val loader = PluginLoader { _, _ ->
+            object : PluginHandle {
+                override suspend fun activate(host: PluginHostContext): PluginSession =
+                    PluginSession {}
+                override suspend fun unload() {}
+            }
+        }
+        val result = AccessPlugin(
+            setOf(feature.id), PluginCatalog { PluginManifest(listOf(base, feature)) },
+            loader, PluginTarget.JS, host
+        ).run(empty)
+        val loaded = assertIs<PluginSlot.Loaded>(
+            assertIs<Sum2.Right<PluginSlot>>(result).value
+        )
+        assertEquals(Sum2.Left(loaded), LoadedPlugin.match(LoadedPlugin.build(loaded)))
+        assertEquals(loaded, LoadedPlugin.build(
+            assertIs<Sum2.Left<PluginSlot.Loaded>>(LoadedPlugin.match(loaded)).value
+        ))
+        assertEquals(Sum2.Right(Unit), loaded.deployment.stop())
+    }
+
+    @Test
+    fun matchThenLoadIfMissingUsesTheKleisliProductAndDoesNotReload() = runTest {
+        val events = mutableListOf<String>()
+        val loader = PluginLoader { plugin, _ ->
+            events += "load:${plugin.id}"
+            object : PluginHandle {
+                override suspend fun activate(host: PluginHostContext): PluginSession {
+                    events += "activate:${plugin.id}"
+                    return PluginSession { events += "dispose:${plugin.id}" }
+                }
+                override suspend fun unload() { events += "unload:${plugin.id}" }
+            }
+        }
+        var catalogReads = 0
+        val catalog = PluginCatalog {
+            catalogReads++
+            PluginManifest(listOf(feature, base))
+        }
+        val pipeline = MatchPlugin() * LoadIfMissing(
+            setOf(feature.id), catalog, loader, PluginTarget.JS, host
+        )
+        val initial = assertIs<Sum2.Right<PluginSlot>>(
+            pipeline.run(PluginSlot.Missing)
+        ).value
+        assertEquals(1, catalogReads)
+        assertEquals(listOf("load:base", "activate:base", "load:feature", "activate:feature"), events)
+
+        val cached = assertIs<Sum2.Right<PluginSlot>>(pipeline.run(initial)).value
+        assertEquals(initial, cached)
+        assertEquals(1, catalogReads, "A matched plugin must not reload its manifest")
+        assertEquals(4, events.size, "A matched plugin must not reload or reactivate")
+
+        val different = (MatchPlugin() * LoadIfMissing(
+            setOf(base.id), catalog, loader, PluginTarget.JS, host
+        )).run(cached)
+        assertEquals(
+            PluginFailure.SlotSelectionMismatch(setOf(feature.id), setOf(base.id)),
+            assertIs<Sum2.Left<PluginFailure>>(different).value
+        )
+        assertEquals(1, catalogReads)
+        assertEquals(Sum2.Right(Unit), assertIs<PluginSlot.Loaded>(cached).deployment.stop())
+        assertEquals(
+            listOf("dispose:feature", "dispose:base", "unload:feature", "unload:base"),
+            events.takeLast(4)
+        )
+    }
+
+    @Test
     fun dependencyPlanningIsPureStableAndPlacesDependenciesBeforeDependents() {
         val catalog = PluginManifest(listOf(feature, base))
         val result = Plan(catalog, setOf(feature.id), PluginTarget.JS, host)
