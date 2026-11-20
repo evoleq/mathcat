@@ -59,6 +59,10 @@ jobs:
             :mathcat-plugins:wasmJsNodeTest :mathcat-plugins:linuxX64Test \
             :mathcat-plugins-actions:jvmTest :mathcat-plugins-actions:jsNodeTest \
             :mathcat-plugins-actions:wasmJsNodeTest :mathcat-plugins-actions:linuxX64Test \
+            :mathcat-routing:jvmTest :mathcat-routing:jsNodeTest \
+            :mathcat-routing:wasmJsNodeTest :mathcat-routing:linuxX64Test \
+            :mathcat-evolution:jvmTest :mathcat-evolution:jsNodeTest \
+            :mathcat-evolution:wasmJsNodeTest :mathcat-evolution:linuxX64Test \
             :mathcat-serialization-ksp-fixture:test :mathcat-context:test :mathcat-transform:test
 
   android:
@@ -80,7 +84,7 @@ jobs:
         with:
           gradle-version: '9.2.1'
       - name: Compile Android KMP targets
-        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-api:compileAndroidMain :mathcat-result:compileAndroidMain :mathcat-serialization:compileAndroidMain :mathcat-ktorx:compileAndroidMain :mathcat-middleware:compileAndroidMain :mathcat-plugins:compileAndroidMain :mathcat-plugins-actions:compileAndroidMain
+        run: gradle --no-daemon :mathcat-type-algebra:compileAndroidMain :mathcat-core:compileAndroidMain :mathcat-store:compileAndroidMain :mathcat-actions:compileAndroidMain :mathcat-api:compileAndroidMain :mathcat-result:compileAndroidMain :mathcat-serialization:compileAndroidMain :mathcat-ktorx:compileAndroidMain :mathcat-middleware:compileAndroidMain :mathcat-plugins:compileAndroidMain :mathcat-plugins-actions:compileAndroidMain :mathcat-routing:compileAndroidMain :mathcat-evolution:compileAndroidMain
 
   apple:
     name: iOS + macOS Native
@@ -125,7 +129,11 @@ jobs:
             :mathcat-plugins:macosX64Test \
             :mathcat-plugins-actions:compileKotlinIosArm64 \
             :mathcat-plugins-actions:compileKotlinIosSimulatorArm64 \
-            :mathcat-plugins-actions:macosX64Test
+            :mathcat-plugins-actions:macosX64Test \
+            :mathcat-routing:compileKotlinIosArm64 :mathcat-routing:compileKotlinIosSimulatorArm64 \
+            :mathcat-routing:macosX64Test \
+            :mathcat-evolution:compileKotlinIosArm64 :mathcat-evolution:compileKotlinIosSimulatorArm64 \
+            :mathcat-evolution:macosX64Test
 
   windows:
     name: Windows Native
@@ -141,7 +149,7 @@ jobs:
           gradle-version: '9.2.1'
       - name: Test mingwX64
         shell: pwsh
-        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-api:mingwX64Test :mathcat-result:mingwX64Test :mathcat-serialization:mingwX64Test :mathcat-ktorx:mingwX64Test :mathcat-middleware:mingwX64Test :mathcat-plugins:mingwX64Test :mathcat-plugins-actions:mingwX64Test
+        run: gradle --no-daemon :mathcat-type-algebra:mingwX64Test :mathcat-core:mingwX64Test :mathcat-store:mingwX64Test :mathcat-actions:mingwX64Test :mathcat-api:mingwX64Test :mathcat-result:mingwX64Test :mathcat-serialization:mingwX64Test :mathcat-ktorx:mingwX64Test :mathcat-middleware:mingwX64Test :mathcat-plugins:mingwX64Test :mathcat-plugins-actions:mingwX64Test :mathcat-routing:mingwX64Test :mathcat-evolution:mingwX64Test
   
   publication:
     name: Publish JVM variants and compile an external consumer
@@ -183,6 +191,10 @@ jobs:
             :mathcat-plugins:publishJvmPublicationToMavenLocal \
             :mathcat-plugins-actions:publishKotlinMultiplatformPublicationToMavenLocal \
             :mathcat-plugins-actions:publishJvmPublicationToMavenLocal \
+            :mathcat-routing:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-routing:publishJvmPublicationToMavenLocal \
+            :mathcat-evolution:publishKotlinMultiplatformPublicationToMavenLocal \
+            :mathcat-evolution:publishJvmPublicationToMavenLocal \
             :mathcat-context:publishToMavenLocal \
             :mathcat-transform:publishToMavenLocal \
             :mathcat-serialization-ksp:publishToMavenLocal
