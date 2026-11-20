@@ -107,6 +107,12 @@
         "mathcat-evolution": "same-release"
       },
       "publication": "kmp"
+    },
+    "mathcat-evolution-runtime": {
+      "requires": {
+        "mathcat-evolution": "same-release"
+      },
+      "publication": "kmp"
     }
   }
 }
