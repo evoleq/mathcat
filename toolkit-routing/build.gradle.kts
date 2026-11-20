@@ -22,7 +22,10 @@ kotlin {
     macosX64()
     macosArm64()
     sourceSets {
-        commonMain.dependencies { api(project(":toolkit-type-algebra")) }
+        commonMain.dependencies {
+            api(project(":toolkit-type-algebra"))
+            api(project(":toolkit-evolution"))
+        }
         commonTest.dependencies { implementation(kotlin("test")) }
     }
 }

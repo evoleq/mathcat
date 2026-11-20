@@ -12,7 +12,9 @@ data class RouteDefinition(
     val name: String,
     val segments: List<Segment>,
     val requires: Set<String> = emptySet(),
-    val layouts: List<String> = emptyList()
+    val layouts: List<String> = emptyList(),
+    /** Optional runtime-loaded feature; the host, never the parser, activates it. */
+    val plugin: String? = null
 )
 
 data class Routes(val definitions: List<RouteDefinition>)
@@ -22,7 +24,8 @@ data class RouteMatch(
     val parameters: Map<String, String>,
     val query: Map<String, List<String>>,
     val requires: Set<String>,
-    val layouts: List<String>
+    val layouts: List<String>,
+    val plugin: String? = null
 )
 
 sealed interface RouteError {
@@ -47,6 +50,7 @@ class RoutesConfiguration internal constructor(
     private val path: List<Segment> = emptyList()
 ) {
     private var routeName: String? = null
+    private var pluginId: String? = null
     private val grants = mutableSetOf<String>()
     private val layouts = mutableListOf<String>()
     private val children = mutableListOf<RoutesConfiguration>()
@@ -61,6 +65,13 @@ class RoutesConfiguration internal constructor(
     fun layout(name: String) {
         require(name.isNotBlank()) { "Layout name must not be empty" }
         layouts.add(name)
+    }
+
+    /** Declare a plugin dependency without loading code during route construction. */
+    fun plugin(id: String) {
+        require(id.isNotBlank()) { "Plugin id must not be empty" }
+        require(pluginId == null) { "A route may only declare one plugin" }
+        pluginId = id
     }
 
     fun name(name: String) {
@@ -85,24 +96,26 @@ class RoutesConfiguration internal constructor(
         if (environment.lowercase() !in setOf("p", "prod", "production")) route(pattern, configure)
     }
 
-    private fun collect(grantsFromParent: Set<String>, layoutsFromParent: List<String>): List<RouteDefinition> {
+    private fun collect(grantsFromParent: Set<String>, layoutsFromParent: List<String>, pluginFromParent: String?): List<RouteDefinition> {
         val allGrants = grantsFromParent + grants
         val allLayouts = layoutsFromParent + layouts
-        val own = routeName?.let { listOf(RouteDefinition(it, path, allGrants, allLayouts)) }
+        val activePlugin = pluginId ?: pluginFromParent
+        val own = routeName?.let { listOf(RouteDefinition(it, path, allGrants, allLayouts, activePlugin)) }
             ?: emptyList()
         val included = fragments.flatMap { fragment ->
             fragment.definitions.map { definition ->
                 definition.copy(
                     segments = path + definition.segments,
                     requires = allGrants + definition.requires,
-                    layouts = allLayouts + definition.layouts
+                    layouts = allLayouts + definition.layouts,
+                    plugin = definition.plugin ?: activePlugin
                 )
             }
         }
-        return own + included + children.flatMap { it.collect(allGrants, allLayouts) }
+        return own + included + children.flatMap { it.collect(allGrants, allLayouts, activePlugin) }
     }
 
-    internal fun done(): Routes = Routes(collect(emptySet(), emptyList()))
+    internal fun done(): Routes = Routes(collect(emptySet(), emptyList(), null))
 }
 
 /** Strictly validate patterns; support both {name} and legacy :name. */
@@ -161,7 +174,7 @@ class CompiledRoutes internal constructor(val definitions: List<RouteDefinition>
             ?: return Sum2.Left(RouteError.NotFound(url))
         return Sum2.Right(RouteMatch(
             selected.first.name, selected.second, query,
-            selected.first.requires, selected.first.layouts
+            selected.first.requires, selected.first.layouts, selected.first.plugin
         ))
     }
 
