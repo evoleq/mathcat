@@ -103,7 +103,8 @@
     },
     "mathcat-routing": {
       "requires": {
-        "mathcat-type-algebra": "same-release"
+        "mathcat-type-algebra": "same-release",
+        "mathcat-evolution": "same-release"
       },
       "publication": "kmp"
     }
