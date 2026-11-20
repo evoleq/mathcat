@@ -1,11 +1,11 @@
 plugins {
     `maven-publish`
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
     testImplementation(kotlin("test-junit"))
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit4)
 }
 
 publishing {

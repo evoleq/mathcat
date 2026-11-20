@@ -1,9 +1,9 @@
 plugins {
-    kotlin("multiplatform") version "2.3.20" apply false
-    kotlin("jvm") version "2.3.20" apply false
-    kotlin("plugin.serialization") version "2.3.20" apply false
-    id("com.google.devtools.ksp") version "2.3.12" apply false
-    id("com.android.kotlin.multiplatform.library") version "9.0.0" apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.android.kmp.library) apply false
 }
 
 // All MathCat modules currently share one verified repository release version.
