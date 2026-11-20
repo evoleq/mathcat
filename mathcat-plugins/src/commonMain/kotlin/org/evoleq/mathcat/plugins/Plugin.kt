@@ -1,11 +1,13 @@
 package org.evoleq.mathcat.plugins
 
 import org.evoleq.mathcat.types.Sum2
+import kotlinx.serialization.Serializable
 
 /**
  * A portable description of a runtime plugin. The manifest is data, not
  * executable code and not an authorization mechanism.
  */
+@Serializable
 @JvmInline
 value class PluginId(val value: String) {
     init {
@@ -18,6 +20,7 @@ value class PluginId(val value: String) {
 }
 
 /** A deliberately small SemVer core (no prerelease/range resolution in v1). */
+@Serializable
 data class PluginVersion(val major: Int, val minor: Int, val patch: Int) :
     Comparable<PluginVersion> {
     init {
@@ -30,6 +33,7 @@ data class PluginVersion(val major: Int, val minor: Int, val patch: Int) :
     override fun toString(): String = "$major.$minor.$patch"
 }
 
+@Serializable
 enum class PluginTarget { JVM, JS }
 
 /**
@@ -37,6 +41,7 @@ enum class PluginTarget { JVM, JS }
  * NOT a cryptographic integrity check. JVM JarPluginLoader requires sha256
  * and verifies the bytes before loading.
  */
+@Serializable
 data class PluginArtifact(val uri: String, val sha256: String? = null) {
     init {
         require(uri.isNotBlank())
@@ -46,11 +51,13 @@ data class PluginArtifact(val uri: String, val sha256: String? = null) {
     }
 }
 
+@Serializable
 data class PluginDependency(
     val id: PluginId,
     val exactVersion: PluginVersion
 )
 
+@Serializable
 data class PluginDescriptor(
     val id: PluginId,
     val version: PluginVersion,
@@ -64,6 +71,7 @@ data class PluginDescriptor(
     }
 }
 
+@Serializable
 data class PluginManifest(val plugins: List<PluginDescriptor>)
 
 data class PluginHostContext(
@@ -88,6 +96,7 @@ sealed interface PluginFailure {
     data class HostApiMismatch(val id: PluginId, val required: Int, val actual: Int) : PluginFailure
     data class MissingCapabilities(val id: PluginId, val missing: Set<String>) : PluginFailure
     data class MissingArtifact(val id: PluginId, val target: PluginTarget) : PluginFailure
+    data class CatalogFailed(val message: String) : PluginFailure
     data class LoadingFailed(val id: PluginId, val message: String) : PluginFailure
     data class ActivationFailed(val id: PluginId, val message: String) : PluginFailure
     data class CleanupFailed(val id: PluginId, val message: String) : PluginFailure
