@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import zipfile
 from pathlib import Path
 from xml.etree import ElementTree
@@ -140,6 +141,20 @@ def inspect(staging: Path, version: str, manifest: dict, scope: str) -> list[Pat
     return payloads
 
 
+def verify_pgp(payloads: list[Path]) -> None:
+    """Cryptographically verify every detached signature using a trusted keyring."""
+    for payload in payloads:
+        signature = payload.with_name(payload.name + ".asc")
+        result = subprocess.run(
+            ["gpg", "--batch", "--no-tty", "--verify", str(signature), str(payload)],
+            text=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise BundleError("Invalid PGP signature for " + str(payload) +
+                              ": " + result.stderr.strip())
+
+
 def make_bundle(staging: Path, version: str, manifest: dict, output: Path) -> int:
     payloads = inspect(staging, version, manifest, "all")
     for item in payloads:
@@ -167,10 +182,14 @@ def main() -> None:
     parser.add_argument("--version", required=True)
     parser.add_argument("--scope", choices=["linux", "all"], default="all")
     parser.add_argument("--output", type=Path, default=Path("build/release/central-bundle.zip"))
+    parser.add_argument("--verify-pgp", action="store_true",
+                        help="Verify detached signatures with GnuPG before proceeding")
     parser.add_argument("--manifest", type=Path, default=Path("compatibility/modules.json"))
     args = parser.parse_args()
     try:
         manifest = json.loads(args.manifest.read_text())
+        if args.verify_pgp:
+            verify_pgp(inspect(args.staging, args.version, manifest, args.scope))
         if args.command == "bundle":
             if args.scope != "all":
                 raise BundleError("A partial host release must never become an uploadable bundle")
