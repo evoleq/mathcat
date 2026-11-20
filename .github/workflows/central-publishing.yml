@@ -140,11 +140,19 @@ jobs:
           pattern: central-*
           path: build/central-staging/
           merge-multiple: true
+      - name: Import signing key for offline signature verification
+        shell: bash
+        env:
+          CENTRAL_SIGNING_KEY: ${{ secrets.CENTRAL_SIGNING_KEY }}
+        run: |
+          set -euo pipefail
+          : "${CENTRAL_SIGNING_KEY:?Missing Central signing key}"
+          printf '%s\n' "$CENTRAL_SIGNING_KEY" | gpg --batch --import
       - name: Verify manifest, POM coordinates, PGP signatures and platform completeness
         env:
           RELEASE_VERSION: ${{ needs.verify.outputs.version }}
         run: |
-          python scripts/central_bundle.py bundle --version "$RELEASE_VERSION"
+          python scripts/central_bundle.py bundle --version "$RELEASE_VERSION" --verify-pgp
           unzip -t build/release/central-bundle.zip > /dev/null
       - uses: actions/upload-artifact@v4
         with:
