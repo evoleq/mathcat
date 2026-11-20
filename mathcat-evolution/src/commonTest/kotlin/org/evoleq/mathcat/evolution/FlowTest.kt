@@ -59,6 +59,26 @@ class FlowTest {
     }
 
     @Test
+    fun transitionCompositionHasIdentityAndAssociativity() {
+        val add: Transition<Int, String, String> = { state, event ->
+            Evolve(state + event.length, "add")
+        }
+        val double: Transition<Int, String, String> = { state, _ ->
+            Evolve(state * 2, "double")
+        }
+        val subtract: Transition<Int, String, String> = { state, _ ->
+            Evolve(state - 3, "subtract")
+        }
+        val identity = IdTransition<Int, String, String>()
+        val input = "abc"
+        val expected = Evolution(15, listOf("add", "double", "subtract"))
+        assertEquals(expected, ((add * double) * subtract)(6, input))
+        assertEquals(expected, (add * (double * subtract))(6, input))
+        assertEquals(add(6, input), (identity * add)(6, input))
+        assertEquals(add(6, input), (add * identity)(6, input))
+    }
+
+    @Test
     fun fragmentsCannotSmuggleAnAlternativeDefault() {
         val fragment = Flow<Int, String, String> {
             otherwise { s, _ -> Evolve(s) }
